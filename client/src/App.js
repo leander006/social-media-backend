@@ -6,6 +6,8 @@ import {
   Routes,
   Route,
 } from "react-router-dom";
+import Login from './Components/Pages/Login';
+import Register from './Components/Pages/Register';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
    <Route exact path="/" element={<Home/>}/>
    <Route path="/chat" element={<Chats/>}/>
    <Route path="/explore" element={<Explore/>}/>
+   <Route path="/login" element={<Login/>}/>
+   <Route path="/register" element={<Register/>}/>
    {/* <Route path="/followers" element={Followers}/>
    <Route path="/yourposts" element={<Chats/>}/>
    <Route path="/likedpost" element={<Chats/>}/> */}

@@ -14,7 +14,7 @@ function ExploreMore({name,profile,content,liked,message,caption,count,likecount
 
     <div className='flex p-4 flex-col w-screen md:w-96 lg:w-11/12 lg:p-6' >
           <div className='flex'>
-                <img src={profile} alt='image' className='w-10 h-10 rounded-full mr-3 border border-purple-400 '/>
+                <img src={profile} alt='image' className='w-10 h-10 rounded-full mr-3 border border-primary '/>
                   <h1 className='capitalize mt-1 font-sans text-slate-700'>{name}</h1>
           </div>
           <div className='p-2 flex justify-center '>
@@ -27,10 +27,10 @@ function ExploreMore({name,profile,content,liked,message,caption,count,likecount
                 </div>
           <i className="fa-solid fa-comments fa-2xl pt-3 cursor-pointer"/>
           </div>
-         {likename && <h1 className='pl-3 text-purple-600'>Liked by {likename} {likecount && " and "+ likecount+" others"}</h1>}
+         {likename && <h1 className='pl-3 text-primary'>Liked by {likename} {likecount && " and "+ likecount+" others"}</h1>}
           <h1 className='capitalize ml-3 mt-2'>{caption}</h1>
           <div className='px-4 pt-1'>
-                <h1 className='text-gray-400 cursor-pointer' >View all {count} Comments</h1>                
+                <h1 className='text-gray-600 cursor-pointer' >View all {count} Comments</h1>                
           </div>
     </div>
   )
