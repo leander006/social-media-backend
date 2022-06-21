@@ -25,7 +25,11 @@ const allUser = asyncHandler(async(req,res) =>{
        
           
            const allUsers = await User.find({_id:{$ne:req.user._id}})
-           return res.status(200).json(allUsers);
+
+         
+
+            return res.status(200).json(allUsers);
+
 
       } catch (error) {
             return res.status(404).json({error:error.message})
@@ -51,12 +55,26 @@ const remove = asyncHandler(async(req,res) =>{
       }
 
 })
+// To get users for adding inside group chat//
 
+const groupUser =asyncHandler(async(req,res) =>{
+      try {
+       
+          
+            const allUsers = await User.find({_id:{$ne:req.user._id}})
+             return res.status(200).json(allUsers);
+ 
+ 
+       } catch (error) {
+             return res.status(404).json({error:error.message})
+       }
+})
 
 module.exports = {
 	allUser,
       particularUser,
-      remove
+      remove,
+      groupUser
       
 
 };

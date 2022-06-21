@@ -14,7 +14,7 @@ function Navbar() {
          <div className='container'>
           <div className='upper w-screen flex bg-navbar justify-between h-10 items-center'>
             <div className='flex items-center '>
-                  <i className="fa-solid fa-angles-right my-5 mx-2 cursor-pointer sm:text-2xl text-primary" onClick={handleVisibility}></i>
+                  <i className="fa-solid fa-angles-right my-5 mx-2 cursor-pointer sm:-2xl text-primary" onClick={handleVisibility}></i>
                  <p className='my-4 text-sm sm:text-xl md:text-xl text-primary' >Instachat</p>
             </div>
             <div className='flex items-center bg-gray-100 h-8 rounded-md ml-1'>

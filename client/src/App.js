@@ -22,6 +22,7 @@ function App() {
      
    <Route exact path="/" element={<Home/>}/>
    <Route path="/chat" element={<Chats/>}/>
+   <Route path="/message/:chatId" element={<Chats/>}/>
    <Route path="/explore" element={<Explore/>}/>
    <Route path="/login" element={<Login/>}/>
    <Route path="/register" element={<Register/>}/>

@@ -1,23 +1,72 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Conversation from '../Conversation'
 import Mesaages from '../Mesaages'
 import Navbar from '../Navbar'
 import NopPreview from '../NopPreview'
 import SearchFreinds from '../SearchFreinds'
+import axios from "axios"
 
+import GetMessages from '../GetMessages'
 function Chats() {
       const [visible, setVisible] = useState(false)
       const [getFreinds, setGetFreinds] = useState(false)
 
+
+      const [chats, setChats] = useState([])
+    const [allUsers, setAllUsers] = useState([])
+
+
+      const config ={
+            headers:{
+                "Content-Type":"application/json",
+                Authorization:`Bearer ${JSON.parse(localStorage.getItem("userInfo"))?.token}`
+            }
+          }
       const handleVisibility =(e) =>{
             e.preventDefault();
             setVisible(true);
-
       }
       const handleFrenids =(e) =>{
             e.preventDefault();
             setGetFreinds(!getFreinds);
       }
+      useEffect(() => {
+            const getChats = async() =>{
+          
+                try {
+                    
+                    const res= await axios.get("http://localhost:3001/api/chat",config);
+                        setChats(res.data);
+
+                    
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            getChats();
+         
+        },[])
+
+        useEffect(() => {
+            const getAllUsers = async() =>{
+          
+                try {
+                    
+                  const res= await axios.get("http://localhost:3001/api/user",config);
+                  setAllUsers(res.data);
+                  
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            getAllUsers();
+         
+        },[])
+
+
+      //   console.log(path);
+
+      
   return (
     <>
          <Navbar/>
@@ -31,71 +80,28 @@ function Chats() {
                   <i className="fa-solid fa-xl fa-user-plus my-6 ml-4 cursor-pointer" onClick={handleFrenids} ></i>
             </div>
      <div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] ' onClick={handleVisibility} >
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"leander"} message={"op"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"Shiv"} message={"i am op"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"phandu"} message={"i am noob"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"lance"} message={"i am gando"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"phandu"} message={"i am noob"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"lance"} message={"i am gando"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>   
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>   
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>   
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"phandu"} message={"i am noob"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"lance"} message={"i am gando"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>
+                  {chats?.map((c) =>(
+                        <Conversation name={c?.chatname}  key={c?._id} id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt} />
+                  ))}
       </div>
 </div>
 
- {visible ?<div className=' md:w-3/5  md:flex md:flex-col md:justify-between'>
-      <div className='preview '>
-      <div className='flex bg-white rounded-lg border'>
-            <img className='w-7 h-7 rounded-full mt-2 mb-2 mr-3 ml-3' src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU' alt='image'/>
-            <h1 className='mt-2 capitalize'>name</h1>
-      </div>
-      <div className= 'messages overflow-y-scroll h-[calc(100vh-10.9rem)]'>
-            {/* Messages */}
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-      </div>
-          <div className='flex bg-slate-200 h-16 items-center p-2 m-3 mt-3 rounded-lg'>
-          <input type="text" placeholder='Enter message' className='w-full h-10 rounded-lg p-5 border'/>
-            <i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400"></i>
-          </div>
-          </div>
-          </div>:<NopPreview/>} 
-         {getFreinds && <div className='border  m-auto bg-purple-500 left-2/4  fixed  w-80 z-30 rounded-lg'>
+ {visible ?<GetMessages setVisible={setVisible}/>:<NopPreview/>} 
+         {getFreinds && <div className='border  m-auto bg-secondary left-2/4  fixed  w-80 z-30 rounded-lg'>
                 <div className='flex'>
                 <div className='flex bg-slate-200 h-16 items-center p-2 m-3 mt-3 rounded-lg'>
           <input type="text" placeholder='Group name' className='w-full h-10 rounded-lg p-5 border'/>
           </div>
                       <i className="fa-solid fa-xmark fa-2xl mt-10 mr-2 cursor-pointer" onClick={handleFrenids}></i>
                 </div>
-                <div className=' h-80 overflow-y-scroll'>
+                <div className=' h-70 overflow-y-scroll'>
                       {/* Search freinds */}
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"} name={"leander"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   name={"aadil"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"shiv"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"lance"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"phandu"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"devraj"}/>
+                      {allUsers?.map((u) =>(
+                        <SearchFreinds name={u.username}  key={u._id} profile={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  joined={u.updatedAt} />
+                  ))}
           </div>
           <div >
-                <button className='border mb-3 ml-2 mt-3 rounded-lg w-14 h-7 bg-orange-500 text-white hover:w-20 hover:h-8'>Create</button>          
+                <button className='border mb-3 ml-2 rounded-lg w-14 h-10 bg-navbar text-main hover:w-20 hover:h-8'>Create</button>          
          </div>
           </div>}
 </div>
@@ -112,23 +118,11 @@ function Chats() {
             </div>
      {!getFreinds ?<div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] ' onClick={handleVisibility}>
            {/* Conversations */}
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"Shiv"} message={"i am op"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"phandu"} message={"i am noob"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"lance"} message={"i am gando"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"phandu"} message={"i am noob"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"lance"} message={"i am gando"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>   
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>   
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>   
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"aadil"} message={"helo daddy"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"phandu"} message={"i am noob"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"lance"} message={"i am gando"} time={"2 hours ago"}/>
-            <Conversation image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"darsh"} message={"haa pata hai"}time={"2 hours ago"}/>
+           {chats?.map((c) =>(
+                        // console.log(c._id),
+                        <Conversation name={c?.chatname}  key={c?._id} id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt} />
+                  ))}
+
       </div>:<div className='border  m-auto bg-purple-500 w-80 z-30 rounded-lg'>
                 <div className='flex'>
                 <div className='flex bg-slate-200 h-16 items-center p-2 m-3 mt-3 rounded-lg'>
@@ -136,48 +130,18 @@ function Chats() {
           </div>
                       <i className="fa-solid fa-xmark fa-2xl mt-10 mr-2 cursor-pointer" onClick={handleFrenids}></i>
                 </div>
-                <div className=' h-80 overflow-y-scroll'>
+                <div className=' h-70 overflow-y-scroll'>
                       {/* Search freinds */}
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"} name={"leander"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   name={"aadil"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"shiv"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"lance"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"phandu"}/>
-          <SearchFreinds image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  name={"devraj"}/>
+                      {allUsers?.map((u) =>(
+                        <SearchFreinds name={u.username} key={u._id} profile={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  joined={u.updatedAt} />
+                  ))}
           </div>
           <div >
                 <button className='border mb-3 ml-2 mt-3 rounded-lg w-14 h-7 bg-orange-500 text-white hover:w-20 hover:h-8'>Create</button>          
          </div>
           </div>}
-</div>:
-<div className=' md:w-3/5  md:flex md:flex-col md:justify-between'>
-      <div className='preview '>
-      <div className='flex bg-white rounded-lg border'>
-            <img className='w-7 h-7 rounded-full mt-2 mb-2 mr-3 ml-3' src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU' alt='image'/>
-            <h1 className='mt-2 capitalize'>name</h1>
-      </div>
-      <div className= 'messages overflow-y-scroll h-[calc(100vh-10.2rem)]'>
-            {/* messages */}
-            <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={false}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-          <Mesaages image={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}   own={true}  message={"jfekrjekrbewfjwhefkjhekfherefkjhekfherefkjhekfherefkjhekfherifhkrfh"} />
-         
-      </div>
-          <div className='flex bg-slate-200 h-16 items-center p-3 mt-3 rounded-lg'>
-          <input type="text" placeholder='Enter message' className='w-full h-10 rounded-lg p-2 border'/>
-            <i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400"></i>
-          </div>
-          </div>
-      
-          </div>}
+</div>:<GetMessages setVisible={setVisible}/>
+}
 </div>   
 
 </div>
