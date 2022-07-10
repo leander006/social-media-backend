@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const User = require('../model/User');
+
 
 const PostSchema = new mongoose.Schema({
     owner:{
@@ -7,12 +7,14 @@ const PostSchema = new mongoose.Schema({
         ref:"User"
     },
     content:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"User"
+        type:String,
+        req:true,
+        trim:true
     },
     caption:{
         type:String,
-        trim:true
+        trim:true,
+        req:true
     }, 
     likes:[{
         type:mongoose.Schema.Types.ObjectId,

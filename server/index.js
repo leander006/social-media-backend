@@ -7,6 +7,8 @@ const chatRoute = require("./routes/chatRoute")
 const authRoute = require('./routes/authRoute');
 const userRoute = require('./routes/userRoute');
 const messageRoute = require('./routes/messageRoute');
+const postRoute = require("./routes/postRoute")
+const commentRoute = require("./routes/commentRoute")
 
 const app = express();
 
@@ -24,6 +26,9 @@ app.use("/api/chat",chatRoute);
 
 app.use("/api/message",messageRoute);
 
+app.use("/api/post",postRoute)
+
+app.use("/api/comment",commentRoute)
 
 mongoose.connect(process.env.MONGO_URI).then(console.log("Connected to mongodb")).catch((err)=>{console.log("invalid",err)})
 

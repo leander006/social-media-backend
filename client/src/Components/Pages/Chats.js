@@ -64,7 +64,7 @@ function Chats() {
         },[])
 
 
-      //   console.log(path);
+      //   console.log(chats.chatname);
 
       
   return (
@@ -81,6 +81,7 @@ function Chats() {
             </div>
      <div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] ' onClick={handleVisibility} >
                   {chats?.map((c) =>(
+                        // console.log(c?.isGroupChat?c?.chatname:c?.users[0].username)
                         <Conversation name={c?.chatname}  key={c?._id} id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt} />
                   ))}
       </div>
@@ -123,7 +124,7 @@ function Chats() {
                         <Conversation name={c?.chatname}  key={c?._id} id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt} />
                   ))}
 
-      </div>:<div className='border  m-auto bg-purple-500 w-80 z-30 rounded-lg'>
+      </div>:<div className='border  m-auto bg-secondary w-80 z-30 rounded-lg'>
                 <div className='flex'>
                 <div className='flex bg-slate-200 h-16 items-center p-2 m-3 mt-3 rounded-lg'>
           <input type="text" placeholder='Group name' className='w-full h-10 rounded-lg p-5 border'/>

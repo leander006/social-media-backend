@@ -28,7 +28,7 @@ const accessChat = asyncHandler(async(req,res) =>{
 
             try {
                   var ChatData ={
-                        chatname:name.username,
+                        chatname:"sender",
                         isGroupChat:false,
                         users:[req.user._id,userId],
 

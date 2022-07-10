@@ -6,6 +6,8 @@ const Message= require("../model/Message")
 //search users//
 
 const particularUser = asyncHandler(async(req,res) =>{
+      const {name} = req.query
+      console.log(name);
       try {
             const keyword = req.query.name
             
