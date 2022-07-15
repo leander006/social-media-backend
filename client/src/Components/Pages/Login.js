@@ -15,11 +15,11 @@ function Login() {
             e.preventDefault();
             dispatch(loginStart())
             try {
-              const res = await axios.post("http://localhost:3001/api/auth/login", {
+              const {data} = await axios.post("http://localhost:3001/api/auth/login", {
                 username,
                 password,
               });
-              dispatch(loginSuccess(res.data))
+              dispatch(loginSuccess(data))
               localStorage.setItem("user",JSON.stringify(data));
               navigate('/chat');
             

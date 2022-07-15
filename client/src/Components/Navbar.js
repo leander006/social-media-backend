@@ -1,12 +1,20 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { logout} from '../redux/userSlice';
 function Navbar() {
 
       const [visible, setVisible] = useState(false);
+      const navigate = useNavigate()
+      const dispatch = useDispatch();
       const handleVisibility = (e) =>{
             e.preventDefault();
             setVisible(!visible);
+      }
+      const log = (e)=>{
+            e.preventDefault();
+            dispatch(logout())
+            navigate("/")
       }
   return (
     <div className='container'>
@@ -43,7 +51,7 @@ function Navbar() {
             </ul>
             </div>
             <div className='flex items-center justify-evenly'>
-                  <i className="fa-solid fa-2xl fa-arrow-right-from-bracket my-5 text-white-100 mr-3 cursor-pointer text-secondary"></i>
+                  <i className="fa-solid fa-2xl fa-arrow-right-from-bracket my-5 text-white-100 mr-3 cursor-pointer text-secondary" onClick={log}></i>
                   <img className='w-10 h-10 rounded-full mt-2 mb-2 cursor-pointer border border-secondary' src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU' alt='image'/>
             </div>
       </div>

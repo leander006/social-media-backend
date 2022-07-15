@@ -4,7 +4,6 @@ import Mesaages from '../Mesaages'
 import Navbar from '../Navbar'
 import NopPreview from '../NopPreview'
 import SearchFreinds from '../SearchFreinds'
-import Cookies from 'js-cookie';
 
 import GetMessages from '../GetMessages'
 import { useSelector } from 'react-redux'
@@ -16,14 +15,11 @@ function Chats() {
       const [visible, setVisible] = useState(false)
       const [chats, setChats] = useState([])
       const [allUsers, setAllUsers] = useState([])
-      const {token,others} = Cookies.get('token')
       const {currentUser} = useSelector(state =>state.user)
-      console.log(currentUser);
-
       const config ={
             headers:{
                 "Content-Type":"application/json",
-                Authorization:`Bearer ${Cookies.get('access_token')}`
+                Authorization:`Bearer ${currentUser?.token}`
             }
           }
       const handleFrenids =(e) =>{
@@ -64,7 +60,7 @@ function Chats() {
         },[])
 
 
-        console.log(allUsers);
+      //   console.log(allUsers);
 
       
   return (

@@ -6,7 +6,8 @@ import axios from 'axios';
 
 const initialState = {
       
-  currentUser: (Cookies.get('data')),
+  currentUser: JSON.parse(localStorage.getItem("user")),
+//   currentUser:JSON.parse(Cookies.get('data')),
   loading:false,
   error:false
 }
@@ -31,6 +32,7 @@ export const UserSlice = createSlice({
               state.currentUser=null;
               state.loading= false;
               state.error=false;
+              localStorage.removeItem("user")
         }
       },
     })
