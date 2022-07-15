@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { Link,useNavigate } from 'react-router-dom'
-import { loginError, loginStart, loginSuccess } from '../../redux/userSlice';
+import { loginError, loginStart, loginSuccess } from '../../redux/Slice/userSlice';
 import Navbar from '../Navbar'
 function Login() {
 

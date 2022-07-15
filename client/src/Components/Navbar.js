@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { logout} from '../redux/userSlice';
+import { logout} from '../redux/Slice/userSlice';
 function Navbar() {
 
       const [visible, setVisible] = useState(false);
