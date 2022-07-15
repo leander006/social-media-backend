@@ -26,18 +26,6 @@ const UserSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
-    postCount: {
-        type: Number,
-        default: 0,
-    },
-    isFollowing: {
-        type: Boolean,
-        default: false,
-    },
-    isUnFollowing: {
-        type: Boolean,
-        default: false,
-    },
     bio: {
         type: String,
         default: '',
@@ -58,6 +46,15 @@ const UserSchema = new mongoose.Schema({
             },
         ],
     },
+    status:{
+        type:String,
+        enum: ['Public', 'Private'],
+        default: 'Public'
+    },
+    postCount:{
+        type:Number,
+        default:0
+    }
 },
 {timestamps:true}
 )

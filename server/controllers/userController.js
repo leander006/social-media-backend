@@ -1,21 +1,26 @@
 const User = require("../model/User");
 const asyncHandler = require('express-async-handler');
 const Post = require("../model/Post")
-const Message= require("../model/Message")
+const Message= require("../model/Message");
 
 //search users//
 
 const particularUser = asyncHandler(async(req,res) =>{
       const {name} = req.query
-      console.log(name);
+      
       try {
             const keyword = req.query.name
             
             const users = await User.find({username:{$regex:keyword ,$options:'$i'}})
-            return res.status(200).json(users);
+            console.log(users.length);
+            if(users.length !== 0){
+                  return res.status(200).json(users)
+            }
+            
+            return res.status(404).send({error:"User doest not exist"});
  
        } catch (error) {
-             return res.status(404).json({error:error.message})
+             return res.status(500).send({error:error.message})
        }
 })
 
@@ -24,17 +29,10 @@ const particularUser = asyncHandler(async(req,res) =>{
 
 const allUser = asyncHandler(async(req,res) =>{
       try {
-       
-          
            const allUsers = await User.find({_id:{$ne:req.user._id}})
-
-         
-
-            return res.status(200).json(allUsers);
-
-
+           return res.status(200).json(allUsers)
       } catch (error) {
-            return res.status(404).json({error:error.message})
+            return res.status(500).send({error:error.message})
       }
 
 })
@@ -53,7 +51,7 @@ const remove = asyncHandler(async(req,res) =>{
            return res.status(200).json("User deleted successfully");
 
       } catch (error) {
-            return res.status(404).json({error:error.message})
+            return res.status(500).send({error:error.message})
       }
 
 })
@@ -68,15 +66,38 @@ const groupUser =asyncHandler(async(req,res) =>{
  
  
        } catch (error) {
-             return res.status(404).json({error:error.message})
+             return res.status(500).send({error:error.message})
+       }
+})
+//get login user
+const loginUser =asyncHandler(async(req,res) =>{
+      try {
+       
+          
+            const users = await User.find({_id:{$eq:req.user._id}})
+             return res.status(200).json(users);
+ 
+ 
+       } catch (error) {
+             return res.status(500).send({error:error.message})
        }
 })
 
+// Update user //
+
+const updateUser =asyncHandler(async(req,res) =>{
+      try {
+            const user = await User.findByIdAndUpdate(req.user._id,req.body,{ new: true })
+            return res.status(200).json(user)
+       } catch (error) {
+             return res.status(500).send({error:error.message})
+       }
+})
 module.exports = {
 	allUser,
       particularUser,
       remove,
-      groupUser
-      
-
+      groupUser,
+      updateUser,
+      loginUser
 };

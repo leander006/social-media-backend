@@ -4,48 +4,48 @@ import Mesaages from '../Mesaages'
 import Navbar from '../Navbar'
 import NopPreview from '../NopPreview'
 import SearchFreinds from '../SearchFreinds'
-import axios from "axios"
+import Cookies from 'js-cookie';
 
 import GetMessages from '../GetMessages'
+import { useSelector } from 'react-redux'
+import axios from 'axios'
 function Chats() {
-      const [visible, setVisible] = useState(false)
+ 
       const [getFreinds, setGetFreinds] = useState(false)
-
-
+      const [currentChat, setCurrentChat] = useState(null)
+      const [visible, setVisible] = useState(false)
       const [chats, setChats] = useState([])
-    const [allUsers, setAllUsers] = useState([])
-
+      const [allUsers, setAllUsers] = useState([])
+      const {token,others} = Cookies.get('token')
+      const {currentUser} = useSelector(state =>state.user)
+      console.log(currentUser);
 
       const config ={
             headers:{
                 "Content-Type":"application/json",
-                Authorization:`Bearer ${JSON.parse(localStorage.getItem("userInfo"))?.token}`
+                Authorization:`Bearer ${Cookies.get('access_token')}`
             }
           }
-      const handleVisibility =(e) =>{
-            e.preventDefault();
-            setVisible(true);
-      }
       const handleFrenids =(e) =>{
             e.preventDefault();
             setGetFreinds(!getFreinds);
       }
-      useEffect(() => {
-            const getChats = async() =>{
+      // useEffect(() => {
+      //       const getChats = async() =>{
           
-                try {
+      //           try {
                     
-                    const res= await axios.get("http://localhost:3001/api/chat",config);
-                        setChats(res.data);
+      //               const res= await axios.get("http://localhost:3001/api/user",config);
+      //                   // setChats(res.data);
 
-                    
-                } catch (error) {
-                    console.log(error);
-                }
-            };
-            getChats();
+      //               console.log(res);
+      //           } catch (error) {
+      //               console.log(error);
+      //           }
+      //       };
+      //       getChats();
          
-        },[])
+      //   },[])
 
         useEffect(() => {
             const getAllUsers = async() =>{
@@ -64,7 +64,7 @@ function Chats() {
         },[])
 
 
-      //   console.log(chats.chatname);
+        console.log(allUsers);
 
       
   return (
@@ -79,15 +79,18 @@ function Chats() {
                   <i className="fa-solid fa-xl fa-magnifying-glass my-6 ml-7 cursor-pointer"></i>
                   <i className="fa-solid fa-xl fa-user-plus my-6 ml-4 cursor-pointer" onClick={handleFrenids} ></i>
             </div>
-     <div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] ' onClick={handleVisibility} >
+     <div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] '  >
                   {chats?.map((c) =>(
                         // console.log(c?.isGroupChat?c?.chatname:c?.users[0].username)
+                        <div className='individual-chat' onClick={() =>{setCurrentChat(c)}} >
                         <Conversation name={c?.chatname}  key={c?._id} id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt} />
+                        </div>
+
                   ))}
       </div>
 </div>
-
- {visible ?<GetMessages setVisible={setVisible}/>:<NopPreview/>} 
+{/* Write conversation and message together instead of getMessage */}
+ {currentChat?<GetMessages setVisible={setVisible}/>:<NopPreview/>} 
          {getFreinds && <div className='border  m-auto bg-secondary left-2/4  fixed  w-80 z-30 rounded-lg'>
                 <div className='flex'>
                 <div className='flex bg-slate-200 h-16 items-center p-2 m-3 mt-3 rounded-lg'>
@@ -117,7 +120,7 @@ function Chats() {
                   <i className="fa-solid fa-xl fa-magnifying-glass my-6 ml-4 cursor-pointer"></i>
                   <i className="fa-solid fa-xl fa-user-plus my-6 ml-3 cursor-pointer" onClick={handleFrenids} ></i>
             </div>
-     {!getFreinds ?<div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] ' onClick={handleVisibility}>
+     {!getFreinds ?<div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] '>
            {/* Conversations */}
            {chats?.map((c) =>(
                         // console.log(c._id),

@@ -8,6 +8,9 @@ import {
 } from "react-router-dom";
 import Login from './Components/Pages/Login';
 import Register from './Components/Pages/Register';
+import axios from 'axios';
+
+axios.defaults.withCredentials= true;
 
 function App() {
   return (
@@ -20,7 +23,7 @@ function App() {
    <Router>
    <Routes> 
      
-   <Route exact path="/" element={<Home/>}/>
+   <Route exact path="/" element={<Login/>}/>
    <Route path="/chat" element={<Chats/>}/>
    <Route path="/message/:chatId" element={<Chats/>}/>
    <Route path="/explore" element={<Explore/>}/>

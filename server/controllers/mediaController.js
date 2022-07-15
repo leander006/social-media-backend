@@ -59,34 +59,17 @@ const like = asyncHandler(async(req,res) =>{
                  
             }
             else{
-                  return res.status(403).send({error:"Already liked"})  
-            }
-      } catch (error) {
-            return res.status(500).send({error:error.message})
-      }
-})
-
-
-// Unlike post //
-
-const unLike = asyncHandler(async(req,res) =>{
-      try {
-            const post = await Post.findById(req.params.id)   
-            if(post.likes.includes(req.user._id)){
                   await post.updateOne({$pull:{likes:req.user._id}})
-                  return res.status(200).json("Unliked post")
-            }
-            else{
-                  return res.status(403).send({error:"Already unliked"})  
+                  return res.status(200).json("Unliked post") 
             }
       } catch (error) {
             return res.status(500).send({error:error.message})
       }
 })
+
 
 module.exports = {
 	follow,
       unfollow,
       like,
-      unLike
 };

@@ -54,6 +54,8 @@ function GetMessages({setVisible}) {
             e.preventDefault();
             setVisible(false)
         }
+
+        console.log(message);
   return (
       <div className=' md:w-3/5  md:flex md:flex-col md:justify-between'>
       <div className='preview '>

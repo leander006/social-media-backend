@@ -9,14 +9,22 @@ const userRoute = require('./routes/userRoute');
 const messageRoute = require('./routes/messageRoute');
 const postRoute = require("./routes/postRoute")
 const commentRoute = require("./routes/commentRoute")
-
+const cookieParser = require('cookie-parser')
 const app = express();
 
 const cors = require('cors')
 
+
 dotenv.config();
-app.use(cors());
+
 app.use(express.json());
+
+app.use(cookieParser())
+
+app.use(cors({
+      origin:["http://localhost:3000"],
+      credentials:true
+}));
 
 app.use("/api/auth",authRoute);
 
@@ -35,3 +43,15 @@ mongoose.connect(process.env.MONGO_URI).then(console.log("Connected to mongodb")
 app.listen(process.env.PORT || 3001,()=>{
       console.log(`Backend runnig on port ${process.env.PORT}`);
 })
+
+
+
+//suggestion for different people to follower new people
+// Story option
+
+// Home page with post of our follwers and ourself
+
+// Exlore page post of all users who's account is public
+
+// Frontend changes in conversation part
+//  and in getConversation name part

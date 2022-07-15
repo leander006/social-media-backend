@@ -6,8 +6,8 @@ const Chat = require("../model/Chat")
 const accessChat = asyncHandler(async(req,res) =>{
       const userId = req.params.id;
       const name = await User.findById(userId);
-      console.log("access");
-      console.log(name.username);
+      // console.log("access");
+      // console.log(name.username);
             var isChat = await Chat.find({
                   isGroupChat:false,
                   $and:[

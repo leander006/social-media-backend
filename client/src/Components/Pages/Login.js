@@ -1,76 +1,30 @@
 import axios from 'axios';
 import React, { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux';
+import { Link,useNavigate } from 'react-router-dom'
+import { loginError, loginStart, loginSuccess } from '../../redux/userSlice';
 import Navbar from '../Navbar'
-
 function Login() {
 
       const [username, setUsername] = useState("")
       const [password, setPassword] = useState("")
-      const handleSubmit = async(e) => {
+      const dispatch = useDispatch()
+      const navigate = useNavigate()
 
+      const handleSubmit = async(e) => {
             e.preventDefault();
-        
-            
+            dispatch(loginStart())
             try {
-            //   if(password !== cpassword){
-            //     return toast({
-                
-            //       description: "Password not matching",
-            //       status: 'warning',
-            //       duration: 700,
-            //       isClosable: true,
-            //     })
-            //   }
-              const {data} = await axios.post("http://localhost:3001/api/auth/login", {
+              const res = await axios.post("http://localhost:3001/api/auth/login", {
                 username,
                 password,
               });
-           
-              localStorage.setItem("userInfo",JSON.stringify(data));
-        
-            //   setUser(data)
-              Navigate('/');
-            //   toast({
-                
-            //     description: "Login successfully",
-            //     status: 'success',
-            //     duration: 700,
-            //     isClosable: true,
-            //   })
+              dispatch(loginSuccess(res.data))
+              localStorage.setItem("user",JSON.stringify(data));
+              navigate('/chat');
             
             } catch (err) {
-             
-            //   if(!username)
-            //   {
-            //     toast({
-            //     description: "Enter Username ",
-            //     status: 'error',
-            //     duration: 700,
-            //     isClosable: true,
-            //   })
-            //   return
-            //   }
-            //   if(!password)
-            //   {
-            //     toast({
-            //     description: "Enter Password ",
-            //     status: 'error',
-            //     duration: 700,
-            //     isClosable: true,
-            //   })
-            //   return
-            //   }
-            //   else{
-            //   toast({
-        
-            //     description: "Wrong Credentials",
-            //     status: 'warning',
-            //     duration: 700,
-            //     isClosable: true,
-            //   })
-            // }
-          
+             dispatch(loginError())
             }
           };
 
