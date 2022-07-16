@@ -16,12 +16,12 @@ function Chats() {
       const [chats, setChats] = useState([])
       const [allUsers, setAllUsers] = useState([])
       const {currentUser} = useSelector(state =>state.user)
-      const config ={
-            headers:{
-                "Content-Type":"application/json",
-                Authorization:`Bearer ${currentUser?.token}`
-            }
-          }
+      // const config ={
+      //       headers:{
+      //           "Content-Type":"application/json",
+      //           Authorization:`Bearer ${currentUser?.token}`
+      //       }
+      //     }
       const handleFrenids =(e) =>{
             e.preventDefault();
             setGetFreinds(!getFreinds);
@@ -43,21 +43,21 @@ function Chats() {
          
       //   },[])
 
-        useEffect(() => {
-            const getAllUsers = async() =>{
+      //   useEffect(() => {
+      //       const getAllUsers = async() =>{
           
-                try {
+      //           try {
                     
-                  const res= await axios.get("http://localhost:3001/api/user",config);
-                  setAllUsers(res.data);
+      //             const res= await axios.get("http://localhost:3001/api/user",config);
+      //             setAllUsers(res.data);
                   
-                } catch (error) {
-                    console.log(error);
-                }
-            };
-            getAllUsers();
+      //           } catch (error) {
+      //               console.log(error);
+      //           }
+      //       };
+      //       getAllUsers();
          
-        },[])
+      //   },[])
 
 
       //   console.log(allUsers);

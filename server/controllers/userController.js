@@ -74,7 +74,7 @@ const loginUser =asyncHandler(async(req,res) =>{
       try {
        
           
-            const users = await User.find({_id:{$eq:req.user._id}})
+            const users = await User.findOne({_id:{$eq:req.user._id}})
              return res.status(200).json(users);
  
  

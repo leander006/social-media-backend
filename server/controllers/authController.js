@@ -64,19 +64,13 @@ const login =asyncHandler(async(req,res)=>{
         }
        const { password, ...others } = user._doc;
        const token=generateToken(user.id);
-    //    let other=null;
-    //    const data={
-    //        token,
-    //        others
-
-    //    }
-    //    res.cookie("token",token,{ expires: new Date(Date.now() + 25892000000),
-    //     secure:process.env.NODE_ENV === "production"?true:false,
-    //     httpOnly:process.env.NODE_ENV === "production"?true:false,})
-    //     res.cookie("data",others,{ expires: new Date(Date.now() + 25892000000),
-    //         secure:process.env.NODE_ENV === "production"?true:false,
-    //         httpOnly:process.env.NODE_ENV === "production"?true:false,})
-            res.status(200).json({others,token:token})
+       res.cookie("token",token,{ expires: new Date(Date.now() + 25892000000),
+        secure:process.env.NODE_ENV === "production"?true:false,
+        httpOnly:process.env.NODE_ENV === "production"?true:false,})
+        res.cookie("data",JSON.stringify(others),{ expires: new Date(Date.now() + 25892000000),
+            secure:process.env.NODE_ENV === "production"?true:false,
+            httpOnly:process.env.NODE_ENV === "production"?true:false,})
+        .status(200).json({others,token:token})
     } catch (error) {
         res.status(501).json(error.message)
        console.log(error.message);

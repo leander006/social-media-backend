@@ -20,9 +20,7 @@ function Login() {
                 password,
               });
               dispatch(loginSuccess(data))
-              localStorage.setItem("user",JSON.stringify(data));
               navigate('/chat');
-            
             } catch (err) {
              dispatch(loginError())
             }

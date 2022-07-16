@@ -1,13 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { useEffect } from 'react'
-import Cookies from 'js-cookie';
-import axios from 'axios';
+import Cookie from "js-cookie"
 
 
 const initialState = {
-      
-  currentUser: JSON.parse(localStorage.getItem("user")),
-//   currentUser:JSON.parse(Cookies.get('data')),
+  currentUser: Cookie.get("token")?JSON.parse(Cookie.get('data')):null,
   loading:false,
   error:false
 }
@@ -32,10 +28,11 @@ export const UserSlice = createSlice({
               state.currentUser=null;
               state.loading= false;
               state.error=false;
-              localStorage.removeItem("user")
+              Cookie.remove("token")
+              Cookie.remove("data")
         }
       },
-    })
+})
     
 
 
