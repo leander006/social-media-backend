@@ -70,7 +70,7 @@ const login =asyncHandler(async(req,res)=>{
         res.cookie("data",JSON.stringify(others),{ expires: new Date(Date.now() + 25892000000),
             secure:process.env.NODE_ENV === "production"?true:false,
             httpOnly:process.env.NODE_ENV === "production"?true:false,})
-        .status(200).json({others,token:token})
+        .status(200).json({others})
     } catch (error) {
         res.status(501).json(error.message)
        console.log(error.message);

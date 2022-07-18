@@ -39,6 +39,9 @@ const sendMessage = asyncHandler(async(req,res) =>{
 
 const allMessages = asyncHandler(async(req,res) =>{
       const chatId = req.params.chatId
+      if(chatId === "undefined"){
+            return 
+      }
       if(!req.user._id)
       {
           return res.status(401).send({error:"First login"}) 

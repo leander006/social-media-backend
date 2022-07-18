@@ -22,12 +22,23 @@ export const MessageSlice = createSlice({
             state.loading=false
             state.error=true
         },
+        getMessageStart:(state) =>{
+          state.loading=true
+        },
+        getMessageSuccess:(state,action) =>{
+        state.loading=false
+        state.allmessage= [...state.allmessage,action.payload]
+        },
+        getMessageError:(state) =>{
+        state.loading=false
+        state.error=true
+        },
       },
 })
     
 
 
-export const { messageStart,messageSuccess,messageError} = MessageSlice.actions
+export const { messageStart,messageSuccess,messageError,getMessageError,getMessageSuccess,getMessageStart} = MessageSlice.actions
 
 
 export default MessageSlice.reducer    

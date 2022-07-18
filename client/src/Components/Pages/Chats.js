@@ -1,68 +1,103 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Conversation from '../Conversation'
 import Mesaages from '../Mesaages'
 import Navbar from '../Navbar'
 import NopPreview from '../NopPreview'
-import SearchFreinds from '../SearchFreinds'
-
+import { getMessageError, getMessageStart, getMessageSuccess, messageError, messageStart, messageSuccess } from '../../redux/Slice/messageSlice';
+import Cookie from "js-cookie"
 import GetMessages from '../GetMessages'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
+import { chatError, chatStart, chatSuccess } from '../../redux/Slice/chatSlice'
+import {io} from  "socket.io-client"
+import { useParams } from 'react-router-dom'
 function Chats() {
  
+      const [messages, setMessages] = useState("")
+      const scrollRef = useRef()
+      const {allmessage} = useSelector(state => state.message)
+      const {currentUser} = useSelector(state => state.user)
+      const {chatId} = useParams()
       const [getFreinds, setGetFreinds] = useState(false)
-      const [currentChat, setCurrentChat] = useState(null)
+      const [currentChat, setCurrentChat] = useState()
       const [visible, setVisible] = useState(false)
-      const [chats, setChats] = useState([])
-      const [allUsers, setAllUsers] = useState([])
-      const {currentUser} = useSelector(state =>state.user)
-      // const config ={
-      //       headers:{
-      //           "Content-Type":"application/json",
-      //           Authorization:`Bearer ${currentUser?.token}`
-      //       }
-      //     }
+      const [socketConnected, setSocketConnected] = useState(false)
+      const dispatch = useDispatch()
+      const {allChat} = useSelector(state => state.chat)
+      const currentuser = currentUser._id?currentUser?._id:currentUser.others?._id
+      var socket,selectedChatCompare;
+      // socket //
+      
+      useEffect(() => {
+            socket= io("http://localhost:3001")
+            socket.emit("setup",currentUser);
+            socket.on("connection",()=> setSocketConnected(true))
+      },[])
+      
+
+
+      // end //
+      const config ={
+            headers:{
+                "Content-Type":"application/json",
+                Authorization:`Bearer ${Cookie.get("token")}`
+            }
+          }
       const handleFrenids =(e) =>{
             e.preventDefault();
             setGetFreinds(!getFreinds);
       }
-      // useEffect(() => {
-      //       const getChats = async() =>{
-          
-      //           try {
-                    
-      //               const res= await axios.get("http://localhost:3001/api/user",config);
-      //                   // setChats(res.data);
-
-      //               console.log(res);
-      //           } catch (error) {
-      //               console.log(error);
-      //           }
-      //       };
-      //       getChats();
+      useEffect(() => {
+            const getChats = async() =>{
+                try {
+                    dispatch(chatStart())
+                    const {data}= await axios.get("http://localhost:3001/api/chat",config);
+                    dispatch(chatSuccess(data))
+                } catch (error) {
+                    dispatch(chatError())
+                }
+            };
+            getChats();
          
-      //   },[])
-
-      //   useEffect(() => {
-      //       const getAllUsers = async() =>{
-          
-      //           try {
-                    
-      //             const res= await axios.get("http://localhost:3001/api/user",config);
-      //             setAllUsers(res.data);
-                  
-      //           } catch (error) {
-      //               console.log(error);
-      //           }
-      //       };
-      //       getAllUsers();
-         
-      //   },[])
+        },[])
 
 
-      //   console.log(allUsers);
-
-      
+            useEffect(() => {
+              const getMessages = async() =>{
+                  try {
+                    dispatch(messageStart())
+                    const {data}= await axios.get(`http://localhost:3001/api/message/get/${chatId}`,config);
+                    dispatch(messageSuccess(data))
+  
+                  } catch (error) {
+                       dispatch(messageError()) 
+                      console.log(error);
+                  }
+              };
+              getMessages();
+           
+          },chatId,setMessages)
+  
+          const sendMessages =async(e) =>{
+              e.preventDefault();
+              try {
+                    dispatch(getMessageStart())
+                    const {data} =await axios.post("http://localhost:3001/api/message/"+chatId,{
+                          content:messages
+                    },config)
+                    dispatch(getMessageSuccess(data))
+              } catch (error) {
+                    dispatch(getMessageError()) 
+                    console.log(error);
+              }
+              
+              setMessages("")
+             
+          }
+          useEffect(() => {
+            scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+          }, setMessages,chatId,sendMessages);
+       
   return (
     <>
          <Navbar/>
@@ -76,17 +111,44 @@ function Chats() {
                   <i className="fa-solid fa-xl fa-user-plus my-6 ml-4 cursor-pointer" onClick={handleFrenids} ></i>
             </div>
      <div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] '  >
-                  {chats?.map((c) =>(
-                        // console.log(c?.isGroupChat?c?.chatname:c?.users[0].username)
-                        <div className='individual-chat' onClick={() =>{setCurrentChat(c)}} >
-                        <Conversation name={c?.chatname}  key={c?._id} id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt} />
+                  {allChat?.map((c) =>(
+                        <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
+                        <Conversation name={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.username :  c?.users[0]?.username  } id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt}  />
                         </div>
 
                   ))}
       </div>
 </div>
+
 {/* Write conversation and message together instead of getMessage */}
- {currentChat?<GetMessages setVisible={setVisible}/>:<NopPreview/>} 
+ {currentChat?   <div className=' md:w-3/5  md:flex md:flex-col md:justify-between'>
+      <div className='preview '>
+      <div className='flex bg-white rounded-lg border justify-between'>
+            <div className='flex left'>
+            <img className='w-7 h-7 rounded-full mt-2 mb-2 mr-3 ml-3 border border-navbar' src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU' alt='image'/>
+            <h1 className='mt-2 capitalize text-primary'>{currentChat?.isGroupChat ? currentChat?.chatname : currentChat?.users[0]?._id === currentUser?._id ? currentChat?.users[1]?.username :  currentChat?.users[0]?.username  }</h1>
+            </div> 
+            <div className='right'>
+            <i className="fa-solid fa-user-plus fa-xl mt-5 mr-3 text-navbar cursor-pointer"></i>
+            </div>
+           
+      </div>
+      <div className= 'messages overflow-y-scroll h-[calc(100vh-10.9rem)] bg-main'>
+            {/* Messages */}
+           
+            {allmessage?.map((m) =>(
+                   <div key={m?._id} ref={scrollRef}>
+                  <Mesaages image={m?.sender?.profile} name={m?.sender?.username} own={m?.sender?._id === currentUser?._id?true:false} message={m.content} date={m.createdAt} />
+                  </div>
+            ))}  
+            
+      </div>
+          <form className='flex bg-slate-200 h-16 items-center p-2 m-3 mt-3 rounded-lg' onSubmit={sendMessages}>
+          <input type="text" placeholder='Enter message' className='w-full h-10 rounded-lg p-5 border' value={messages} onChange={e=>setMessages(e.target.value)}/>
+           <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" ></i></button> 
+          </form>
+          </div>
+          </div>:<NopPreview/>} 
          {getFreinds && <div className='border  m-auto bg-secondary left-2/4  fixed  w-80 z-30 rounded-lg'>
                 <div className='flex'>
                 <div className='flex bg-slate-200 h-16 items-center p-2 m-3 mt-3 rounded-lg'>
@@ -96,9 +158,9 @@ function Chats() {
                 </div>
                 <div className=' h-70 overflow-y-scroll'>
                       {/* Search freinds */}
-                      {allUsers?.map((u) =>(
+                      {/* {allUsers?.map((u) =>(
                         <SearchFreinds name={u.username}  key={u._id} profile={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  joined={u.updatedAt} />
-                  ))}
+                  ))} */}
           </div>
           <div >
                 <button className='border mb-3 ml-2 rounded-lg w-14 h-10 bg-navbar text-main hover:w-20 hover:h-8'>Create</button>          
@@ -118,10 +180,10 @@ function Chats() {
             </div>
      {!getFreinds ?<div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] '>
            {/* Conversations */}
-           {chats?.map((c) =>(
+           {/* {allChat?.map((c) =>(
                         // console.log(c._id),
                         <Conversation name={c?.chatname}  key={c?._id} id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt} />
-                  ))}
+                  ))} */}
 
       </div>:<div className='border  m-auto bg-secondary w-80 z-30 rounded-lg'>
                 <div className='flex'>
@@ -132,9 +194,9 @@ function Chats() {
                 </div>
                 <div className=' h-70 overflow-y-scroll'>
                       {/* Search freinds */}
-                      {allUsers?.map((u) =>(
+                      {/* {allUsers?.map((u) =>(
                         <SearchFreinds name={u.username} key={u._id} profile={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU"}  joined={u.updatedAt} />
-                  ))}
+                  ))} */}
           </div>
           <div >
                 <button className='border mb-3 ml-2 mt-3 rounded-lg w-14 h-7 bg-orange-500 text-white hover:w-20 hover:h-8'>Create</button>          

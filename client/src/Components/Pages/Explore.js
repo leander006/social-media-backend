@@ -25,7 +25,6 @@ useEffect(() => {
       dispatch(postStart())
       const {data} = await axios.get("http://localhost:3001/api/post",config)
       dispatch(postSuccess(data))
-      // console.log(data);
     } catch (error) {
       dispatch(postError())
     }

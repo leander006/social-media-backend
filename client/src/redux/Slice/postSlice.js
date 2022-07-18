@@ -37,8 +37,6 @@ export const PostSlice = createSlice({
       },
 })
     
-
-
 export const { postStart,postSuccess,postError,followerPostStart,followerPostSuccess,followerPostError} = PostSlice.actions
 
 

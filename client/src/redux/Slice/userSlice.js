@@ -3,7 +3,7 @@ import Cookie from "js-cookie"
 
 
 const initialState = {
-  currentUser: Cookie.get("token")?JSON.parse(Cookie.get('data')):null,
+  currentUser:JSON.parse(Cookie.get('data')),
   loading:false,
   error:false
 }
