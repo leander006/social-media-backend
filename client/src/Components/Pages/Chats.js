@@ -3,7 +3,7 @@ import Conversation from '../Conversation'
 import Mesaages from '../Mesaages'
 import Navbar from '../Navbar'
 import NopPreview from '../NopPreview'
-import { getMessageError, getMessageStart, getMessageSuccess, messageError, messageStart, messageSuccess } from '../../redux/Slice/messageSlice';
+import { messageError, messageStart, messageSuccess } from '../../redux/Slice/messageSlice';
 import Cookie from "js-cookie"
 import GetMessages from '../GetMessages'
 import { useDispatch, useSelector } from 'react-redux'
@@ -11,6 +11,8 @@ import axios from 'axios'
 import { chatError, chatStart, chatSuccess } from '../../redux/Slice/chatSlice'
 import {io} from  "socket.io-client"
 import { useParams } from 'react-router-dom'
+var socket,selectedChatCompare
+// selectedChatCompare use for either emiting message or giving notification//
 function Chats() {
  
       const [messages, setMessages] = useState("")
@@ -22,21 +24,24 @@ function Chats() {
       const [currentChat, setCurrentChat] = useState()
       const [visible, setVisible] = useState(false)
       const [socketConnected, setSocketConnected] = useState(false)
+      const [typing, setTyping] = useState(false)
+      const [isTyping, setIsTyping] = useState(false)
       const dispatch = useDispatch()
       const {allChat} = useSelector(state => state.chat)
       const currentuser = currentUser._id?currentUser?._id:currentUser.others?._id
-      var socket,selectedChatCompare;
-      // socket //
       
+      // socket //
+
       useEffect(() => {
             socket= io("http://localhost:3001")
             socket.emit("setup",currentUser);
-            socket.on("connection",()=> setSocketConnected(true))
+            socket.on("connected", () => setSocketConnected(true))
+            socket.on("typing",() => setIsTyping(true));
+            socket.on("stop typing",() => setIsTyping(false));
       },[])
       
-
-
       // end //
+
       const config ={
             headers:{
                 "Content-Type":"application/json",
@@ -47,20 +52,28 @@ function Chats() {
             e.preventDefault();
             setGetFreinds(!getFreinds);
       }
-      useEffect(() => {
-            const getChats = async() =>{
-                try {
-                    dispatch(chatStart())
-                    const {data}= await axios.get("http://localhost:3001/api/chat",config);
-                    dispatch(chatSuccess(data))
-                } catch (error) {
-                    dispatch(chatError())
-                }
-            };
-            getChats();
-         
-        },[])
 
+      const typingHandler = (e) =>{
+            setMessages(e.target.value)
+
+            if(!socketConnected) return
+
+            if(!typing){
+                  setTyping(true)
+                  socket.emit("typing",chatId)
+            }
+            let lastTypingTime = new Date().getTime()
+            var timerLength = 2000
+
+            setTimeout(() => {
+                  var timenow = new Date().getTime()
+                  var timeDiff = timenow - lastTypingTime
+                  if(timeDiff >= timerLength && typing ){
+                        socket.emit("stop typing",chatId)
+                        setTyping(false)
+                  }
+            }, timerLength);
+      }
 
             useEffect(() => {
               const getMessages = async() =>{
@@ -68,35 +81,64 @@ function Chats() {
                     dispatch(messageStart())
                     const {data}= await axios.get(`http://localhost:3001/api/message/get/${chatId}`,config);
                     dispatch(messageSuccess(data))
-  
-                  } catch (error) {
+                    selectedChatCompare=chatId
+                    socket.emit("join room",chatId)
+                  } catch (error){
                        dispatch(messageError()) 
-                      console.log(error);
+                      console.log(error.message);
                   }
               };
               getMessages();
            
-          },chatId,setMessages)
+          },[chatId])
   
           const sendMessages =async(e) =>{
               e.preventDefault();
+              socket.emit("stop typing", chatId);
               try {
-                    dispatch(getMessageStart())
+                    dispatch(messageStart())
                     const {data} =await axios.post("http://localhost:3001/api/message/"+chatId,{
                           content:messages
                     },config)
-                    dispatch(getMessageSuccess(data))
+                    socket.emit("new message",data)
+                    dispatch(messageSuccess([...allmessage,data]))
               } catch (error) {
-                    dispatch(getMessageError()) 
+                    dispatch(messageError()) 
                     console.log(error);
               }
-              
-              setMessages("")
-             
-          }
+              setMessages("")             
+            }
+
+            useEffect(() => {
+                  const getChats = async() =>{
+                      try {
+                          dispatch(chatStart())
+                          const {data}= await axios.get("http://localhost:3001/api/chat",config);
+                          dispatch(chatSuccess(data))
+                      } catch (error) {
+                          dispatch(chatError())
+                      }
+                  };
+                  getChats();
+               
+              },[])
+          useEffect(() => {
+            socket.on("message recieved",(newMessage) =>{
+                  dispatch(messageStart())
+                  if(!selectedChatCompare || selectedChatCompare._id === newMessage.chat._id){
+                        // notification
+                        dispatch(messageError())
+                  }
+                  else{
+                        dispatch(messageSuccess([...allmessage,newMessage]))
+                  }
+                  
+            })
+      })
+      
           useEffect(() => {
             scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-          }, setMessages,chatId,sendMessages);
+          }, [setMessages,chatId,sendMessages]);
        
   return (
     <>
@@ -126,7 +168,7 @@ function Chats() {
       <div className='flex bg-white rounded-lg border justify-between'>
             <div className='flex left'>
             <img className='w-7 h-7 rounded-full mt-2 mb-2 mr-3 ml-3 border border-navbar' src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU' alt='image'/>
-            <h1 className='mt-2 capitalize text-primary'>{currentChat?.isGroupChat ? currentChat?.chatname : currentChat?.users[0]?._id === currentUser?._id ? currentChat?.users[1]?.username :  currentChat?.users[0]?.username  }</h1>
+            <h1 className='mt-2 capitalize text-primary'>{currentChat?.isGroupChat ? currentChat?.chatname : currentChat?.users[0]?._id === currentuser  ? currentChat?.users[1]?.username :  currentChat?.users[0]?.username  }</h1>
             </div> 
             <div className='right'>
             <i className="fa-solid fa-user-plus fa-xl mt-5 mr-3 text-navbar cursor-pointer"></i>
@@ -138,13 +180,14 @@ function Chats() {
            
             {allmessage?.map((m) =>(
                    <div key={m?._id} ref={scrollRef}>
-                  <Mesaages image={m?.sender?.profile} name={m?.sender?.username} own={m?.sender?._id === currentUser?._id?true:false} message={m.content} date={m.createdAt} />
+                  <Mesaages message={m}   />
                   </div>
             ))}  
             
       </div>
+      {typing ? <div>Typing...</div>:<></>}
           <form className='flex bg-slate-200 h-16 items-center p-2 m-3 mt-3 rounded-lg' onSubmit={sendMessages}>
-          <input type="text" placeholder='Enter message' className='w-full h-10 rounded-lg p-5 border' value={messages} onChange={e=>setMessages(e.target.value)}/>
+          <input type="text" placeholder='Enter message' className='w-full h-10 rounded-lg p-5 border' value={messages} onChange={typingHandler}/>
            <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" ></i></button> 
           </form>
           </div>

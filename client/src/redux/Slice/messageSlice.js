@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  allmessage: null,
+  allmessage: [],
   loading:false,
   error:false
 }
@@ -21,18 +21,7 @@ export const MessageSlice = createSlice({
         messageError:(state) =>{
             state.loading=false
             state.error=true
-        },
-        getMessageStart:(state) =>{
-          state.loading=true
-        },
-        getMessageSuccess:(state,action) =>{
-        state.loading=false
-        state.allmessage= [...state.allmessage,action.payload]
-        },
-        getMessageError:(state) =>{
-        state.loading=false
-        state.error=true
-        },
+        }
       },
 })
     
