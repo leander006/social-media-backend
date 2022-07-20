@@ -25,6 +25,7 @@ function App() {
    <Routes> 
      
    <Route exact path="/" element={<Login/>}/>
+   <Route path="/home" element={<Home/>}/>
    <Route path="/chat" element={<Chats/>}/>
    <Route path="/message/:chatId" element={<Chats/>}/>
    <Route path="/explore" element={<Explore/>}/>

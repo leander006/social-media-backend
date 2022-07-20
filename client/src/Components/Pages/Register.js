@@ -1,37 +1,73 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import axios from 'axios'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import Navbar from '../Navbar'
 
 function Register() {
-  return (
-    <>
-    <Navbar/>
-      <div className="flex justify-center h-[calc(100vh-2.5rem)] w-screen bg-gradient-to-r from-cyan-300 to-blue-700 " >
-      <div className='right flex justify-center items-center '>
-            <div className='flex  w-80 bg-white rounded-lg lg:w-[766px] md:w-[600px] md:justify-center md:pt-[80px] lg:pt-[50px] '>
-                  <div className='flex flex-col w-full p-5'>
-                        <h1 className='text-slate-300 text-xl '>Enroll for free</h1>
-                        <h1 className='text-2xl mt-1 mb-1'>Register for InstaChat</h1>
-                        <h2 className='text-slate-300'>Already a member? <Link className='text-secondary' to="/login">Login</Link></h2>
+      const [username, setUsername] = useState("")
+      const [password, setPassword] = useState("")
+      const [name, setName] = useState("")
+      const [email, setEmail] = useState("")
 
-                        <div className='flex justify-center flex-col item-center mt-4'>
-                              <label className='mb-1'>Username</label>
-                                 <input className='w-full mb-3 h-12 rounded-md p-3 bg-slate-100' type="text" placeholder='Username' required/>
-                              <label className='mb-1'>Email</label>
-                                 <input className='w-full h-12 mb-4 rounded-md p-3 bg-slate-100' type="email" placeholder='Email' required/>
-                                 <label className='mb-1'>Password</label>
-                                 <input className='w-full mb-3 h-12 rounded-md p-3 bg-slate-100' type="password" placeholder='Password' required/>
-                                  <label className='mb-1'>Select Profile Picture</label>
-                                 <label className='flex justify-center my-3 cursor-pointer' htmlFor='forFile'><i className="fa-solid fa-2xl fa-plus"></i></label>
-                                 <input type="file" type="file" id='forFile' accept='image/png , image/jpg, image/jpeg' style={{display:"none"}}  name="file" required />
-                                  <div className="bg-slate-200  flex mt-4 mb-3 rounded-lg hover:bg-slate-100 hover:border">
-                                  <button className=' w-full h-10'>Upload Image</button>
-                                  </div>
-                                 <button className='bg-primary text-white rounded-lg  w-full h-10 hover:bg-blue-500'>Register</button>
-                                 <div className=' bg-slate-200  flex mt-4 rounded-lg hover:bg-slate-100 hover:border '>
-                                 <i className="fa-brands text-primary fa-2xl fa-google-plus-g m-auto pl-2"></i>
-                                 <button className=' w-full h-10'>Register with google</button>
+      const navigate = useNavigate()
+
+      const handleSubmit = async(e) => {
+            e.preventDefault();
+            try {
+              const {data} = await axios.post("http://localhost:3001/api/auth/login", {
+                username,
+                password,
+              });
+
+              navigate('/chat');
+            } catch (err) {
+            }
+          };
+  return (
+      <>
+      <div className="flex justify-evenly flex-row-reverse h-screen w-screen md:bg-[#2D3B58]" >
+        <div className='hidden md:flex m-auto flex-1'>
+          <img src='/register.jpeg' className='' ></img>
+        </div>
+      <div className='flex flex-1 items-center p-4 lg:p-10'>
+            <div className='flex w-screen bg-white rounded-lg xl:w-[720px] lg:w-[500px]  md:w-[370px] md:justify-center' onSubmit={handleSubmit}>
+                  <div className='flex flex-col w-full p-4'>
+                        <h1 className='text-black text-xl md:mb-3'>CREATE ACCOUNT</h1>
+                        <h3 className='text-slate-600 mt-2'>Join the virtual social network</h3>
+                        <form className='flex justify-center flex-col item-center mt-4' onSubmit={handleSubmit}>
+                             
+                                 <div className=' md:flex justify-evenly'>
+                                    <div className='md:mr-2'>
+                                          <label className='mb-2'>Name</label>
+                                          <input className='w-full h-12 rounded-md p-3 md:mb-8 mb-2 lg:mt-2 border border-black' onChange={e=>setName(e.target.value)} value={name}  type="text" required/>
+                                    </div>
+                                    <div>
+                                          <label className='mb-2'>Email</label>
+                                          <input className='w-full h-12 rounded-md p-3 md:mb-8 mb-2 lg:mt-2  border border-black' onChange={e=>setEmail(e.target.value)} value={email} type="email" required/>
+                                    </div>
+                              </div>
+               
+                              <div className=' md:flex justify-evenly '>
+                                    <div className='md:mr-2'>
+                                          <label className='mb-2'>Username</label>
+                                          <input className='w-full  h-12 rounded-md p-3 md:mb-8 mb-2 lg:mt-2 border border-black' onChange={e=>setUsername(e.target.value)} value={username}  type="text" required/>
+                                    </div>
+                                    <div>
+                                          <label className='mb-2'>Password</label>
+                                          <input className='w-full h-12 rounded-md p-3 md:mb-8 mb-2 lg:mt-2  border border-black' onChange={e=>setPassword(e.target.value)} value={password} type="password" required/>
+                                    </div>
+                              </div>
+                  
+                  
+                                 <div className='md:flex md:justify-evenly'>
+                                 <button className='bg-[#BED7F8] mb-2  lg:w-full w-full  h-10 md:mr-2 hover:bg-[#afd1fd]'>Create account</button>
+                                 <Link to="/login"><button className='bg-[#BED7F8] lg:w-56 xl:w-80 w-full h-10 md:w-40 hover:bg-[#afd0fa]'>Login</button></Link>
                                  </div>
+                        </form>
+                        <h1 className='text-center my-2 text-slate-500'>--------or--------</h1>
+                        <div className=' bg-[#2D3B58] text-white flex rounded-lg hover:bg-[#212e49] hover:border '>
+                                 <i className="fa-brands text-[#b4c1db] fa-2xl fa-google-plus-g m-auto pl-2"></i>
+                                 <button  className=' w-full h-10'>Sign in with google</button>
                         </div>
                   </div>
             </div>

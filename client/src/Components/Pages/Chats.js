@@ -35,7 +35,7 @@ function Chats() {
       useEffect(() => {
             socket= io("http://localhost:3001")
             socket.emit("setup",currentUser);
-            socket.on("connected", () => setSocketConnected(true))
+            socket.on("connection", () => setSocketConnected(true))
             socket.on("typing",() => setIsTyping(true));
             socket.on("stop typing",() => setIsTyping(false));
       },[])
@@ -63,7 +63,7 @@ function Chats() {
                   socket.emit("typing",chatId)
             }
             let lastTypingTime = new Date().getTime()
-            var timerLength = 2000
+            var timerLength = 2500
 
             setTimeout(() => {
                   var timenow = new Date().getTime()

@@ -28,27 +28,29 @@ function Login() {
 
   return (
     <>
-    <Navbar/>
-      <div className="flex justify-center h-[calc(100vh-2.5rem)] w-screen bg-gradient-to-r from-cyan-300 to-blue-700 " >
-      <div className='right flex justify-center items-center '>
-            <div className='flex w-80 bg-white rounded-lg lg:w-[766px] md:w-[600px] md:justify-center md:mt-[80px] lg:mt-[50px] ' onSubmit={handleSubmit}>
+      <div className="flex justify-evenly h-screen w-screen md:bg-[#2D3B58]" >
+        <div className='hidden md:flex m-auto flex-1'>
+          <img src='/login.jpeg' className='' ></img>
+        </div>
+      <div className='flex flex-1 justify-center items-center '>
+            <div className='flex w-screen  bg-white rounded-lg lg:w-[400px]  md:w-[300px] md:justify-center' onSubmit={handleSubmit}>
                   <div className='flex flex-col w-full p-5'>
-                        <h1 className='text-slate-300 text-xl '>Start for free</h1>
-                        <h1 className='text-2xl mt-2 mb-2'>Sign up for InstaChat</h1>
-                        <h2 className='text-slate-300'>New member? <Link className='text-secondary' to="/register">Register</Link></h2>
-
+                        <h1 className='text-black text-xl md:mb-3'>Login</h1>
                         <form className='flex justify-center flex-col item-center mt-4' onSubmit={handleSubmit}>
                               <label className='mb-2'>Username</label>
-                                 <input className='w-full mb-3 h-12 rounded-md p-3 bg-slate-100' onChange={e=>setUsername(e.target.value)} type="text" placeholder='Username'/>
+                                 <input className='w-full mb-3 h-12 rounded-md p-3 md:mb-8  border border-black' onChange={e=>setUsername(e.target.value)}  type="text" required/>
                               <label className='mb-2'>Password</label>
-                                 <input className='w-full h-12 mb-4 rounded-md p-3 bg-slate-100' onChange={e=>setPassword(e.target.value)} type="password" placeholder='Password '/>
-                                 <button className='bg-primary text-white rounded-lg  w-full h-10 hover:bg-blue-500'>Login</button>
-                        
-                        </form>
-                        <div className=' bg-slate-200  flex mt-4 rounded-lg hover:bg-slate-100 hover:border '>
-                                 <i className="fa-brands text-primary fa-2xl fa-google-plus-g m-auto pl-2"></i>
-                                 <button  className=' w-full h-10'>Sign up with google</button>
+                                 <input className='w-full h-12 mb-4 rounded-md p-3 md:mb-8  border border-black' onChange={e=>setPassword(e.target.value)} type="password" required/>
+                                 <div className='md:flex md:justify-evenly'>
+                                 <button className='bg-[#BED7F8] mb-2  w-full md:w-32 h-10 md:mr-2 hover:bg-[#afd1fd]'>Login</button>
+                                 <Link to="/register"><button className='bg-[#BED7F8] w-full h-10 md:w-32 hover:bg-[#afd0fa]'>Sign up</button></Link>
                                  </div>
+                        </form>
+                        <h1 className='text-center my-2 text-slate-500'>--------or--------</h1>
+                        <div className=' bg-[#2D3B58] text-white flex rounded-lg hover:bg-[#212e49] hover:border '>
+                                 <i className="fa-brands text-[#b4c1db] fa-2xl fa-google-plus-g m-auto pl-2"></i>
+                                 <button  className=' w-full h-10'>Login with google</button>
+                        </div>
                   </div>
             </div>
       </div>
