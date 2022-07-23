@@ -30,7 +30,7 @@ function Login() {
     <>
       <div className="flex justify-evenly h-screen w-screen md:bg-[#2D3B58]" >
         <div className='hidden md:flex m-auto flex-1'>
-          <img src='/login.jpeg' className='' ></img>
+          <img src='/images/login.jpeg' className='' ></img>
         </div>
       <div className='flex flex-1 justify-center items-center '>
             <div className='flex w-screen  bg-white rounded-lg lg:w-[400px]  md:w-[300px] md:justify-center' onSubmit={handleSubmit}>

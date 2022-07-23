@@ -1,10 +1,23 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom'
+import { unClicked } from '../redux/Slice/userSlice';
+
 
 function Footer() {
+        const [visible, setVisible] = useState(true);
+        const {allPost} = useSelector(state=>state.post)
+        const navigate = useNavigate()
+        const dispatch = useDispatch();
+        const explore= (e) =>{
+                e.preventDefault();
+                dispatch(unClicked())
+                setVisible(!visible);
+                navigate("/explore")
+          }
   return (
-    <div className='flex items-center bg-[#BED7F8] h-10 md:hidden justify-between p-2 fixed bottom-0 w-screen'>
-
+    <div className={allPost?'flex items-center bg-[#BED7F8] h-10 md:hidden justify-between p-2  w-screen':'flex items-center bg-[#BED7F8] h-10 md:hidden justify-between fixed bottom-0 p-2  w-screen'}>
+           
           <div className='cursor-pointer'>
                   <Link to ="/home" ><i  className="fa-solid fa-xl fa-house"></i></Link>  
           </div>
@@ -14,24 +27,20 @@ function Footer() {
           </div>
 
           <div className='cursor-pointer'>
-                  <Link to ="/explore" ><i  className="fa-solid fa-xl fa-circle-play"></i></Link>
+                  <Link to ="/explore" ><i  className="fa-solid fa-xl fa-circle-play" onClick={explore}></i></Link>
           </div>
 
           <div className='cursor-pointer'>
-                  <Link to ="/home" ><i  className="fa-solid fa-xl fa-bookmark"></i></Link>
+                  <Link to ="/savedPost" ><i  className="fa-solid fa-xl fa-bookmark"></i></Link>
           </div>
 
           <div className='cursor-pointer'>
-                  <Link to ="/home" ><i  className="fa-solid fa-xl fa-heart"></i></Link>
+                  <Link to ="/like" ><i  className="fa-solid fa-xl fa-heart"></i></Link>
           </div>
 
           <div className='cursor-pointer'>
-                  <Link to ="/home" ><i  className="fa-solid fa-xl fa-user"></i></Link>
+                  <Link to ="/profile" ><i  className="fa-solid fa-xl fa-user"></i></Link>
           </div >
-
-          <div className='cursor-pointer'>
-                  <Link to ="/home" ><i  className="fa-solid fa-xl fa-gear"></i></Link> 
-          </div>
     </div>
   )
 }

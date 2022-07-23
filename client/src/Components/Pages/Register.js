@@ -27,7 +27,7 @@ function Register() {
       <>
       <div className="flex justify-evenly flex-row-reverse h-screen w-screen md:bg-[#2D3B58]" >
         <div className='hidden md:flex m-auto flex-1'>
-          <img src='/register.jpeg' className='' ></img>
+          <img src='/images/register.jpeg' className='' ></img>
         </div>
       <div className='flex flex-1 items-center p-4 lg:p-10'>
             <div className='flex w-screen bg-white rounded-lg xl:w-[720px] lg:w-[500px]  md:w-[370px] md:justify-center' onSubmit={handleSubmit}>

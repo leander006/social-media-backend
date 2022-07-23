@@ -1,37 +1,51 @@
 import React, { useState } from 'react'
-import Comments from './Comments'
+import { Link} from 'react-router-dom'
 
-function ExploreMore({name,profile,content,liked,message,caption,count,likecount,likename,time}) {
+
+function ExploreMore({name,profile,content,time,image}) {
       const [likes, setLikes] = useState(false)
-
+      const [saved, setSaved] = useState(false)
       const handleLikes =(e) =>{
             e.preventDefault()
             setLikes(!likes)
       }
 
+      const handleSaved =(e) =>{
+            e.preventDefault()
+            setSaved(!saved)
+      }
+      
+
   return (
-
-
-    <div className='flex p-4 flex-col w-screen md:w-96 lg:w-11/12 lg:p-6' >
-          <div className='flex'>
-                <img src={profile} alt='image' className='w-10 h-10 rounded-full mr-3 border border-primary '/>
-                  <h1 className='capitalize mt-1 font-sans text-slate-700'>{name}</h1>
+    <div className='flex flex-col w-screen md:w-[59%] p-2  lg:w-[65%] xl:w-[49%] bg-[#455175] md:mt-4 my-3' >
+          <div className='flex p-1 items-center' >
+          <Link to="/profile"><img src={profile} alt='image' className='w-10 h-10  rounded-full cursor-pointer border'/></Link>
+                  <Link to="/profile"><h1 className='capitalize ml-2 font-sans cursor-pointer text-white' >{name}</h1></Link>
           </div>
-          <div className='p-2 flex justify-center '>
-          <img src={content} className='rounded-lg md:w-full  object-contain ' alt='image'/>
+          <div className='flex justify-center'>
+          <Link to="/singlePage"><img src={content} className= 'object-contain cursor-pointer lg:w-[100vw]' alt='image'/></Link>
           </div>
-          <div className='flex pl-3 pb-2'>
-                <div className='likes cursor-pointer' onClick={handleLikes}>
-                {!likes ? <i className="fa-regular fa-heart fa-2xl pr-3"/>:
-                  <i className="fa-solid fa-heart fa-2xl pr-3 text-red-700"/>}
+          <div className='flex my-3 mx-3 items-center justify-between' >
+                <div className='flex likes cursor-pointer items-center' onClick={handleLikes}>
+                      <div className='flex flex-col justify-center mt-3'>
+                              {!likes ? <i className="fa-regular fa-heart fa-2xl pr-3"/>:
+                              <i className="fa-solid fa-heart fa-2xl pr-3 text-red-700"/>
+                              }
+                              <h1 className='mt-3 ml-1'>23</h1>
+                      </div>
+                       <Link to="/singlePage"><div>
+                              <i className="fa-regular fa-2xl fa-comment cursor-pointer" ></i>
+                              <h1>23</h1>
+                        </div></Link> 
+                        
                 </div>
-          <i className="fa-solid fa-comments fa-2xl pt-3 cursor-pointer"/>
+                 <div>
+                        {saved ?<i className="fa-solid fa-xl fa-bookmark" onClick={handleSaved}></i>:
+                        <i className="fa-regular fa-xl fa-bookmark" onClick={handleSaved}></i>}
+                </div>             
+                
           </div>
-         {likename && <h1 className='pl-3 text-primary'>Liked by {likename} {likecount && " and "+ likecount+" others"}</h1>}
-          <h1 className='capitalize ml-3 mt-2'>{caption}</h1>
-          <div className='px-4 pt-1'>
-                <h1 className='text-gray-600 cursor-pointer' >View all {count} Comments</h1>                
-          </div>
+       
     </div>
   )
 }

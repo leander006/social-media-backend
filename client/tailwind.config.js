@@ -5,13 +5,13 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-
     extend: {   
-      colors:{
-        "main":'#DFF6FF',
-        "primary":"#1363DF",
-        "secondary":"#47B5FF",
-        "navbar":"#06283D"
+      gridTemplateColumns: {
+        // Simple 8 row grid
+        '8': "repeat(auto-fill, 250px)",
+      },
+      gridAutoRows:{
+        '2fr':"10px",
       },
   },
   },

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { logout } from '../redux/Slice/userSlice';
+import { clicked, logout,unClicked } from '../redux/Slice/userSlice';
 
 function SideBar() {
       const [visible, setVisible] = useState(true);
@@ -9,9 +9,20 @@ function SideBar() {
       const dispatch = useDispatch();
       const handleVisibility = (e) =>{
             e.preventDefault();
+            dispatch(clicked())
             setVisible(!visible);
       }
-
+      const handleUnVisibility = (e) =>{
+            e.preventDefault();
+            dispatch(unClicked())
+            setVisible(!visible);
+      }
+      const explore= (e) =>{
+            e.preventDefault();
+            dispatch(unClicked())
+            setVisible(!visible);
+            navigate("/explore")
+      }
       const log = (e)=>{
             e.preventDefault();
             dispatch(logout())
@@ -22,36 +33,32 @@ function SideBar() {
       <div className={visible?'hidden md:flex flex-1 bg-[#BED7F8] h-[calc(100vh-2.7rem)] z-10 w-12':'hidden md:flex bg-[#BED7F8] flex-col h-[calc(100vh-2.7rem)] z-10 w-44' }> 
             <div>
                   {visible && <h1><i className="fa-solid fa-xl fa-bars ml-3 mt-5 cursor-pointer text-[#001A72]" onClick={handleVisibility }></i></h1>}
-                 { !visible && <i className="fa-solid fa-xl ml-3 mt-5  fa-xmark text-[#001A72] cursor-pointer"onClick={handleVisibility }></i>}
+                 { !visible && <i className="fa-solid fa-xl ml-3 mt-5  fa-xmark text-[#001A72] cursor-pointer"onClick={handleUnVisibility }></i>}
             </div>
            { !visible && <div className='flex flex-col space-y-7 ml-12'>
                   <div className='flex mt-2 items-center'>
                         <i className="fa-solid fa-house"></i>
-                        <Link to="/home"><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Home</h1></Link>
+                        <Link to='/home'><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Home</h1></Link>
                   </div>
                   <div className='flex mt-2 items-center'>
                         <i className="fa-solid fa-circle-play"></i>
-                        <Link to='/explore'><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0'>Explore</h1></Link>
+                        <h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0 cursor-pointer' onClick={explore} >Explore</h1>
                   </div>
                   <div className='flex mt-2 items-center '>
                         <i className="fa-solid fa-comment"></i>
-                        <Link to='/chat'><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0'>Chats</h1></Link>
+                        <Link to='/chat'><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Chats</h1></Link>
                   </div>
                   <div className='flex mt-2 items-center '>
                         <i className="fa-solid fa-bookmark"></i>
-                        <Link to="/home"><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0'>Saved Posts</h1></Link>
+                        <Link to="/savedPost"><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Saved Posts</h1></Link>
                   </div>
                   <div className='flex mt-2 items-center '>
                         <i className="fa-solid fa-heart"></i>
-                        <Link to="/home"><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0'>Liked Posts</h1></Link>
+                        <Link to="/like"><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Liked Posts</h1></Link>
                   </div>
                   <div className='flex mt-2 items-center '>
                         <i className="fa-solid fa-user"></i>
-                        <Link to="/home"><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0'>Profile</h1></Link>
-                  </div>
-                  <div className='flex mt-2 items-center'>
-                        <i className="fa-solid fa-gear"></i>
-                        <Link to="/home"><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0'>Settings</h1></Link>
+                        <Link to="/profile"><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Profile</h1></Link>
                   </div>
             </div>}
             { !visible && <div className='fixed bottom-0 m-3'>
