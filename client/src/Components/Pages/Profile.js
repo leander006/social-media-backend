@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import Footer from '../Footer'
 import Pin from '../GridSystem/Pin'
 import Navbar from '../Navbar'
@@ -26,10 +27,10 @@ function Profile() {
         <div className='sidebar'>
           <SideBar/>
         </div>
-        <div className='h-[calc(100vh-20rem)] text-white xl:w-[94%] md:w-[70%] w-screen'>
+        <div className='h-[calc(100vh-20rem)] text-white xl:w-[94%]  w-screen'>
             <div className='flex justify-center md:space-x-12 '>
                 <div className='left image mt-6 xl:ml-[16rem] '>
-                      <img className='rounded-full w-28 md:w-36 p-4 ' src='/images/noProfile.jpeg' />
+                      <img className='rounded-full p-1 md:p-4 w-28 md:w-36 ' alt='profile' src='/images/noProfile.jpeg' />
                 </div>
                 <div className='right flex flex-col'>
                   <div className='top flex space-x-14 md:space-x-[12rem] xl:space-x-[16rem] lg:space-x-[14rem] mt-8 xl:mr-48'>
@@ -37,7 +38,7 @@ function Profile() {
                               <h1>Leander</h1>
                         </div>
                         <div className='h-6 flex items-center rounded-lg p-0.5 text-black bg-[#BED7F8] cursor-pointer active:bg-[#88b8f7] active:rounded-lg'>
-                              <h1>Message</h1>  
+                              <Link to='/chat'><h1>Message</h1></Link>  
                         </div>    
                   </div>
 
@@ -65,9 +66,9 @@ function Profile() {
                 </div>
             </div>
             <div className='mt-24 flex justify-center items-center '>
-              <div className='bg-[#BED7F8] text-black w-64 md:w-80 xl:w-[36rem] lg:w-96 rounded-lg flex active:bg-[#85b6f7] justify-center cursor-pointer'>
-                  <h1 className='font-bold'>Edit Profile</h1>
-              </div>
+            <Link to="/edit"><div className='bg-[#BED7F8] text-black w-64 md:w-80 xl:w-[36rem] lg:w-96 rounded-lg flex active:bg-[#85b6f7] justify-center cursor-pointer'>
+                 <h1 className='font-bold'>Edit Profile</h1>
+              </div></Link>
                 <i className="fa-solid fa-xl ml-2 fa-user-plus cursor-pointer"></i>
             </div>
 

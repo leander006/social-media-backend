@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 function SearchFreinds({name,profile,joined}) {
-  const [loading, setloading] = useState(false)
   return (
 <div class="border border-blue-300 shadow rounded-md bg-white my-3 max-w-sm w-full mx-auto">
   <div class={loading?"animate-pulse flex space-x-4":"flex space-x-4"}>

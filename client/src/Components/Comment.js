@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-function Message() {
+function Comment() {
   return (
     <>
       <div className='flex'>
@@ -10,7 +10,7 @@ function Message() {
                         <Link to="/profile"><h1 className='capitalize ml-2  cursor-pointer text-white' >Leander</h1></Link>
       </div>
       <div className='ml-9 mt-1 text-white text-sm break-all w-96 mb-4'>
-          <h1>messagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessagemessage</h1>
+          <h1>messagemessage</h1>
      </div>
      
       </div>
@@ -18,4 +18,4 @@ function Message() {
   )
 }
 
-export default Message
+export default Comment

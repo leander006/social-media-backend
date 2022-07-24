@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Footer from '../Footer'
-import Message from '../Message'
+import Comment from '../Comment'
 import Navbar from '../Navbar'
 import SideBar from '../SideBar'
 
@@ -36,19 +36,11 @@ function SinglePage({name}) {
                         </div>
                   </div>
                   <div className='border-x-0 border-t-2 border-[#BED7F8] md:h-3/4 border-b-0 overflow-y-scroll'>
-                  <Message/>
-                        <Message/>
-                        <Message/>
-                        <Message/> <Message/>
-                        <Message/>
-                        <Message/>
-                        <Message/> <Message/>
-                        <Message/>
-                        <Message/>
-                        <Message/> <Message/>
-                        <Message/>
-                        <Message/>
-                        <Message/>
+                  <Comment/>
+                  <Comment/>
+                  <Comment/>
+                  <Comment/>
+                        
                   </div>
                   <div className='flex my-3 mx-3 text-white  items-center justify-between' >
                 <div className='flex items-center' >

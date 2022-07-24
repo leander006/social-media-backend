@@ -15,6 +15,7 @@ import Profile from "./Components/Pages/Profile"
 import SinglePage from './Components/Pages/SinglePage';
 import Chat from './Components/Pages/Chat';
 import Write from './Components/Pages/Write';
+import Edit from './Components/Pages/Edit';
 
 axios.defaults.withCredentials= true;
 
@@ -36,6 +37,7 @@ function App() {
    <Route path="/explore" element={<Explore/>}/>
    <Route path="/write" element={<Write/>}/>
    <Route path="/login" element={<Login/>}/>
+   <Route path="/edit" element={<Edit/>}/>
    <Route path="/register" element={<Register/>}/>
    <Route path="/singlepage" element={<SinglePage/>}/>
   </Routes>

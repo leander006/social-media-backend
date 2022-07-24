@@ -7,12 +7,12 @@ function Conversation({name,message,id}) {
       
   return (
       
-            <Link to={`/message/${id}`}>
-                  <div className='flex border justify-between m-2 rounded-md bg-white cursor-pointer'>
+            
+            <div className='flex md:h-12 border justify-between m-2 rounded-md bg-white cursor-pointer'>
 
             <div className='flex justify-end'>
                   <div>
-                  <img className='w-10 h-10 rounded-full mt-2 mb-2 mr-3 ml-3 border border-main' src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU" alt='image'/>
+                  <img className='w-10 h-10 md:w-7 md:h-7 rounded-full mt-2 mb-2 mr-3 ml-3 border border-main' src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSB8icZLgdz4veJ2ZtLg30cYRDEWPPpj0L6Q&usqp=CAU" alt='image'/>
                   </div>
 
             <div className='flex flex-col' >
@@ -25,7 +25,7 @@ function Conversation({name,message,id}) {
             </div>
             
       </div>
-      </Link>
+    
       
   )
 }
