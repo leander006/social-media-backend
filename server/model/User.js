@@ -5,6 +5,10 @@ const UserSchema = new mongoose.Schema({
         type:String,
         required:false,
     },
+    name:{
+        type:String,
+        required:true,
+    },
     username:{
         type:String,
         required:true,
@@ -21,7 +25,7 @@ const UserSchema = new mongoose.Schema({
     },
     profile:{
         type:String,
-        default:''
+        default:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKSLF2KD0x9KU5CwmXdqJjrphNQNmJgqzjPQ&usqp=CAU'
     },
     bio: {
         type: String,

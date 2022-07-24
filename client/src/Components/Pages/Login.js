@@ -20,9 +20,10 @@ function Login() {
                 password,
               });
               dispatch(loginSuccess(data))
-              navigate('/chat');
+              navigate('/home');
             } catch (err) {
              dispatch(loginError())
+             console.log(err?.response?.data);
             }
           };
 

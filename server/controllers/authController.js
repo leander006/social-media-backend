@@ -7,24 +7,25 @@ const asyncHandler = require('express-async-handler')
 
 const registration = asyncHandler(async(req,res) =>{
 
-    const {username,email,password} = req.body;
+    const {username,email,password,name} = req.body;
 
-    if(!username || !email || !password)
+    if(!username || !email || !password || !name)
     {
         return res.status(401).json({error:"Please enter all  field"});
     } 
-    const userExist = await User.findOne({username});
-    const emailExist = await User.findOne({email})
 
+    const userExist = await User.findOne({username:username});
+
+    const emailExist = await User.findOne({email:email})
     try {
-         if(userExist)
+         if(userExist !== null )
         {
             return res.status(400).json({error:"Username Exists"});
         }
-    else  if(emailExist)
-    {
-        return res.status(400).json({error:"Email Exists"});
-    }
+        else  if(emailExist !== null)
+        {
+            return res.status(400).json({error:"Email Exists"});
+        }
   
           const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(req.body.password,salt);
@@ -32,6 +33,7 @@ const registration = asyncHandler(async(req,res) =>{
             username:username,
             email:email,
             password:hashPassword,
+            name:name
         })
 
         const user = await newUser.save();

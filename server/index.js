@@ -15,6 +15,8 @@ const app = express();
 
 const cors = require('cors')
 
+app.use("/uploadProfile",express.static("uploadProfile"))
+app.use("/uploads",express.static("uploads"))
 
 dotenv.config();
 

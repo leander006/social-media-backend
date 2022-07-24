@@ -14,13 +14,15 @@ function Register() {
       const handleSubmit = async(e) => {
             e.preventDefault();
             try {
-              const {data} = await axios.post("http://localhost:3001/api/auth/login", {
+              const {data} = await axios.post("http://localhost:3001/api/auth/register", {
                 username,
                 password,
+                name,
+                email
               });
-
-              navigate('/chat');
+              navigate('/login');
             } catch (err) {
+                  console.log(err?.response?.data);
             }
           };
   return (
@@ -30,7 +32,7 @@ function Register() {
           <img src='/images/register.jpeg' className='' ></img>
         </div>
       <div className='flex flex-1 items-center p-4 lg:p-10'>
-            <div className='flex w-screen bg-white rounded-lg xl:w-[720px] lg:w-[500px]  md:w-[370px] md:justify-center' onSubmit={handleSubmit}>
+            <div className='flex w-[89vw] bg-white rounded-lg xl:w-[720px] lg:w-[500px]  md:w-[370px] md:justify-center' onSubmit={handleSubmit}>
                   <div className='flex flex-col w-full p-4'>
                         <h1 className='text-black text-xl md:mb-3'>CREATE ACCOUNT</h1>
                         <h3 className='text-slate-600 mt-2'>Join the virtual social network</h3>

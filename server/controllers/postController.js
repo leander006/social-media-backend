@@ -4,21 +4,14 @@ const Post = require('../model/Post');
 const User = require('../model/User');
 
 
-
 const createPost = asyncHandler(async(req,res) =>{
-
-      const {content,caption} = req.body;
-  
-      if(!content || !caption)
-      {
-          return res.status(401).json("Please enter all  field");
-      }   
+      const {caption} = req.body;
       try {
           const newPost = new Post({
               owner:req.user._id,
-              content:content,
               caption:caption,
-          })
+              content:process.env.content + req.file.path
+        })
   
           const post = await newPost.save();
           await User.findByIdAndUpdate(
@@ -32,7 +25,7 @@ const createPost = asyncHandler(async(req,res) =>{
              
       }
   
-  })
+})
 // Get post by id
 const particularPost = asyncHandler(async(req,res) =>{
     try {

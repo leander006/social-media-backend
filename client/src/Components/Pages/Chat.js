@@ -9,7 +9,14 @@ import NopPreview from '../NopPreview'
 import ChatSearchSkeleton from '../Skeleton/ChatSearchSkeleton'
 
 function Chat() {
-  const [currentChat, setCurrentChat] = useState(true)
+  const [currentChat, setCurrentChat] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const [search, setSearch] = useState("")
+  const handleVisible = (e) =>{
+        e.preventDefault()
+        setSearch("")
+        setVisible(!visible)
+  }
   return (
       <>
       <Navbar/>
@@ -19,19 +26,29 @@ function Chat() {
           </div>
           {/* Destop view  */}
           <div className='hidden md:flex w-screen '>
-       
        <div className='conversation w-[40%] border border-y-0'>
        <div className='flex justify-between items-center p-3'>
           <div className='flex bg-[#455175] w-full h-8 mt-1 items-center rounded-md'>
-            <input className='rounded-md  w-full h-full p-1 ' type="text"  placeholder='search your friends'></input>
-            <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer "></i>
-            {/* <ChatSearchSkeleton/> */}
+            <input className='rounded-md  w-full h-full p-1' value={search} type="text" onChange={e =>setSearch(e.target.value)}  placeholder='search your friends'></input>
+            <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={ handleVisible}></i>
+            {visible &&  <div className="shadow hidden md:flex mt-24 fixed z-30 ">
+                <div className="md:w-64 lg:w-80 xl:w-[30rem]  ">
+                      <div className='flex bg-slate-300 p-2'>
+                      <Link to="/profile"><img src='/images/noProfile.jpeg' className="rounded-full h-10 w- cursor-pointer"></img></Link>
+                            <div className="flex-1 md:ml-2 md:mt-2 ">
+                                  <div className="h-3 ">Leander</div>
+                            </div>  
+                      </div>
+                </div>
+              </div>}
+
           </div>
+         
         <div>
              <i className="fa-solid fa-2xl fa-user-plus ml-4 text-[#BED7F8] cursor-pointer"></i>
         </div>
-     
        </div>
+       {search && <ChatSearchSkeleton/>}
        <div className='md:h-[calc(100vh-6.7rem)] p-3 overflow-y-scroll'>
          {/* {allChat?.map((c) =>(
                <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
@@ -84,19 +101,29 @@ function Chat() {
           {/* Mobile view */}
 
 
-          <div className='flex md:hidden flex-col md:p-0 md:items-center w-screen '>
+          <div className='flex md:hidden z-10 flex-col md:p-0 md:items-center w-screen '>
        
-         {currentChat ? <div className='conversation md:flex-1'>
-            <div className='flex justify-between items-center p-3'>
+         {!currentChat ? <div className='conversation md:flex-1'>
+            <div className='flex justify-between items-center md:p-3'>
               <div className='flex bg-[#455175] w-full h-8 mt-1 items-center rounded-md'>
-                    <input className='rounded-md  w-full h-full p-1 ' type="text"  placeholder='search your friends'></input>
-                    <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer "></i>
+                    <input className='rounded-md  w-full h-full p-1' value={search} onChange={e =>setSearch(e.target.value)} type="text"  placeholder='search your friends'></input>
+                    <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={handleVisible}></i>
               </div>
               <div>
-                    <i className="fa-solid fa-2xl fa-user-plus ml-4 text-[#BED7F8] cursor-pointer"></i>
+                    <i className="fa-solid fa-2xl fa-user-plus ml-4 text-[#BED7F8] cursor-pointer" ></i>
               </div>
-              
+              {visible && <div className="flex mt-24 fixed z-30 ">
+                <div className=" w-[92vw] p-2">
+                      <div className='flex bg-slate-300 p-2'>
+                      <Link to="/profile"><img src='/images/noProfile.jpeg' className="rounded-full h-10 w-10 cursor-pointer"></img></Link>
+                            <div className="flex-1 ml-2 mt-2 ">
+                                  <div className="h-3 ">Leander</div>
+                            </div>  
+                      </div>
+                </div> 
+              </div>}
             </div>
+            {search && <ChatSearchSkeleton/>}
             <div className='h-[calc(100vh-7.9rem)] md:h-[calc(100vh-2.7rem)] p-3 overflow-y-scroll'>
                   {/* {allChat?.map((c) =>(
                         <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
@@ -116,7 +143,7 @@ function Chat() {
                   <Conversation/>
 
             </div>
-           
+            
             </div> :
             <div className='message'>
             <div className='flex justify-between items-center message bg-[#BED7F8] md:hidden'>

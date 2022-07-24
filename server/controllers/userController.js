@@ -3,8 +3,6 @@ const asyncHandler = require('express-async-handler');
 const Post = require("../model/Post")
 const Message= require("../model/Message");
 
-//search users//
-
 const particularUser = asyncHandler(async(req,res) =>{
       const {name} = req.query
       
@@ -86,8 +84,19 @@ const loginUser =asyncHandler(async(req,res) =>{
 // Update user //
 
 const updateUser =asyncHandler(async(req,res) =>{
+      // console.log(req.file);
+
       try {
-            const user = await User.findByIdAndUpdate(req.user._id,req.body,{ new: true })
+            const user = await User.findByIdAndUpdate(req.user._id,
+                 {     
+                       name:req.body.name,
+                       bio:req.body.bio,
+                       username:req.body.username,
+                       status:req.body.status,
+                       profile:process.env.content+req.file.path
+                 },
+            { new: true })
+
             return res.status(200).json(user)
        } catch (error) {
              return res.status(500).send({error:error.message})
