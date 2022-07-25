@@ -51,15 +51,17 @@ const unfollow = asyncHandler(async(req,res) =>{
 const like = asyncHandler(async(req,res) =>{
       try {
             const post = await Post.findById(req.params.id)
-    
+            const user = await User.findById(req.user._id)  
             if(!post.likes.includes(req.user._id)){
                   const newPost=await post.updateOne({$push:{likes:req.user._id}})
+                  await user.updateOne({$push:{likedPost:req.params.id}})
                   console.log(newPost);
                   return res.status(200).json("Liked post")
                  
             }
             else{
                   await post.updateOne({$pull:{likes:req.user._id}})
+                  await user.updateOne({$pull:{likedPost:req.params.id}})
                   return res.status(200).json("Unliked post") 
             }
       } catch (error) {
@@ -67,9 +69,30 @@ const like = asyncHandler(async(req,res) =>{
       }
 })
 
+const bookmark = asyncHandler(async(req,res) =>{
+      try {
+            const post = await Post.findById(req.params.id)
+            const user = await User.findById(req.user._id)  
+            if(!post.bookmarked.includes(req.user._id)){
+                  const newPost=await post.updateOne({$push:{bookmarked:req.user._id}})
+                  await user.updateOne({$push:{bookmarkedPost:req.params.id}})
+                  console.log(newPost);
+                  return res.status(200).json("Bookmarked post")
+                 
+            }
+            else{
+                  await post.updateOne({$pull:{bookmarked:req.user._id}})
+                  await user.updateOne({$pull:{bookmarkedPost:req.params.id}})
+                  return res.status(200).json("Bookmarked post") 
+            }
+      } catch (error) {
+            return res.status(500).send({error:error.message})
+      }
+})
 
 module.exports = {
 	follow,
       unfollow,
       like,
+      bookmark 
 };

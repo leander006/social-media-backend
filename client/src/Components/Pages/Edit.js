@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { loginError, loginStart, loginSuccess, logout } from '../../redux/Slice/userSlice'
+import {logout } from '../../redux/Slice/userSlice'
 import Footer from '../Footer'
 import Navbar from '../Navbar'
 import SideBar from '../SideBar'

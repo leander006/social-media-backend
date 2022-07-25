@@ -55,7 +55,23 @@ const UserSchema = new mongoose.Schema({
     postCount:{
         type:Number,
         default:0
-    }
+    },
+    likedPost: {
+        type: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            },
+        ],
+    },
+    bookmarkedPost: {
+        type: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            },
+        ],
+    },
 },
 {timestamps:true}
 )

@@ -30,7 +30,7 @@ function App() {
    <Route exact path="/" element={<Login/>}/>
    <Route path="/home" element={<Home/>}/>
    <Route path="/like" element={<LikedPost/>}/>
-   <Route path="/profile" element={<Profile/>}/>
+   <Route path="/profile/:userId" element={<Profile/>}/>
    <Route path="/savedPost" element={<SavedPost/>}/>
    <Route path="/chat" element={<Chat/>}/>
    <Route path="/message/:chatId" element={<Chats/>}/>
@@ -39,7 +39,7 @@ function App() {
    <Route path="/login" element={<Login/>}/>
    <Route path="/edit" element={<Edit/>}/>
    <Route path="/register" element={<Register/>}/>
-   <Route path="/singlepage" element={<SinglePage/>}/>
+   <Route path="/singlepage/:postId" element={<SinglePage/>}/>
   </Routes>
  </Router>
   );

@@ -9,7 +9,7 @@ const particularUser = asyncHandler(async(req,res) =>{
       try {
             const keyword = req.query.name
             
-            const users = await User.find({username:{$regex:keyword ,$options:'$i'}})
+            const users = await User.find({username:{$regex:keyword ,$options:'$i'}}).populate("following","-password").populate("followers","-password")
             console.log(users.length);
             if(users.length !== 0){
                   return res.status(200).json(users)
@@ -25,9 +25,24 @@ const particularUser = asyncHandler(async(req,res) =>{
 
 // get all user //
 
+const userById = asyncHandler(async(req,res) =>{
+      try {
+           const user = await User.findById(req.params.id).populate("following","-password").populate("followers","-password")
+           const post = await Post.find({owner:req.params.id})
+           return res.status(200).json({user:user,post:post})
+      } catch (error) {
+            return res.status(500).send({error:error.message})
+      }
+
+})
+
+// get user by id//
+
+
+
 const allUser = asyncHandler(async(req,res) =>{
       try {
-           const allUsers = await User.find({_id:{$ne:req.user._id}})
+           const allUsers = await User.find({_id:{$ne:req.user._id}}).populate("following","-password").populate("followers","-password")
            return res.status(200).json(allUsers)
       } catch (error) {
             return res.status(500).send({error:error.message})
@@ -53,13 +68,15 @@ const remove = asyncHandler(async(req,res) =>{
       }
 
 })
+
+
 // To get users for adding inside group chat//
 
 const groupUser =asyncHandler(async(req,res) =>{
       try {
        
           
-            const allUsers = await User.find({_id:{$ne:req.user._id}})
+            const allUsers = await User.find({_id:{$ne:req.user._id}}).populate("following","-password").populate("followers","-password")
              return res.status(200).json(allUsers);
  
  
@@ -72,7 +89,7 @@ const loginUser =asyncHandler(async(req,res) =>{
       try {
        
           
-            const users = await User.findOne({_id:{$eq:req.user._id}})
+            const users = await User.findOne({_id:{$eq:req.user._id}}).populate("following","-password").populate("followers","-password")
              return res.status(200).json(users);
  
  
@@ -108,5 +125,6 @@ module.exports = {
       remove,
       groupUser,
       updateUser,
-      loginUser
+      loginUser,
+      userById
 };
