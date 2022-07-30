@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Navbar from '../Navbar'
 
@@ -9,17 +9,14 @@ import Cookie from "js-cookie"
 import SideBar from '../SideBar'
 import Footer from '../Footer'
 
-
 import Pin from '../GridSystem/Pin'
-
-import { useNavigate } from 'react-router-dom'
 import Skeleton from '../Skeleton/Skeleton'
 
 const sizeArray = ["sm", "md", "lg"];
 
 function Explore() {
   const {click} = useSelector(state =>state.user)
-  const navigate=useNavigate()
+  const [visible, setvisible] = useState(false)
   const dispatch = useDispatch()
   const config ={
     headers:{
@@ -45,6 +42,9 @@ useEffect(() => {
   
 },[] )
   
+const handle = () =>{
+  setvisible(!visible)
+}
 
   return (
     <>
@@ -53,17 +53,17 @@ useEffect(() => {
         <div>
           <SideBar/>
         </div>
-        <div className='flex  mb-4'>
-          {!true?<div className='flex md:hidden m-auto mt-1 items-center bg-slate-200 rounded-md'>
+        <div className='flex flex-col mb-4'>
+         <div className='flex md:hidden m-auto mt-1 items-center bg-slate-200 rounded-md'>
                 <input className='rounded-md m-2 p-1' type="text" placeholder='search your friends'></input>
                 <i className="fa-solid fa-xl fa-magnifying-glass ml-1"></i>
-          </div>:<></>}
+          </div>
       { !loading? <div className={click?'m-0 w-screen lg:w-[87vw] md:w-[77vw] p-3  h-[calc(100vh-5rem)] md:h-[calc(100vh-2.7rem)] overflow-y-scroll justify-center absolute grid auto-rows-2fr grid-cols-8':'m-0  w-screen md:w-[93%] p-3 bg-[#2D3B58] h-[calc(100vh-6.9rem)] md:h-[calc(100vh-2.7rem)] overflow-y-scroll justify-center md:absolute grid auto-rows-2fr grid-cols-8'}  >
     {allpost?.map((p) =>(
         <Pin url={p.content} id={p._id} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
       )
     )}
-  </div>:<Skeleton/>}
+  </div >:<Skeleton/>}
         </div>
 
       </div>

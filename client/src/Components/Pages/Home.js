@@ -14,6 +14,7 @@ import axios from 'axios'
 function Home() {
 
   const {followerPost,loading} = useSelector(state =>state.post)
+  const {currentUser} = useSelector(state =>state.user)
   const dispatch = useDispatch()
   const config ={
     headers:{
@@ -30,7 +31,7 @@ function Home() {
         dispatch(followerPostSuccess(data))
         
       } catch (error) {
-        dispatch(followerPostError())
+          dispatch(followerPostError())
            console.log(error?.response?.data);
       }
     }
@@ -46,7 +47,7 @@ function Home() {
         </div>
       {!loading ? <div className='flex flex-col md:p-0  md:items-center h-[calc(100vh-4.3rem)]  md:h-[calc(100vh-2.7rem)] overflow-y-scroll md:border md:border-x-0 md:border-r-2 md:border-[#BED7F8] md:border-t-0 flex-auto mb-2 md:mb-0'>
           {followerPost?.map((p) =>(
-            <ExploreMore explore={p} key={p._id}/>
+            <ExploreMore explore={p} key={p._id} bookmark={currentUser?.bookmarkedPost?.includes(p?._id)?true:false} likes={currentUser?.likedPost?.includes(p?._id)?true:false}/>
           ))}
         </div>:<div className='flex flex-col md:p-0  md:items-center h-[calc(100vh-4.3rem)]  md:h-[calc(100vh-2.7rem)] overflow-y-scroll md:border md:border-x-0 md:border-r-2 md:border-[#BED7F8] md:border-t-0 flex-auto mb-2 md:mb-0'>
           {followerPost?.map((p) =>(

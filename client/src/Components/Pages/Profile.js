@@ -10,12 +10,11 @@ import SideBar from '../SideBar'
 import ProfileSkeleton from '../Skeleton/ProfileSkeleton'
 
 function Profile() {
-  const {click} = useSelector(state =>state.user)
+  const {click,currentUser} = useSelector(state =>state.user)
   const [loading, setLoading] = useState(false)
   const {userId} = useParams()
   const [user, setUser] = useState()
   const [post, setPost] = useState([])
-
   const config ={
     headers:{
         "Content-Type":"application/json",
@@ -35,7 +34,7 @@ useEffect(() => {
     }
   }
   getPost()
-},[])
+},[userId])
 
   const sizeArray = ["sm", "md", "lg"];
   return (
@@ -83,16 +82,16 @@ useEffect(() => {
 
                 </div>
             </div>
-            <div className='mt-24 flex justify-center items-center '>
-            <Link to="/edit"><div className='bg-[#BED7F8] text-black w-64 md:w-80 xl:w-[36rem] lg:w-96 rounded-lg flex active:bg-[#85b6f7] justify-center cursor-pointer'>
+            {user?._id === currentUser?._id && <div className='mt-24 flex justify-center items-center '>
+            <Link to={"/edit/"+userId}><div className='bg-[#BED7F8] text-black w-64 md:w-80 xl:w-[36rem] lg:w-96 rounded-lg flex active:bg-[#85b6f7] justify-center cursor-pointer'>
                  <h1 className='font-bold'>Edit Profile</h1>
               </div></Link>
                 <i className="fa-solid fa-xl ml-2 fa-user-plus cursor-pointer"></i>
-            </div>
+            </div>}
 
             <div className={click?'m-0 w-screen xl:w-[86vw] lg:w-[80vw] md:w-[77vw] p-3 md:mt-3 h-[calc(100vh-5rem)] md:h-[calc(100vh-24.8rem)] overflow-y-scroll justify-center absolute grid auto-rows-2fr grid-cols-8':'m-0  w-screen md:w-[93%] p-9 bg-[#2D3B58] md:h-[calc(100vh-24.8rem)] md:mt-3 overflow-y-scroll justify-center md:absolute grid auto-rows-2fr grid-cols-8'}  >
     {post.map((p) =>(
-        <Pin url={p.content} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
+        <Pin url={p.content} id={p._id} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
       )
     )}
   </div>

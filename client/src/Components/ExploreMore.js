@@ -1,21 +1,75 @@
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link} from 'react-router-dom'
+import Cookie from "js-cookie"  
+import axios from 'axios'
+import { loginError, loginStart, loginSuccess } from '../redux/Slice/userSlice'
+
 
 
 function ExploreMore({explore}) {
-      const [likes, setLikes] = useState(false)
-      const [saved, setSaved] = useState(false)
+      const {currentUser} = useSelector(state =>state.user)
+      const [like, setLike] = useState(explore?.likes?.length)
+      const [isLiked, setIsLiked] = useState(explore.likes?.includes(currentUser._id))
+      const [bookmark, setBookmark] = useState(explore.bookmark?.includes(currentUser._id))
+      const dispatch = useDispatch()
 
-      const handleLikes =(e) =>{
+      const config ={
+            headers:{
+                "Content-Type":"application/json",
+                Authorization:`Bearer ${Cookie.get('token')}`
+            }
+          }
+
+          const handleLikes =async(e) =>{
             e.preventDefault()
-            setLikes(!likes)
+            try {
+                  dispatch(loginStart())
+                  const {data}=await axios.put(`http://localhost:3001/api/post/likePost/${explore._id}`,{},config)
+                  dispatch(loginSuccess(data))
+                  setLike(isLiked ? like - 1 : like + 1);
+                  setIsLiked(!isLiked)
+            } catch (error) {
+                  dispatch(loginError())
+                  console.log(error?.response?.data);
+            }
+
+      }          
+      const handleSaved =async(e) =>{
+            e.preventDefault()
+            try {
+                  dispatch(loginStart())
+                  const {data}= await axios.put(`http://localhost:3001/api/post/bookmarkPost/${explore?._id}`,{},config)
+                  dispatch(loginSuccess(data))
+                  setBookmark(!bookmark)
+            } catch (error) {
+                  dispatch(loginError())
+                  console.log(error?.response?.data);
+            }
       }
 
-      const handleSaved =(e) =>{
-            e.preventDefault()
-            setSaved(!saved)
-      }
+      //     useEffect(() => {
+      //       const getUser = async() =>{
+      //             try {
+      //                   dispatch(loginStart())
+      //                  const {data} = await axios.get("http://localhost:3001/api/user/oneUser?userId="+currentUser._id,config)
+      //                  dispatch(loginSuccess(data))
+      //                  console.log(data.likedPost);
+      //             } catch (error) {
+      //                   dispatch(loginError())
+      //             }
+      //       }
+      //       getUser()
+      //     }, [explore.owner._id])
+          
+
+          useEffect(() => {
+            setIsLiked(currentUser?.others?currentUser.others?.likedPost?.includes(explore._id):currentUser.likedPost?.includes(explore._id) );
+            setBookmark(currentUser?.others?currentUser?.others?.bookmarkedPost?.includes(explore._id):currentUser.bookmarkedPost?.includes(explore._id) );
+          }, [explore._id,currentUser])
+
+
+
       
 
   return (
@@ -31,10 +85,11 @@ function ExploreMore({explore}) {
           <div className='flex my-3 mx-3 items-center justify-between' >
                 <div className='flex likes cursor-pointer items-center' onClick={handleLikes}>
                       <div className='flex flex-col justify-center mt-3'>
-                              {!likes ? <i className="fa-regular fa-heart fa-2xl pr-3"/>:
-                              <i className="fa-solid fa-heart fa-2xl pr-3 text-red-700"/>
+                              {isLiked?
+                              <i className="fa-solid fa-heart fa-2xl pr-3 text-red-700"/>: 
+                              <i className="fa-regular fa-heart fa-2xl pr-3"/>
                               }
-                              <h1 className='mt-3 ml-1'>{explore?.likes?.length}</h1>
+                              <h1 className='mt-3 ml-1'>{like}</h1>
                       </div>
                        <Link to={"/singlePage/"+explore?._id}><div>
                               <i className="fa-regular fa-2xl fa-comment cursor-pointer" ></i>
@@ -43,7 +98,7 @@ function ExploreMore({explore}) {
                         
                 </div>
                  <div>
-                        {saved ?<i className="fa-solid fa-xl fa-bookmark cursor-pointer" onClick={handleSaved}></i>:
+                        { bookmark ?<i className="fa-solid fa-xl fa-bookmark cursor-pointer" onClick={handleSaved}></i>:
                         <i className="fa-regular fa-xl fa-bookmark cursor-pointer" onClick={handleSaved}></i>}
                 </div>             
                 

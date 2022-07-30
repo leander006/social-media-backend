@@ -47,7 +47,7 @@ const handleVisible = (e) =>{
                         <h1>{currentUser.username}</h1>
                   </div>
                   <div className='mr-2 cursor-pointer'>
-                        <Link to="/profile"><img className='rounded-full w-10 p-1' src={currentUser.profile} /></Link>
+                        <Link to={"/profile/"+currentUser?._id}><img className='rounded-full w-10 p-1' src={currentUser.profile} /></Link>
                   </div>
                 </div>
           </div>

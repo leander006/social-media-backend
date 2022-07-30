@@ -68,7 +68,6 @@ const followingPost = asyncHandler(async(req,res) =>{
         const user = await User.findById(req.user._id)
         const post = await Post.find({owner:user._id}).populate("owner").populate({path:"likes",populate:{path:"username"}}).populate({path:"comments",populate:{path:"username"}}).sort({createdAt:-1})
         const following = user.following
-        console.log(following);
 // Promise.all is use to get all post of user's following login user
 
         const morePost = await Promise.all(
@@ -76,7 +75,6 @@ const followingPost = asyncHandler(async(req,res) =>{
                 return Post.find({owner:id}).populate("owner").populate({path:"likes",populate:{path:"username"}}).populate({path:"comments",populate:{path:"username"}}).sort({createdAt:-1})
             })
         )
-console.log(morePost);
 // flat() is use to return json as a single object if not used it returned two object as [{},{}]
 
           res.status(200).json(post.concat(morePost.flat()))
@@ -95,8 +93,7 @@ const likePost = asyncHandler(async(req,res) =>{
     const morePost = await Promise.all(
     likes.map((id) =>{
         return Post.find({_id:id}).populate("owner").populate({path:"likes",populate:{path:"username"}}).populate({path:"comments",populate:{path:"username"}}).sort({createdAt:-1})
-    }))      
-    console.log(morePost);    
+    }))         
         res.status(200).json(morePost.flat())
     } catch (error) {
         res.status(404).send({error:error.message})

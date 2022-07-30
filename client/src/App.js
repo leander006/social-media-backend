@@ -21,6 +21,7 @@ axios.defaults.withCredentials= true;
 
 
 function App() {
+  
   return (
 
 
@@ -37,7 +38,7 @@ function App() {
    <Route path="/explore" element={<Explore/>}/>
    <Route path="/write" element={<Write/>}/>
    <Route path="/login" element={<Login/>}/>
-   <Route path="/edit" element={<Edit/>}/>
+   <Route path="/edit/:editId" element={<Edit/>}/>
    <Route path="/register" element={<Register/>}/>
    <Route path="/singlepage/:postId" element={<SinglePage/>}/>
   </Routes>

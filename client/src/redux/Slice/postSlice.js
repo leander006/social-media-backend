@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  allpost: null,
-  followerPost:null,
+  allpost: [],
+  followerPost:[],
   loading:false,
   likePost:null,
   bookmarkPost:null,
@@ -35,33 +35,24 @@ export const PostSlice = createSlice({
     followerPostError:(state) =>{
         state.loading=false
         state.error=true
-    },
-    likepostStart:(state) =>{
+    }, 
+    getfollowerStart:(state) =>{
         state.loading=true
+        
     },
-    likepostSuccess:(state,action) =>{
+    getfollowerSuccess:(state) =>{
         state.loading=false
-        state.likePost= action.payload
+        state.followerPost=state.followerPost
     },
-    likepostError:(state) =>{
+    getfollowerError:(state) =>{
         state.loading=false
         state.error=true
     },
-    bookmarkedpostStart:(state) =>{
-        state.loading=true
-    },
-    bookmarkedpostSuccess:(state,action) =>{
-        state.loading=false
-        state.bookmarkPost= action.payload
-    },
-    bookmarkedpostError:(state) =>{
-        state.loading=false
-        state.error=true
-    }
+
 },
 })
     
-export const { postStart,postSuccess,postError,followerPostStart,followerPostSuccess,followerPostError,likepostError,likepostStart,likepostSuccess,bookmarkedpostError,bookmarkedpostStart,bookmarkedpostSuccess} = PostSlice.actions
+export const { postStart,postSuccess,postError,followerPostStart,followerPostSuccess,followerPostError,getfollowerStart,getfollowerSuccess,getfollowerError} = PostSlice.actions
 
 
 export default PostSlice.reducer    
