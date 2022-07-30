@@ -5,10 +5,10 @@ const Message= require("../model/Message");
 const { cloudinary } = require("../utils/cloudinary");
 
 const particularUser = asyncHandler(async(req,res) =>{
-      try {
             const name = req.query.name
             const userId = req.query.userId
-            const users = name ? await User.find({username:{$regex:name ,$options:'$i'}}).populate("following","-password").populate("followers","-password"):await User.findById(userId).populate("following","-password").populate("followers","-password")
+      try {
+            const users = name ? await User.find({"_id":{$ne:req.user._id},username:{$regex:name ,$options:'$i'}}):await User.findById(userId).populate("following","-password").populate("followers","-password")
             if(users.length !== 0){
                   return res.status(200).json(users)
             }
@@ -18,6 +18,23 @@ const particularUser = asyncHandler(async(req,res) =>{
        }
 })
 
+
+
+// Search friend //
+
+const friendSearch = asyncHandler(async(req,res) =>{
+      const name = req.query.name
+try {
+      const users = await User.find({"_id":{$ne:req.user._id},followers:{$elemMatch:{$eq:req.user._id}},username:{$regex:name ,$options:'$i'}})
+      if(users.length !== 0){
+            return res.status(200).json(users)
+      }
+      return res.status(404).send({error:"User doest not exist"});
+
+ } catch (error) {
+       return res.status(500).send({error:error.message})
+ }
+})
 
 // get all user //
 
@@ -195,5 +212,6 @@ module.exports = {
       loginUser,
       userById,
       suggestedUser,
-      uploadPic
+      uploadPic,
+      friendSearch 
 };

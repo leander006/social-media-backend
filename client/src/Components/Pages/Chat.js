@@ -7,15 +7,31 @@ import SideBar from '../SideBar'
 import Messages from '../Mesaages'
 import NopPreview from '../NopPreview'
 import ChatSearchSkeleton from '../Skeleton/ChatSearchSkeleton'
+import Cookie from "js-cookie"  
+import axios from 'axios';
+import SearchFreind from '../SearchFreind'
 
 function Chat() {
   const [currentChat, setCurrentChat] = useState(false)
   const [visible, setVisible] = useState(false)
   const [search, setSearch] = useState("")
-  const handleVisible = (e) =>{
-        e.preventDefault()
-        setSearch("")
-        setVisible(!visible)
+  const [searched, setSearched] = useState([])
+  const config ={
+      headers:{
+          "Content-Type":"application/json",
+          Authorization:`Bearer ${Cookie.get('token')}`
+      }
+    }
+  const handleVisible = async(e) =>{
+      e.preventDefault()
+      try {
+            const {data} = await axios.get("http://localhost:3001/api/user/freind/search?name="+search,config)
+            setSearched(data)
+      } catch (error) {
+            console.log(error.response.data);
+      }
+      setVisible(!visible)
+      setSearch("")       
   }
   return (
       <>
@@ -33,12 +49,9 @@ function Chat() {
             <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={ handleVisible}></i>
             {visible &&  <div className="shadow hidden md:flex mt-24 fixed z-30 ">
                 <div className="md:w-64 lg:w-80 xl:w-[30rem]  ">
-                      <div className='flex bg-slate-300 p-2'>
-                      <Link to="/profile"><img src='/images/noProfile.jpeg' className="rounded-full h-10 w- cursor-pointer"></img></Link>
-                            <div className="flex-1 md:ml-2 md:mt-2 ">
-                                  <div className="h-3 ">Leander</div>
-                            </div>  
-                      </div>
+                {searched.map((s) =>(
+                                    <SearchFreind key={s._id} search={s}/>
+                              ))}
                 </div>
               </div>}
 

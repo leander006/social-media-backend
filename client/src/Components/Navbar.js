@@ -25,14 +25,12 @@ const handleVisible = async(e) =>{
       try {
             const {data} = await axios.get("http://localhost:3001/api/user/oneUser?name="+search,config)
             setSearched(data)
-            console.log(data);
             setSearch("")
-            console.log(data);
       } catch (error) {
-            console.log(error);
+            console.log(error.response.data);
       }
-      
       setVisible(!visible)
+      
 }
   return (
 
