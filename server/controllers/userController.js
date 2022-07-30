@@ -2,6 +2,7 @@ const User = require("../model/User");
 const asyncHandler = require('express-async-handler');
 const Post = require("../model/Post")
 const Message= require("../model/Message");
+const { cloudinary } = require("../utils/cloudinary");
 
 const particularUser = asyncHandler(async(req,res) =>{
       try {
@@ -11,9 +12,7 @@ const particularUser = asyncHandler(async(req,res) =>{
             if(users.length !== 0){
                   return res.status(200).json(users)
             }
-            
             return res.status(404).send({error:"User doest not exist"});
- 
        } catch (error) {
              return res.status(500).send({error:error.message})
        }
@@ -84,12 +83,8 @@ const groupUser =asyncHandler(async(req,res) =>{
 //get login user
 const loginUser =asyncHandler(async(req,res) =>{
       try {
-       
-          
             const users = await User.findOne({_id:{$eq:req.user._id}}).populate("following","-password").populate("followers","-password")
              return res.status(200).json(users);
- 
- 
        } catch (error) {
              return res.status(500).send({error:error.message})
        }
@@ -97,8 +92,23 @@ const loginUser =asyncHandler(async(req,res) =>{
 
 // Update user //
 
+const uploadPic =async (req, res) => {
+      try {
+          const fileStr = req.body.data;
+          const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+              upload_preset: 'Social_Media_app',
+          });
+          res.status(200).json(uploadResponse);
+      } catch (err) {
+          console.error(err);
+          res.status(500).json({ err: 'Something went wrong' });
+      }
+  };
+
+
 const updateUser =asyncHandler(async(req,res) =>{
-      // console.log(req.file);
+
+      console.log(req.body.profile);
 
       try {
             const user = await User.findByIdAndUpdate(req.params.id,
@@ -107,11 +117,13 @@ const updateUser =asyncHandler(async(req,res) =>{
                        bio:req.body.bio,
                        username:req.body.username,
                        status:req.body.status,
-                       profile:process.env.content+req.file.path
+                       profile:req.body.profile
                  },
             { new: true })
-
-            return res.status(200).json(user)
+            return res.cookie("data",JSON.stringify(user),{ expires: new Date(Date.now() + 25892000000),
+                  secure:process.env.NODE_ENV === "production"?true:false,
+                  httpOnly:process.env.NODE_ENV === "production"?true:false,})
+              .status(200).json(user)
        } catch (error) {
              return res.status(500).send({error:error.message})
        }
@@ -182,5 +194,6 @@ module.exports = {
       updateUser,
       loginUser,
       userById,
-      suggestedUser
+      suggestedUser,
+      uploadPic
 };

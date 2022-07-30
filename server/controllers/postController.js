@@ -10,7 +10,7 @@ const createPost = asyncHandler(async(req,res) =>{
           const newPost = new Post({
               owner:req.user._id,
               caption:caption,
-              content:process.env.content + req.file.path
+              content:req.body.content
         })
   
           const post = await newPost.save();

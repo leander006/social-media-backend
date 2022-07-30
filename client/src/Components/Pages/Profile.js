@@ -46,8 +46,8 @@ useEffect(() => {
         </div>
         <div className='h-[calc(100vh-20rem)] text-white xl:w-[94%]  w-screen'>
             <div className='flex justify-center md:space-x-12 '>
-                <div className='left image mt-6 xl:ml-[16rem] '>
-                      <img className='rounded-full p-1 md:p-4 w-28 md:w-36 ' alt='profile' src={user?.profile} />
+                <div className='left image mt-6 xl:ml-[16rem] mr-2'>
+                      <img className='rounded-full p-1 md:p-4 h-12 w-12 md:w-36 md:h-36' alt='profile' src={user?.profile} />
                 </div>
                 <div className='right flex flex-col'>
                   <div className='top flex space-x-14 md:space-x-[12rem] xl:space-x-[16rem] lg:space-x-[14rem] mt-8 xl:mr-48'>

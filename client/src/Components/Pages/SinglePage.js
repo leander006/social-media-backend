@@ -113,11 +113,11 @@ function SinglePage() {
           </div>
          {loading? <div className='flex flex-col p-4 md:items-center lg:justify-center md:p-4 md:flex-row h-[calc(100vh-4.3rem)] w-screen md:h-[calc(100vh-2.7rem)] overflow-y-scroll'>
               <div className='h-1/4 md:h-3/4 lg:h-5/6 md:border border-[#BED7F8] md:w-[50%] lg:w-2/5'>
-                        <img className='  w-full h-full' src={post?.content}></img>
+                        <img className=' w-full h-full' src={post?.content}></img>
               </div>
               <div className='flex flex-col md:border border-[#BED7F8] p-2 h-3/4 md:h-3/4 lg:h-5/6 md:w-[50%] lg:w-2/5  '>
-                  <div className='flex p-1 ' >
-                        <Link to={"/profile/"+post?.owner?._id}><img src={post?.owner?.profile} alt='image' className='w-10 h-10  rounded-full cursor-pointer border' /></Link>
+                  <div className='flex p-1' >
+                        <Link to={"/profile/"+post?.owner?._id}><img src={post?.owner?.profile} alt='image' className='w-fit h-12 rounded-full cursor-pointer border' /></Link>
                         <div className='main '>
                         <Link to={"/profile/"+post?.owner?._id}><h1 className='capitalize ml-2 font-sans cursor-pointer font-bold text-white' >{post?.owner?.username}</h1></Link>
                         <p className='ml-2 text-sm mt-3 text-slate-300 break-all'>{post?.caption}</p>

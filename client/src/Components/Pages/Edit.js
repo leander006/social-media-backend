@@ -11,12 +11,16 @@ import axios from 'axios'
 function Edit() {
       const navigate = useNavigate()
       const dispatch = useDispatch();
-      const [name, setName] = useState("")
+      const [name, setName] = useState()
       const [user, setUser] = useState()
-      const [username, setUsername] = useState("")
-      const [bio, setBio] = useState("")
+      const [username, setUsername] = useState()
+      const [bio, setBio] = useState()
+      const [profile, setProfile] = useState()
+      const [selectedImg, setSelectedImg] = useState("")
+      const [previewSource, setPreviewSource] = useState('');
+      const [fileInputState, setFileInputState] = useState('');
       const {editId} = useParams()
-      const [profile, setProfile] = useState(null)
+
       const config ={
             headers:{
                 "Content-Type":"application/json",
@@ -24,7 +28,20 @@ function Edit() {
             }
           }
 
-       
+          const handleFileInputChange = (e) => {
+            const file = e.target.files[0];
+            previewFile(file);
+            setSelectedImg(file);
+            setFileInputState(e.target.value);
+        };
+
+          const previewFile = (file) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                setPreviewSource(reader.result);
+            };
+        }
           
           useEffect(() => {
             const getPost = async() =>{
@@ -38,28 +55,48 @@ function Edit() {
             getPost()
           },[editId])
 
-      const handleSubmit = async(e) =>{
-            e.preventDefault()
+
+      const handleImage = (e) => {
+            e.preventDefault();
+            if (!selectedImg) return;
+            const reader = new FileReader();
+            reader.readAsDataURL(selectedImg);
+            reader.onloadend = () => {
+                uploadImage(reader.result);
+            };
+            reader.onerror = () => {
+                console.error('AHHHHHHHH!!');
+            };
+        };
+
+      const uploadImage = async (base64EncodedImage) => {
             try {
-                  dispatch(loginStart())
-                  if (profile) {
-                        const data1 = new FormData();
-                        const fileName = Date.now() + profile.name;
-                        data.append("name", fileName);
-                        data.append("file", profile);
-                        profile = fileName;
-                        // console.log(profile);
-                  const {data} = await axios.put("http://localhost:3001/api/user/update/"+editId,
-                  {username:username, bio:bio, name:name,profile:profile}
-                  ,config); 
-                  dispatch(loginSuccess(data))
-                  navigate("/profile/"+editId)
-                  }
-            } catch (error) {
-                  dispatch(loginError())
-                  console.log(error?.response?.data);
+               const {data}= await axios.post('http://localhost:3001/api/user/upload',{data: base64EncodedImage }
+                ,config);
+                setFileInputState('');
+                setPreviewSource('');
+                setProfile(data.url)
+            } catch (err) {
+                console.error(err);
+
             }
-      
+        };
+
+        const handleSubmit = async(e) =>{
+            e.preventDefault()
+            dispatch(loginStart())
+            try {
+                  const user = await axios.put("http://localhost:3001/api/user/update/"+editId,{username:username, bio:bio, name:name,
+                  profile:profile},config); 
+
+                  dispatch(loginSuccess(user.data))
+                  navigate("/profile/"+editId)
+
+                  }
+                  catch (error) {
+                        dispatch(loginError())
+                        console.log(error?.response?.data);
+                  }
            
       }
       const log = (e)=>{
@@ -67,7 +104,6 @@ function Edit() {
             dispatch(logout())
             navigate("/")
       }
-
   return (
       <>
       <Navbar/>
@@ -87,25 +123,26 @@ function Edit() {
                   </div>
 
                   <div className='flex flex-col justify-center items-center' >
-                        <img className='image w-16 h-16 rounded-full ' src={user?.profile} alt='image'/>
+                        <img className='image w-16 h-16 rounded-full ' src={previewSource?previewSource:profile?profile:user?.profile} alt='image'/>
                         <label className='text-[#8aaaeb] cursor-pointer hover:text-[#6795f1]' htmlFor='forFile'>Change Profile</label>
-                        <input type="file" id='forFile' accept='image/png , image/jpg, image/jpeg' style={{display:"none"}} onChange={e=>setProfile(e.target.files[0])}  name="file" required />
+                        <input type="file" id='forFile' accept='image/png , image/jpg, image/jpeg' style={{display:"none"}} value={fileInputState} onChange={handleFileInputChange}  name="file" required />
                   </div>
-
+                 {selectedImg && <div className='flex justify-center'><h1 className='bg-blue-600 active:bg-blue-400 cursor-pointer mt-2 text-white p-1 rounded' onClick={handleImage}>Upload image</h1></div>}
                   <div className='bottom'>
+
                         <div className='p-2'>
                               <h1 className='text-[#8aaaeb] '>Name</h1>
-                              <input className='bg-[#2D3B58] border-b w-full mt-2 outline-none' placeholder={user?.name} value={name} onChange={e=>setName(e.target.value)}  type="text"></input>
+                              <input className='bg-[#2D3B58] border-b w-full mt-2 outline-none' placeholder={user?.name} onChange={e=>setName(e.target.value)}  type="text"></input>
                         </div>
 
                         <div className='p-2'>
                               <h1 className='text-[#8aaaeb] '>Username</h1>
-                              <input className='bg-[#2D3B58] border-b w-full mt-2 outline-none' placeholder={user?.username} value={username} onChange={e=>setUsername(e.target.value)}  type="text"></input>
+                              <input className='bg-[#2D3B58] border-b w-full mt-2 outline-none' placeholder={user?.username} onChange={e=>setUsername(e.target.value)}  type="text"></input>
                         </div>
 
                         <div className='p-2'>
                               <h1 className='text-[#8aaaeb] '>Bio</h1>
-                              <textarea className='bg-[#2D3B58] border-b w-full mt-2 outline-none' placeholder={user?.bio} value={bio} onChange={e=>setBio(e.target.value)}  type="text"></textarea>
+                              <textarea className='bg-[#2D3B58] border-b w-full mt-2 outline-none' placeholder={user?.bio} onChange={e=>setBio(e.target.value)}  type="text"></textarea>
                         </div>
 
                   </div> 

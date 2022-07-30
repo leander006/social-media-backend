@@ -2,7 +2,7 @@
 const express = require('express');
 const { follow, unfollow, like, unLike } = require('../controllers/mediaController');
 const router = express.Router();
-const {allUser, particularUser,groupUser, updateUser, loginUser, userById, suggestedUser} = require("../controllers/userController");
+const {allUser, particularUser,groupUser, updateUser, loginUser, userById, suggestedUser, uploadPic} = require("../controllers/userController");
 const { protect } = require('../middleware/authMiddleware');
 const { upload } = require('../middleware/profilePicUpload');
 
@@ -12,7 +12,8 @@ router.get("/oneUser",protect,particularUser)
 router.get("/",protect,groupUser)
 router.get("/:id",protect,userById)
 router.get("/suggesteduser/user",protect,suggestedUser)
-router.put("/update/:id",upload.single('profile'),protect,updateUser)
+router.post("/upload",protect,uploadPic)
+router.put("/update/:id",protect,updateUser)
 router.put("/addFollower/:id",protect,follow)
 router.put("/removeFollower/:id",protect,unfollow)
 router.get("/loginUser",protect,loginUser)
