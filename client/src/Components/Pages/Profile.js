@@ -1,20 +1,27 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import {useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
 import Footer from '../Footer'
 import Pin from '../GridSystem/Pin'
 import Cookie from "js-cookie"  
 import Navbar from '../Navbar'
 import SideBar from '../SideBar'
-import ProfileSkeleton from '../Skeleton/ProfileSkeleton'
+
+
 
 function Profile() {
+  
   const {click,currentUser} = useSelector(state =>state.user)
   const [loading, setLoading] = useState(false)
   const {userId} = useParams()
+  const [follow, setFollow] = useState(false)
   const [user, setUser] = useState()
   const [post, setPost] = useState([])
+
+  const current =currentUser.others?currentUser.others:currentUser
+
+
   const config ={
     headers:{
         "Content-Type":"application/json",
@@ -28,6 +35,7 @@ useEffect(() => {
       const {data} = await axios.get("http://localhost:3001/api/user/"+userId,config)
       setUser(data.user)
       setPost(data.post)
+      setFollow(current?.following?.includes(data.user._id))
       setLoading(true)
     } catch (error) {
         console.log(error?.response?.data);
@@ -35,6 +43,18 @@ useEffect(() => {
   }
   getPost()
 },[userId])
+
+
+
+const following = async(e) =>{
+  e.preventDefault()
+  try {
+        const {data}= await axios.put(`http://localhost:3001/api/user/addFollower/${userId}`,{},config)
+        setFollow(!follow)
+  } catch (error) {
+        console.log(error?.response?.data);
+  }
+}
 
   const sizeArray = ["sm", "md", "lg"];
   return (
@@ -54,9 +74,14 @@ useEffect(() => {
                         <div>
                               <h1>{user?.username}</h1>
                         </div>
-                        <div className='h-6 flex items-center rounded-lg p-0.5 text-black bg-[#BED7F8] cursor-pointer active:bg-[#88b8f7] active:rounded-lg'>
-                              <Link to='/chat'><h1>Message</h1></Link>  
-                        </div>    
+                        {userId !== currentUser?._id &&<div className='h-6 flex items-center'>
+                              <Link to='/chat'><h1 className=' rounded-lg p-0.5 text-black bg-[#BED7F8] cursor-pointer active:bg-[#88b8f7] active:rounded-lg'>Message</h1></Link>  
+                              {userId !== currentUser?._id && <div>
+                              {follow ?<i className="fa-solid fa-user-slash fa-xl ml-2 cursor-pointer" onClick={following}></i>:
+                              <i className="fa-solid fa-xl ml-2 fa-user-plus cursor-pointer" onClick={following}></i>}
+                              </div>}
+                        </div>  } 
+                         
                   </div>
 
                   <div className='mid-up flex space-x-4 md:space-x-10 lg:space-x-14 md:mb-3 mt-4'>
@@ -86,7 +111,6 @@ useEffect(() => {
             <Link to={"/edit/"+userId}><div className='bg-[#BED7F8] text-black w-64 md:w-80 xl:w-[36rem] lg:w-96 rounded-lg flex active:bg-[#85b6f7] justify-center cursor-pointer'>
                  <h1 className='font-bold'>Edit Profile</h1>
               </div></Link>
-                <i className="fa-solid fa-xl ml-2 fa-user-plus cursor-pointer"></i>
             </div>}
 
             <div className={click?'m-0 w-screen xl:w-[86vw] lg:w-[80vw] md:w-[77vw] p-3 md:mt-3 h-[calc(100vh-5rem)] md:h-[calc(100vh-24.8rem)] overflow-y-scroll justify-center absolute grid auto-rows-2fr grid-cols-8':'m-0  w-screen md:w-[93%] p-9 bg-[#2D3B58] md:h-[calc(100vh-24.8rem)] md:mt-3 overflow-y-scroll justify-center md:absolute grid auto-rows-2fr grid-cols-8'}  >

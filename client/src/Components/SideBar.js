@@ -1,5 +1,6 @@
+import { current } from '@reduxjs/toolkit';
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { clicked, logout,unClicked } from '../redux/Slice/userSlice';
 
@@ -7,6 +8,9 @@ function SideBar() {
       const [visible, setVisible] = useState(true);
       const navigate = useNavigate()
       const dispatch = useDispatch();
+      const {currentUser} = useSelector(state =>state.user)
+      const current =currentUser.others?currentUser.others:currentUser
+
       const handleVisibility = (e) =>{
             e.preventDefault();
             dispatch(clicked())
@@ -58,12 +62,12 @@ function SideBar() {
                   </div>
                   <div className='flex mt-2 items-center '>
                         <i className="fa-solid fa-user"></i>
-                        <Link to="/profile"><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Profile</h1></Link>
+                        <Link to={"/profile/"+current._id}><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Profile</h1></Link>
                   </div>
             </div>}
             { !visible && <div className='fixed bottom-0 m-3'>
                   <div className='flex items-center'>
-                        <i className="fa-solid fa-xl fa-arrow-right-from-bracket" onClick={log}></i>
+                        <i className="fa-solid fa-xl fa-arrow-right-from-bracket cursor-pointer" onClick={log}></i>
                         <h1 className='ml-2 text-[#04283D]'>Logout</h1>
                   </div>
 

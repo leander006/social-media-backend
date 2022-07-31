@@ -47,22 +47,7 @@ function ExploreMore({explore}) {
                   console.log(error?.response?.data);
             }
       }
-
-      //     useEffect(() => {
-      //       const getUser = async() =>{
-      //             try {
-      //                   dispatch(loginStart())
-      //                  const {data} = await axios.get("http://localhost:3001/api/user/oneUser?userId="+currentUser._id,config)
-      //                  dispatch(loginSuccess(data))
-      //                  console.log(data.likedPost);
-      //             } catch (error) {
-      //                   dispatch(loginError())
-      //             }
-      //       }
-      //       getUser()
-      //     }, [explore.owner._id])
           
-
           useEffect(() => {
             setIsLiked(currentUser?.others?currentUser.others?.likedPost?.includes(explore._id):currentUser.likedPost?.includes(explore._id) );
             setBookmark(currentUser?.others?currentUser?.others?.bookmarkedPost?.includes(explore._id):currentUser.bookmarkedPost?.includes(explore._id) );

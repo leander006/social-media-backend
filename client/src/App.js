@@ -27,7 +27,7 @@ function App() {
 
    <Router>
    <Routes> 
-     
+   
    <Route exact path="/" element={<Login/>}/>
    <Route path="/home" element={<Home/>}/>
    <Route path="/like" element={<LikedPost/>}/>

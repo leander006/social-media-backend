@@ -9,7 +9,11 @@ import NopPreview from '../NopPreview'
 import ChatSearchSkeleton from '../Skeleton/ChatSearchSkeleton'
 import Cookie from "js-cookie"  
 import axios from 'axios';
-import SearchFreind from '../SearchFreind'
+
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import DirectMessage from '../DirectMessage'
 
 function Chat() {
   const [currentChat, setCurrentChat] = useState(false)
@@ -27,12 +31,33 @@ function Chat() {
       try {
             const {data} = await axios.get("http://localhost:3001/api/user/freind/search?name="+search,config)
             setSearched(data)
+            toast.success("This are result", {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: true,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              });
+           
       } catch (error) {
-            console.log(error.response.data);
+        toast.warn("something went wrong try again", {
+          position: "bottom-center",
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          });
       }
       setVisible(!visible)
       setSearch("")       
   }
+
+  
+
   return (
       <>
       <Navbar/>
@@ -50,17 +75,19 @@ function Chat() {
             {visible &&  <div className="shadow hidden md:flex mt-24 fixed z-30 ">
                 <div className="md:w-64 lg:w-80 xl:w-[30rem]  ">
                 {searched.map((s) =>(
-                                    <SearchFreind key={s._id} search={s}/>
+                                    <DirectMessage key={s._id} search={s}/>
                               ))}
                 </div>
               </div>}
-
+             
           </div>
-         
+                
         <div>
              <i className="fa-solid fa-2xl fa-user-plus ml-4 text-[#BED7F8] cursor-pointer"></i>
         </div>
        </div>
+
+       
        {search && <ChatSearchSkeleton/>}
        <div className='md:h-[calc(100vh-6.7rem)] p-3 overflow-y-scroll'>
          {/* {allChat?.map((c) =>(
@@ -186,6 +213,7 @@ function Chat() {
 
           {/* ---------- */}
         </div>
+        <ToastContainer/>
         <Footer/>
       </>
   )

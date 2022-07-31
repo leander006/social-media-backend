@@ -5,6 +5,10 @@ import SearchSkeleton from './Skeleton/SearchSkeleton'
 import Cookie from "js-cookie"  
 import axios from 'axios';
 import SearchFreind from './SearchFreind'
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function Navbar() {
 const [visible, setVisible] = useState(false)
 const [search, setSearch] = useState("")
@@ -25,13 +29,32 @@ const handleVisible = async(e) =>{
       try {
             const {data} = await axios.get("http://localhost:3001/api/user/oneUser?name="+search,config)
             setSearched(data)
-            setSearch("")
+           
+            toast.success("This are result", {
+                  position: "bottom-center",
+                  autoClose: 1000,
+                  hideProgressBar: true,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  });
       } catch (error) {
-            console.log(error.response.data);
+            toast.warn("something went wrong try again", {
+                  position: "bottom-center",
+                  autoClose: 1000,
+                  hideProgressBar: true,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  })
       }
       setVisible(!visible)
+      setSearch("")
       
 }
+const current =currentUser.others?currentUser.others:currentUser
   return (
 
     <div className='container z-50'>
@@ -62,13 +85,15 @@ const handleVisible = async(e) =>{
                         <Link to="/chat"><i className="fa-regular fa-xl fa-comment"></i></Link>
                   </div>
                   <div className='font-bold'>
-                        <h1>{currentUser?.others?currentUser.others?.username:currentUser.username}</h1>
+                        <h1>{current?.username}</h1>
                   </div>
                   <div className='mr-2 cursor-pointer'>
-                        <Link to={"/profile/"+currentUser?._id}><img className='rounded-full w-10 h-10 p-1' src={currentUser?.others?currentUser.others?.profile:currentUser.profile} /></Link>
+                        <Link to={"/profile/"+current._id}><img className='rounded-full w-10 h-10 p-1' src={currentUser?.others?currentUser.others?.profile:currentUser.profile} /></Link>
                   </div>
                 </div>
           </div>
+          
+          <ToastContainer/>
           {search && <SearchSkeleton/>}
       </div>
   )

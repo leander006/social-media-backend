@@ -75,9 +75,12 @@ const followingPost = asyncHandler(async(req,res) =>{
                 return Post.find({owner:id}).populate("owner").populate({path:"likes",populate:{path:"username"}}).populate({path:"comments",populate:{path:"username"}}).sort({createdAt:-1})
             })
         )
+
+      
+        const followerPost = post.concat(morePost.flat())
 // flat() is use to return json as a single object if not used it returned two object as [{},{}]
 
-          res.status(200).json(post.concat(morePost.flat()))
+          res.status(200).json(followerPost)
     } catch (error) {
           res.status(404).send({error:error.message})
     }

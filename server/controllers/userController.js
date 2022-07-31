@@ -24,6 +24,7 @@ const particularUser = asyncHandler(async(req,res) =>{
 
 const friendSearch = asyncHandler(async(req,res) =>{
       const name = req.query.name
+
 try {
       const users = await User.find({"_id":{$ne:req.user._id},followers:{$elemMatch:{$eq:req.user._id}},username:{$regex:name ,$options:'$i'}})
       if(users.length !== 0){
@@ -69,9 +70,7 @@ const remove = asyncHandler(async(req,res) =>{
       try {
        
            const post = await Post.find({owner:req.user._id})
-           console.log(post);
            const message = await Message.find({owner:req.user._id})
-           console.log(message);
            await User.findByIdAndDelete(req.user._id)
       //      await post.findByIdAndDelete()
            return res.status(200).json("User deleted successfully");

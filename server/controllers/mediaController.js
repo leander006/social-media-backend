@@ -4,48 +4,36 @@ const asyncHandler = require('express-async-handler');
 const Post = require('../model/Post');
 const User = require('../model/User');
 
-//Add followers //
+//Add followers and Remove followers//
 const follow = asyncHandler(async(req,res) =>{
       try {
             const user = await User.findById(req.params.id)   
             const currentUser = req.user;
+            console.log(user.followers);
             if(!user.followers.includes(req.user._id)){
 
                   await user.updateOne({$push:{followers:req.user._id}})
                   await currentUser.updateOne({$push:{following:req.params.id}})
-                  return res.status(200).json("Follower added successfully")
-                 
+                  const newUser = await User.findById(currentUser._id)
+                  return res.cookie("data",JSON.stringify(newUser),{ expires: new Date(Date.now() + 25892000000),
+                        secure:process.env.NODE_ENV === "production"?true:false,
+                        httpOnly:process.env.NODE_ENV === "production"?true:false,}).status(200).json(newUser)
             }
             else{
-                  return res.status(403).send({error:"Already following"})  
-            }
-      } catch (error) {
-            return res.status(500).send({error:error.message})
-      }
-})
-//Remove followers //
-const unfollow = asyncHandler(async(req,res) =>{
-      try {
-            const user = await User.findById(req.params.id)   
-            const currentUser = req.user;
-            if(currentUser.following.length === 0){
-                  return res.status(402).send({error:"You don't follow anyone"})
-            }
-            if(user.followers.includes(req.user._id)){
                   await user.updateOne({$pull:{followers:req.user._id}})
                   await currentUser.updateOne({$pull:{following:req.params.id}})
-                  return res.status(200).json("Follower removed successfully")
-                 
-            }
-            else{
-                  return res.status(403).send({error:"You are not following"})  
+                  const newUser = await User.findById(currentUser._id)
+                  return res.cookie("data",JSON.stringify(newUser),{ expires: new Date(Date.now() + 25892000000),
+                        secure:process.env.NODE_ENV === "production"?true:false,
+                        httpOnly:process.env.NODE_ENV === "production"?true:false,}).status(200).json(newUser)
             }
       } catch (error) {
             return res.status(500).send({error:error.message})
       }
 })
 
-//Like post //
+
+//Like post and unlike //
 
 
 const like = asyncHandler(async(req,res) =>{
@@ -72,6 +60,9 @@ const like = asyncHandler(async(req,res) =>{
             return res.status(500).send({error:error.message})
       }
 })
+
+//bookmark and remove bookmark //
+
 
 const bookmark = asyncHandler(async(req,res) =>{
             const post = await Post.findById(req.params.id)
@@ -102,7 +93,6 @@ const bookmark = asyncHandler(async(req,res) =>{
 
 module.exports = {
 	follow,
-      unfollow,
       like,
       bookmark 
 };
