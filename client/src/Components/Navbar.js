@@ -63,7 +63,7 @@ const current =currentUser.others?currentUser.others:currentUser
                         <h1>Logo</h1>
                 </div>
                 <div className='md:flex hidden h-8 w-1/3 m-auto mt-1 items-center bg-[#455175] rounded-md'>
-                <input className='rounded-md  w-full h-full p-1' value={search} type="text" onChange={e =>setSearch(e.target.value)} placeholder='search your friends'></input>
+                <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>setSearch(e.target.value)} placeholder='search your friends'></input>
                 <i className="fa-solid fa-xl fa-magnifying-glass ml-1 text-[#BED7F8] cursor-pointer " onClick={handleVisible}></i>
                 </div>
 

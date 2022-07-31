@@ -6,22 +6,23 @@ const Chat = require("../model/Chat")
 const accessChat = asyncHandler(async(req,res) =>{
       const userId = req.params.id;
       const name = await User.findById(userId);
-      // console.log("access");
-      // console.log(name.username);
             var isChat = await Chat.find({
                   isGroupChat:false,
                   $and:[
                         {users:{$elemMatch:{$eq:req.user._id}}},
-                        {users:{$elemMatch:{$eq:userId}}}
+                        {users:{$elemMatch:{$eq:userId}}},
+                        
                   ]
-            })
+            }).populate("users","-password")
+            .populate("latestMessage")
+
             isChat = await User.populate(isChat,{
                   path:"latestMessage.sender",
                   select:"username profile"
             })
 
             if(isChat.length>0){
-                  return res.status(200).json("chats already exist cannot create new chat")
+                  return res.status(200).json({chat:isChat[0],res:"chats already exist cannot create new chat"})
             }
 
             try {
@@ -74,7 +75,26 @@ const fetchChat = asyncHandler(async(req,res) =>{
                   return res.status(400).send("More than 2 users must be seleted")
             }
             users.push(req.user)
+            var isChat = await Chat.find({
+                  isGroupChat:true,
+                  chatname:req.body.name,
+                  $and:[
+                        {users:{$elemMatch:{$eq:req.user._id}}},
+                        {users:{$elemMatch:{$eq:users.map((u) => u._id)}}},
+                        
+                  ]
 
+            }).populate("users","-password")
+            .populate("latestMessage")
+
+            isChat = await User.populate(isChat,{
+                  path:"latestMessage.sender",
+                  select:"username profile"
+            })
+
+            if(isChat.length>0){
+                  return res.status(200).json({chat:isChat[0],res:"chats already exist cannot create new chat"})
+            }
             try {
                   const groupChat = await Chat.create({
                         chatname:req.body.name,

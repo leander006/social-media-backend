@@ -24,7 +24,6 @@ const particularUser = asyncHandler(async(req,res) =>{
 
 const friendSearch = asyncHandler(async(req,res) =>{
       const name = req.query.name
-
 try {
       const users = await User.find({"_id":{$ne:req.user._id},followers:{$elemMatch:{$eq:req.user._id}},username:{$regex:name ,$options:'$i'}})
       if(users.length !== 0){
@@ -123,9 +122,6 @@ const uploadPic =async (req, res) => {
 
 
 const updateUser =asyncHandler(async(req,res) =>{
-
-      console.log(req.body.profile);
-
       try {
             const user = await User.findByIdAndUpdate(req.params.id,
                  {     

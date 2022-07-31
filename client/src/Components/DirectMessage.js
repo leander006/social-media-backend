@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { chatError, chatStart, chatSuccess } from '../redux/Slice/chatSlice';
 
-function DirectMessage({search,visi, setVisi}) {
+function DirectMessage({search,visi, setVisi,setCurrentChat}) {
 
   const {allChat} = useSelector(state => state.chat)
   const dispatch = useDispatch()
@@ -20,11 +20,13 @@ function DirectMessage({search,visi, setVisi}) {
         try {
           dispatch(chatStart())
           const {data} = await axios.post("http://localhost:3001/api/chat/"+search._id,{},config)
-          if(typeof(data) === "string"){
+          if(typeof(data.res) === "string"){
+            setCurrentChat(data.chat)
             setVisi(!visi)
             return 
           }
           dispatch(chatSuccess([data,...allChat,]))
+          setCurrentChat(data)
           setVisi(!visi)
       } catch (error) {
           dispatch(chatError())
