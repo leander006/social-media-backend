@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  allChat: null,
-  loading:false,
+  allChat: [],
+  chatloading:false,
   error:false
 }
 
@@ -12,14 +12,14 @@ export const ChatSlice = createSlice({
       initialState,
       reducers: {
         chatStart:(state) =>{
-              state.loading=true
+              state.chatloading=true
         },
         chatSuccess:(state,action) =>{
-            state.loading=false
+            state.chatloading=false
             state.allChat= action.payload
         },
         chatError:(state) =>{
-            state.loading=false
+            state.chatloading=false
             state.error=true
         },
       },

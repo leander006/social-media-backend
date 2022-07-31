@@ -142,7 +142,7 @@ function Edit() {
 
                         <div className='p-2'>
                               <h1 className='text-[#8aaaeb] '>Bio</h1>
-                              <textarea className='bg-[#2D3B58] border-b w-full mt-2 outline-none' placeholder={user?.bio} onChange={e=>setBio(e.target.value)}  type="text"></textarea>
+                              <textarea className='bg-[#2D3B58] border-b w-full mt-2 outline-none' placeholder={user?.bio} onChange={e=>setBio(e.target.value)} type="text"></textarea>
                         </div>
 
                   </div> 

@@ -44,13 +44,13 @@ function SideBar() {
                         <i className="fa-solid fa-house"></i>
                         <Link to='/home'><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Home</h1></Link>
                   </div>
-                  <div className='flex mt-2 items-center'>
-                        <i className="fa-solid fa-circle-play"></i>
-                        <h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0 cursor-pointer' onClick={explore} >Explore</h1>
-                  </div>
                   <div className='flex mt-2 items-center '>
                         <i className="fa-solid fa-comment"></i>
                         <Link to='/chat'><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Chats</h1></Link>
+                  </div>
+                  <div className='flex mt-2 items-center'>
+                        <i className="fa-solid fa-circle-play"></i>
+                        <h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0 cursor-pointer' onClick={explore} >Explore</h1>
                   </div>
                   <div className='flex mt-2 items-center '>
                         <i className="fa-solid fa-bookmark"></i>

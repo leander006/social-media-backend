@@ -5,7 +5,7 @@ import Navbar from '../Navbar'
 import NopPreview from '../NopPreview'
 import { messageError, messageStart, messageSuccess } from '../../redux/Slice/messageSlice';
 import Cookie from "js-cookie"
-import GetMessages from '../GetMessages'
+// import GetMessages from '../GetMessages'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { chatError, chatStart, chatSuccess } from '../../redux/Slice/chatSlice'
@@ -155,7 +155,7 @@ function Chats() {
      <div className='conversations overflow-y-scroll border h-[calc(100vh-6.8rem)] '  >
                   {allChat?.map((c) =>(
                         <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
-                        <Conversation name={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.username :  c?.users[0]?.username  } id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt}  />
+                        <Conversation img={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.profile :  c?.users[0]?.profile  } name={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.username :  c?.users[0]?.username  }  id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt}  />
                         </div>
 
                   ))}
@@ -245,7 +245,7 @@ function Chats() {
                 <button className='border mb-3 ml-2 mt-3 rounded-lg w-14 h-7 bg-orange-500 text-white hover:w-20 hover:h-8'>Create</button>          
          </div>
           </div>}
-</div>:<GetMessages setVisible={setVisible}/>
+</div>:<></>
 }
 </div>   
 

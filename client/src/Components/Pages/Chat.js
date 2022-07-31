@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Conversation from '../Conversation'
 import Footer from '../Footer'
@@ -14,12 +14,26 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DirectMessage from '../DirectMessage'
+import { useDispatch, useSelector } from 'react-redux'
+import { chatError, chatStart, chatSuccess } from '../../redux/Slice/chatSlice'
+import { messageError, messageStart, messageSuccess } from '../../redux/Slice/messageSlice'
+import MessageSkeleton from '../Skeleton/MessageSkeleton'
+import ConversationSkeleton from '../Skeleton/ConversationSkeleton'
 
 function Chat() {
   const [currentChat, setCurrentChat] = useState(false)
   const [visible, setVisible] = useState(false)
   const [search, setSearch] = useState("")
+  const [message, setMessage] = useState("")
   const [searched, setSearched] = useState([])
+  const [visi, setVisi] = useState(false)
+  const {allChat} = useSelector(state => state.chat)
+  const {allmessage,messageloading} = useSelector(state => state.message)
+  const {currentUser,chatloading} = useSelector(state => state.user)
+
+  const currentuser = currentUser._id?currentUser?._id:currentUser.others?._id
+
+  const dispatch = useDispatch()
   const config ={
       headers:{
           "Content-Type":"application/json",
@@ -56,7 +70,46 @@ function Chat() {
       setSearch("")       
   }
 
-  
+  useEffect(() => {
+    const getChat = async() =>{
+      try {
+        dispatch(chatStart())
+        const {data} = await axios.get("http://localhost:3001/api/chat",config)
+        dispatch(chatSuccess(data))
+      } catch (error) {
+        dispatch(chatError())
+          console.log(error?.response?.data);
+      }
+    }
+    getChat()
+  }, [currentUser])
+
+  useEffect(() => {
+    const getMessage = async() =>{
+      try {
+        dispatch(messageStart())
+        const {data} = await axios.get("http://localhost:3001/api/message/get/"+currentChat._id,config)
+        dispatch(messageSuccess(data))
+      } catch (error) {
+        dispatch(messageError())
+          console.log(error?.response?.data);
+      }
+    }
+    getMessage()
+  }, [currentChat])
+
+  const sendMessage = async(e) =>{
+        e.preventDefault()
+        try {
+            dispatch(messageStart())
+            const {data} = await axios.post("http://localhost:3001/api/message/"+currentChat._id,{content:message},config)
+            dispatch(messageSuccess([...allmessage,data]))
+            setMessage("")
+        } catch (error) {
+            dispatch(messageError())
+            console.log(error?.response?.data);
+        }
+  }
 
   return (
       <>
@@ -73,11 +126,11 @@ function Chat() {
             <input className='rounded-md  w-full h-full p-1' value={search} type="text" onChange={e =>setSearch(e.target.value)}  placeholder='search your friends'></input>
             <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={ handleVisible}></i>
             {visible &&  <div className="shadow hidden md:flex mt-24 fixed z-30 ">
-                <div className="md:w-64 lg:w-80 xl:w-[30rem]  ">
+               {!visi && <div className="md:w-64 lg:w-80 xl:w-[30rem]  ">
                 {searched.map((s) =>(
-                                    <DirectMessage key={s._id} search={s}/>
-                              ))}
-                </div>
+                        <DirectMessage key={s._id}  visi={visi} setVisi={setVisi} search={s}/>
+                ))}
+                </div>}
               </div>}
              
           </div>
@@ -90,23 +143,16 @@ function Chat() {
        
        {search && <ChatSearchSkeleton/>}
        <div className='md:h-[calc(100vh-6.7rem)] p-3 overflow-y-scroll'>
-         {/* {allChat?.map((c) =>(
+         {allChat ? !chatloading? allChat?.map((c) =>(
                <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
-               <Conversation name={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.username :  c?.users[0]?.username  } id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt}  />
+               <Conversation img={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.profile :  c?.users[0]?.profile  } name={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.username :  c?.users[0]?.username  } chat={c} key={c._id}  />
                </div>
 
-         ))} */}
-         <Conversation/>
-         <Conversation/>
-         <Conversation/>
-         <Conversation/>
-         <Conversation/>
-         <Conversation/>
-         <Conversation/>
-         <Conversation/>
-         <Conversation/>
-         <Conversation/>
-
+         )):allChat?.map((c) =>(
+           <div key={c._id} >
+          <ConversationSkeleton key={c._id}/>
+          </div>))
+          :<div className='flex justify-center font-bold text-gray-400 text-xl'>No conversation</div>}
    </div>
          
        </div> 
@@ -114,24 +160,23 @@ function Chat() {
         {currentChat? <div className='message w-[60%]'>
         <div className='flex justify-between items-center message  md:bg-[#84b6f7]'>
            <div className='flex h-12 items-center p-3'>
-               <Link to="/profile"><img src="/images/noProfile.jpeg" alt='image' className='w-10 h-10  rounded-full cursor-pointer border'/></Link>
-               <Link to="/profile"><h1 className='capitalize text-black ml-4 font-sans cursor-pointer ' >Leander</h1></Link>
+               <Link to="/profile"><img src={currentChat?.isGroupChat ? currentChat?.chatname : currentChat?.users[0]?._id === currentuser  ? currentChat?.users[1]?.profile :currentChat?.users[0]?.profile} alt='image' className='w-10 h-10  rounded-full cursor-pointer border'/></Link>
+               <Link to="/profile"><h1 className='capitalize text-black ml-4 font-sans cursor-pointer ' >{currentChat?.isGroupChat ? currentChat?.chatname : currentChat?.users[0]?._id === currentuser  ? currentChat?.users[1]?.username :  currentChat?.users[0]?.username}</h1></Link>
            </div>
-           <div>
-               <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer"></i>
-           </div>
+           {currentChat?.isGroupChat && <div>
+                        <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer"></i>
+                    </div>}
    </div>
    <div className='md:h-[calc(100vh-10.2rem)] md:bg-[#BED7F8] p-3 overflow-y-scroll'>
-         <Messages/>
-         <Messages/>
-         <Messages/>
-         <Messages/>
-         <Messages/>
-         <Messages/>
+   {!messageloading ? allmessage.map((m) =>(
+                <Messages own={m.sender._id === currentuser} message={m} key={m._id}/>
+            )):allmessage.map((m) =>(
+              <MessageSkeleton key={m._id}/>
+          ))}
    </div>
         <form className='flex bg-[#BED7F8] h-12 items-center p-2 m-3 mt-3 rounded-lg' >
-          <input type="text" placeholder='Enter message' className='w-full h-10 rounded-lg p-5 border' />
-           <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" ></i></button> 
+          <input type="text" placeholder='Enter message' value={message} onChange={e =>setMessage(e.target.value)} className='w-full h-10 rounded-lg p-5 border'  />
+           <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" onClick={sendMessage} ></i></button> 
           </form>
         </div>:<div className='flex m-auto items-center'><NopPreview/></div>}
 
@@ -145,67 +190,55 @@ function Chat() {
        
          {!currentChat ? <div className='conversation md:flex-1'>
             <div className='flex justify-between items-center md:p-3'>
-              <div className='flex bg-[#455175] w-full h-8 mt-1 items-center rounded-md'>
-                    <input className='rounded-md  w-full h-full p-1' value={search} onChange={e =>setSearch(e.target.value)} type="text"  placeholder='search your friends'></input>
+              <div className='flex bg-[#455175] ml-2 w-full h-8 mt-2 items-center rounded-md'>
+                    <input className='rounded-md  w-full h-full p-1' value={search} onChange={e =>setSearch(e.target.value)} type="text"  placeholder='search your friends'/>
                     <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={handleVisible}></i>
               </div>
-              <div>
-                    <i className="fa-solid fa-2xl fa-user-plus ml-4 text-[#BED7F8] cursor-pointer" ></i>
-              </div>
+                    <i className="fa-solid fa-xl mt-2 fa-user-plus ml-3 mr-1 text-[#BED7F8] cursor-pointer" ></i>
               {visible && <div className="flex mt-24 fixed z-30 ">
                 <div className=" w-[92vw] p-2">
-                      <div className='flex bg-slate-300 p-2'>
-                      <Link to="/profile"><img src='/images/noProfile.jpeg' className="rounded-full h-10 w-10 cursor-pointer"></img></Link>
-                            <div className="flex-1 ml-2 mt-2 ">
-                                  <div className="h-3 ">Leander</div>
-                            </div>  
-                      </div>
+                {searched.map((s) =>(
+                      <DirectMessage key={s._id} visi={visi} setVisi={setVisi} search={s}/>
+                ))}
                 </div> 
               </div>}
             </div>
             {search && <ChatSearchSkeleton/>}
             <div className='h-[calc(100vh-7.9rem)] md:h-[calc(100vh-2.7rem)] p-3 overflow-y-scroll'>
-                  {/* {allChat?.map((c) =>(
-                        <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
-                        <Conversation name={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.username :  c?.users[0]?.username  } id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt}  />
-                        </div>
+            {allChat ?!chatloading? allChat?.map((c) =>(
+               <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
+               <Conversation img={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.profile :  c?.users[0]?.profile  } name={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.username :  c?.users[0]?.username  } chat={c} key={c._id}  />
+               </div>
 
-                  ))} */}
-                  <Conversation/>
-                  <Conversation/>
-                  <Conversation/>
-                  <Conversation/>
-                  <Conversation/>
-                  <Conversation/>
-                  <Conversation/>
-                  <Conversation/>
-                  <Conversation/>
-                  <Conversation/>
-
+         )):allChat?.map((c) =>(
+           <div key={c._id} className=''>
+          <ConversationSkeleton key={c._id}/>
+          </div>))
+          :<div className='flex justify-center font-bold text-gray-400 text-xl'>No conversation</div>}
             </div>
             
             </div> :
             <div className='message'>
-            <div className='flex justify-between items-center message bg-[#BED7F8] md:hidden'>
+            <div className='flex justify-between items-center message bg-[#8cbeff] md:hidden'>
                     <div className='flex h-12 items-center p-3'>
-                        <Link to="/profile"><img src="/images/noProfile.jpeg" alt='image' className='w-10 h-10  rounded-full cursor-pointer border'/></Link>
-                        <Link to="/profile"><h1 className='capitalize text-black ml-4 font-sans cursor-pointer ' >Leander</h1></Link>
+                    <i className="fa-solid mr-2 fa-xl cursor-pointer fa-arrow-left" onClick={() =>{setCurrentChat(!currentChat)}}></i>
+                        <Link to="/profile"><img src={currentChat?.isGroupChat ? currentChat?.chatname : currentChat?.users[0]?._id === currentuser  ? currentChat?.users[1]?.profile :currentChat?.users[0]?.profile}  alt='image' className='w-10 h-10 rounded-full cursor-pointer border'/></Link>
+                        <Link to="/profile"><h1 className='capitalize text-black ml-4 font-sans cursor-pointer'>{currentChat?.isGroupChat ? currentChat?.chatname : currentChat?.users[0]?._id === currentuser  ? currentChat?.users[1]?.username:currentChat?.users[0]?.username}</h1></Link>
                     </div>
-                    <div>
+                    {currentChat?.isGroupChat && <div>
                         <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer"></i>
-                    </div>
+                    </div>}
             </div>
-            <div className='h-[calc(100vh-12rem)] md:h-[calc(100vh-2.7rem)] p-3 overflow-y-scroll'>
-                  <Messages/>
-                  <Messages/>
-                  <Messages/>
-                  <Messages/>
-                  <Messages/>
-                  <Messages/>
+            <div className='h-[calc(100vh-12rem)] bg-[#BED7F8]  p-3 overflow-y-scroll'>
+            {!messageloading ? allmessage.map((m) =>(
+                <Messages message={m} own={m.sender._id === currentuser} key={m._id}/>
+            )):allmessage.map((m) =>(
+              <MessageSkeleton key={m._id}/>
+          ))}
             </div>
             <form className='flex bg-[#BED7F8] h-12 items-center p-2 m-3 mt-3 rounded-lg' >
-          <input type="text" placeholder='Enter message' className='w-full h-full rounded-lg p-5 border' />
-           <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" ></i></button> 
+          <input type="text" placeholder='Enter message' value={message} onChange={e =>setMessage(e.target.value)} className='w-full h-full rounded-lg p-5 border' />
+           <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" onClick={sendMessage} ></i></button> 
           </form>
           </div>}
  
@@ -218,62 +251,4 @@ function Chat() {
       </>
   )
 }
-
 export default Chat
-
-
-
-// <div className='hidden md:flex w-screen '>
-       
-// <div className='conversation'>
-  //  <div className='flex justify-between items-center p-3'>
-  //    <div className='flex bg-[#455175] w-full h-8 mt-1 items-center rounded-md'>
-  //          <input className='rounded-md  w-full h-full p-1 ' type="text"  placeholder='search your friends'></input>
-  //          <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer "></i>
-  //    </div>
-  //    <div>
-  //          <i className="fa-solid fa-2xl fa-user-plus ml-4 text-[#BED7F8] cursor-pointer"></i>
-  //    </div>
-     
-  //  </div>
-  //  <div className='md:h-[calc(100vh-6.7rem)] p-3 overflow-y-scroll'>
-  //        {/* {allChat?.map((c) =>(
-  //              <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
-  //              <Conversation name={c?.isGroupChat ? c?.chatname : c?.users[0]?._id === currentuser  ? c?.users[1]?.username :  c?.users[0]?.username  } id={c?._id} message={c?.latestMessage?.content} time={c?.latestMessage?.createdAt}  />
-  //              </div>
-
-  //        ))} */}
-  //        <Conversation/>
-  //        <Conversation/>
-  //        <Conversation/>
-  //        <Conversation/>
-  //        <Conversation/>
-  //        <Conversation/>
-  //        <Conversation/>
-  //        <Conversation/>
-  //        <Conversation/>
-  //        <Conversation/>
-
-  //  </div>
-  
-//    </div> 
-   
-//   {!currentChat ?  <div className='message '>
-  //  <div className='flex justify-between items-center message bg-[#BED7F8] md:hidden'>
-  //          <div className='flex h-12 items-center p-3'>
-  //              <Link to="/profile"><img src="/images/noProfile.jpeg" alt='image' className='w-10 h-10  rounded-full cursor-pointer border'/></Link>
-  //              <Link to="/profile"><h1 className='capitalize text-black ml-4 font-sans cursor-pointer ' >Leander</h1></Link>
-  //          </div>
-  //          <div>
-  //              <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer"></i>
-  //          </div>
-  //  </div>
-  //  <div className='h-[calc(100vh-7.9rem)] md:h-[calc(100vh-2.7rem)] p-3 overflow-y-scroll'>
-  //        <Messages/>
-  //        <Messages/>
-  //        <Messages/>
-  //        <Messages/>
-  //        <Messages/>
-  //        <Messages/>
-  //  </div>
-//  </div>:<NopPreview/>}

@@ -1,12 +1,13 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import {useSelector } from 'react-redux'
-import { Link, useParams } from 'react-router-dom'
+import {useDispatch, useSelector } from 'react-redux'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import Footer from '../Footer'
 import Pin from '../GridSystem/Pin'
 import Cookie from "js-cookie"  
 import Navbar from '../Navbar'
 import SideBar from '../SideBar'
+import { chatError, chatStart, chatSuccess } from '../../redux/Slice/chatSlice'
 
 
 
@@ -18,9 +19,10 @@ function Profile() {
   const [follow, setFollow] = useState(false)
   const [user, setUser] = useState()
   const [post, setPost] = useState([])
-
+  const {allChat} = useSelector(state => state.chat)
+  const dispatch = useDispatch()
   const current =currentUser.others?currentUser.others:currentUser
-
+  const navigate = useNavigate()
 
   const config ={
     headers:{
@@ -44,7 +46,22 @@ useEffect(() => {
   getPost()
 },[userId])
 
-
+const openChat = async(e) =>{
+  e.preventDefault()
+  try {
+    dispatch(chatStart())
+    const {data} = await axios.post("http://localhost:3001/api/chat/"+userId,{},config)
+    if(typeof(data) === "string"){
+      navigate("/chat")
+      return 
+    }
+    dispatch(chatSuccess([data,...allChat,]))
+    navigate("/chat")
+} catch (error) {
+    dispatch(chatError())
+    console.log(error);
+}
+}
 
 const following = async(e) =>{
   e.preventDefault()
@@ -75,7 +92,7 @@ const following = async(e) =>{
                               <h1>{user?.username}</h1>
                         </div>
                         {userId !== currentUser?._id &&<div className='h-6 flex items-center'>
-                              <Link to='/chat'><h1 className=' rounded-lg p-0.5 text-black bg-[#BED7F8] cursor-pointer active:bg-[#88b8f7] active:rounded-lg'>Message</h1></Link>  
+                              <h1 className=' rounded-lg p-0.5 text-black bg-[#BED7F8] cursor-pointer active:bg-[#88b8f7] active:rounded-lg' onClick={openChat}>Message</h1>
                               {userId !== currentUser?._id && <div>
                               {follow ?<i className="fa-solid fa-user-slash fa-xl ml-2 cursor-pointer" onClick={following}></i>:
                               <i className="fa-solid fa-xl ml-2 fa-user-plus cursor-pointer" onClick={following}></i>}
@@ -99,7 +116,7 @@ const following = async(e) =>{
                   <div >
                       <h1 className='font-bold'>Bio:</h1>
                   </div>
-                  <div className='h-28 w-60 break-all pl-2 pr-2'>
+                  <div className='h-28  md:w-80 w-64 break-all pl-2 pr-2'>
                   {user?.bio}
                   </div>
 

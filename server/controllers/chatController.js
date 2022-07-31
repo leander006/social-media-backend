@@ -14,16 +14,14 @@ const accessChat = asyncHandler(async(req,res) =>{
                         {users:{$elemMatch:{$eq:req.user._id}}},
                         {users:{$elemMatch:{$eq:userId}}}
                   ]
-            }).populate("users","-password")
-            .populate("latestMessage")
-
+            })
             isChat = await User.populate(isChat,{
                   path:"latestMessage.sender",
                   select:"username profile"
             })
 
             if(isChat.length>0){
-                  return res.status(200).json(isChat[0])
+                  return res.status(200).json("chats already exist cannot create new chat")
             }
 
             try {
@@ -35,7 +33,7 @@ const accessChat = asyncHandler(async(req,res) =>{
                   };
                   const chats = await Chat.create(ChatData);
 
-                  const fullChat = await (await Chat.findOne({_id:chats._id})).populate("users","-password")
+                  const fullChat = await Chat.findOne({_id:chats._id}).populate("users","-password")
                   return res.status(200).send(fullChat)
             } catch (error) {
                   return res.status(500).send({error:error.message})
