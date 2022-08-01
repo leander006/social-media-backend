@@ -10,7 +10,7 @@ function Mesaages({message,own}) {
             <h1 className='text-[#2D3B58]'>{message?.sender?.username}</h1>
             <h3 className='text-slate-900 ml-2 '>{format(message?.createdAt)}</h3>
             </div>
-          <div className='w-52 break-all pl-2  text-[#2D3B58]'>
+          <div className='break-all pl-2 text-[#2D3B58]'>
                   {message?.content}
                   </div>
 

@@ -138,7 +138,6 @@ const renameGroup = asyncHandler(async(req,res) =>{
 const addMember = asyncHandler(async(req,res) =>{
       const chatId = req.params.id
       const userId = req.body.userId
-
       try {
             const updatedChat = await Chat.findByIdAndUpdate(chatId,{
                    // regex//
@@ -165,7 +164,6 @@ const removeMember = asyncHandler(async(req,res) =>{
 
       try {
             const removeChat = await Chat.findByIdAndUpdate(chatId,{
-                  // regex//
                   $pull:{users:userId},
             },
             {

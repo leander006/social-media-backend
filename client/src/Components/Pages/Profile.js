@@ -92,7 +92,7 @@ const following = async(e) =>{
                               <h1>{user?.username}</h1>
                         </div>
                         {userId !== currentUser?._id &&<div className='h-6 flex items-center'>
-                              <h1 className=' rounded-lg p-0.5 text-black bg-[#BED7F8] cursor-pointer active:bg-[#88b8f7] active:rounded-lg' onClick={openChat}>Message</h1>
+                              {/* <h1 className=' rounded-lg p-0.5 text-black bg-[#BED7F8] cursor-pointer active:bg-[#88b8f7] active:rounded-lg' onClick={openChat}>Message</h1> */}
                               {userId !== currentUser?._id && <div>
                               {follow ?<i className="fa-solid fa-user-slash fa-xl ml-2 cursor-pointer" onClick={following}></i>:
                               <i className="fa-solid fa-xl ml-2 fa-user-plus cursor-pointer" onClick={following}></i>}

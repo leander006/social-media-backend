@@ -12,8 +12,8 @@ function Conversation({chat,name,img}) {
 
             <div className='flex flex-col' >
                   <h1 className='capitalize text-slate-600'>{name}</h1>
-                  <h1 className=' hidden md:flex lg:hidden capitalize text-primary' >{chat?.latestMessage?.content.length>20?chat?.latestMessage?.content.substring(0,15)+"...":chat?.latestMessage?.content}</h1>
-                  <h1 className='md:hidden lg:flex capitalize text-primary' >{chat?.latestMessage?.content.length>20?chat?.latestMessage?.content.substring(0,20)+"...":chat?.latestMessage?.content}</h1>
+                  <h1 className=' hidden md:flex lg:hidden capitalize text-primary' >{chat?.latestMessage?.content?.length>20?chat?.latestMessage?.content.substring(0,15)+"...":chat?.latestMessage?.content}</h1>
+                  <h1 className='md:hidden lg:flex capitalize text-primary' >{chat?.latestMessage?.content?.length>20?chat?.latestMessage?.content.substring(0,20)+"...":chat?.latestMessage?.content}</h1>
             </div>
             </div>
             
