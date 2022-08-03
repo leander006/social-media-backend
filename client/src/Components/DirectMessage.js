@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Cookie from "js-cookie"  
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { chatError, chatStart, chatSuccess } from '../redux/Slice/chatSlice';
+import { chatError, chatStart, chatSuccess, setCurrentChat } from '../redux/Slice/chatSlice';
 
-function DirectMessage({search,visi, setVisi,setCurrentChat}) {
+function DirectMessage({search,visi, setVisi}) {
 
   const {allChat} = useSelector(state => state.chat)
   const dispatch = useDispatch()
@@ -21,12 +21,12 @@ function DirectMessage({search,visi, setVisi,setCurrentChat}) {
           dispatch(chatStart())
           const {data} = await axios.post("http://localhost:3001/api/chat/"+search._id,{},config)
           if(typeof(data.res) === "string"){
-            setCurrentChat(data.chat)
+            dispatch(setCurrentChat(data.chat))
             setVisi(!visi)
             return 
           }
           dispatch(chatSuccess([data,...allChat,]))
-          setCurrentChat(data)
+          dispatch(setCurrentChat(data))
           setVisi(!visi)
       } catch (error) {
           dispatch(chatError())

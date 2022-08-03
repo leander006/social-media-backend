@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Conversation from '../Conversation'
 import Footer from '../Footer'
@@ -15,17 +15,19 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DirectMessage from '../DirectMessage'
 import { useDispatch, useSelector } from 'react-redux'
-import { chatError, chatStart, chatSuccess } from '../../redux/Slice/chatSlice'
+import { chatError, chatStart, chatSuccess, setCurrentChat, setNotification } from '../../redux/Slice/chatSlice'
 import { messageError, messageStart, messageSuccess } from '../../redux/Slice/messageSlice'
 import MessageSkeleton from '../Skeleton/MessageSkeleton'
 import ConversationSkeleton from '../Skeleton/ConversationSkeleton'
 import GroupUser from '../GroupUser'
 import ListItems from '../ListItems'
 var socket,selectedChatCompare
+const Endpoint="http://localhost:3001"
+
 
 function Chat() {
-  const [currentChat, setCurrentChat] = useState(false)
   const [visible, setVisible] = useState(false)
+  const scrollRef = useRef()
   const [search, setSearch] = useState("")
   const [message, setMessage] = useState("")
   const [searched, setSearched] = useState([])
@@ -36,7 +38,7 @@ function Chat() {
   const [searchResult, setSearchResult] = useState(false)
   const [addUserGroup, setAdddUserGroup] = useState(false)
   const [visi, setVisi] = useState(false)
-  const {allChat} = useSelector(state => state.chat)
+  const {allChat,notification,currentChat} = useSelector(state => state.chat)
   const {allmessage,messageloading} = useSelector(state => state.message)
   const {currentUser,chatloading} = useSelector(state => state.user)
   const [chatname, setChatname] = useState("")
@@ -47,12 +49,13 @@ function Chat() {
   const [typing, setTyping] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
   useEffect(() => {
-    socket= io("http://localhost:3001")
+    socket= io(Endpoint)
     socket.emit("setup",currentUser);
-    socket.on("connection", () => setSocketConnected(true))
+    socket.on("connected", () => setSocketConnected(true))
     socket.on("typing",() => setIsTyping(true));
     socket.on("stop typing",() => setIsTyping(false));
   },[])
+
 
   const typingHandler = (e) =>{
     setMessage(e.target.value)
@@ -62,9 +65,10 @@ function Chat() {
     if(!typing){
           setTyping(true)
           socket.emit("typing",currentChat._id)
+         
     }
     let lastTypingTime = new Date().getTime()
-    var timerLength = 2500
+    var timerLength = 3000
 
     setTimeout(() => {
           var timenow = new Date().getTime()
@@ -134,7 +138,6 @@ function Chat() {
         dispatch(messageStart())
         const {data} = await axios.get("http://localhost:3001/api/message/get/"+currentChat._id,config)
         dispatch(messageSuccess(data))
-        selectedChatCompare=currentChat._id
         socket.emit("join room",currentChat._id)
       } catch (error) {
         dispatch(messageError())
@@ -142,11 +145,15 @@ function Chat() {
       }
     }
     getMessage()
+    selectedChatCompare=currentChat._id;
   }, [currentChat])
 
   const sendMessage = async(e) =>{
         e.preventDefault()
-        socket.emit("stop typing", currentChat._id);
+        socket.emit("stop typing",currentChat._id);
+        if(!selectedChatCompare || selectedChatCompare._id === currentChat._id){
+              
+        }
         try {
             dispatch(messageStart())
             const {data} = await axios.post("http://localhost:3001/api/message/"+currentChat._id,{content:message},config)
@@ -158,6 +165,23 @@ function Chat() {
             console.log(error?.response?.data);
         }
   }
+  useEffect(() => {
+    socket.on("message recieved",(newMessage) =>{
+          if(!selectedChatCompare || selectedChatCompare._id === newMessage.chat._id){
+                // notification
+                if(!notification.includes(newMessage)){
+                  // await axios.post("http://localhost:3001/api/user/notification/notify",{id:newMessage.chat._id},config)
+                  console.log("newMessage ",newMessage);
+                  dispatch(setNotification([newMessage,...notification]))
+                  setMessage("")
+                }
+                
+          }
+          else{
+                dispatch(messageSuccess([...allmessage,newMessage]))
+          }  
+    })
+})
   const handleGroupChat = (e) =>{
         e.preventDefault()
         setSearchResult(!searchResult) 
@@ -197,10 +221,9 @@ const handleRemove =async(deleteUser) =>{
   try {
       const {data} = await axios.put("http://localhost:3001/api/chat/remove/"+currentChat._id,{userId:deleteUser._id},config)
       setMessage("")
-      setCurrentChat(data)
+      dispatch(setCurrentChat(data))
   } catch (error) {
       console.log(error);
-      // dispatch(chatError())
   }
 }
 
@@ -214,7 +237,7 @@ const handleAdd =async(addUser) =>{
     }
     else{
       const {data} = await axios.put("http://localhost:3001/api/chat/add/"+currentChat._id,{userId:addUser._id},config)
-      setCurrentChat(data)
+      dispatch(setCurrentChat(data));
     }
     
   } catch (error) {
@@ -226,7 +249,7 @@ const handleRename =async(e) =>{
   e.preventDefault()
   try {
       const {data} = await axios.put("http://localhost:3001/api/chat/rename/"+currentChat._id,{chatname:chatname},config)
-      setCurrentChat(data)
+      dispatch(setCurrentChat(data));
   } catch (error) {
       console.log(error);
   }
@@ -251,6 +274,11 @@ const create = async(e)=>{
 
 }
 
+useEffect(() => {
+  scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+}, [setMessage,currentChat,sendMessage]);
+
+
   return (
       <>
       <Navbar/>
@@ -268,7 +296,7 @@ const create = async(e)=>{
             {visible &&  <div className="shadow hidden md:flex mt-24 fixed z-30 ">
                {!visi && <div className="md:w-64 lg:w-80 xl:w-[30rem]  ">
                 {searched.map((s) =>(
-                        <DirectMessage key={s._id}  visi={visi} setVisi={setVisi} setCurrentChat={setCurrentChat} search={s}/>
+                        <DirectMessage key={s._id}  visi={visi} setVisi={setVisi} search={s}/>
                 ))}
                 </div>}
               </div>}
@@ -282,8 +310,8 @@ const create = async(e)=>{
        {search && <ChatSearchSkeleton/>}
        <div className='md:h-[calc(100vh-6.7rem)] p-3 overflow-y-scroll'>
          {allChat ? !chatloading? allChat?.map((c) =>(
-               <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
-               <Conversation img={c?.isGroupChat?"images/noProfile.jpeg":currentuser === c?.users[0]?._id ? c?.users[1]?.profile:c?.users[0]?.profile} name={c?.isGroupChat?c?.chatname:currentuser === c?.users[0]?._id ? c?.users[1]?.username:c?.users[0]?.username} chat={c} key={c?._id}  />
+               <div className='individual-chat' key={c?._id} onClick={() =>{dispatch(setCurrentChat(c))}} >
+               <Conversation isTyping={isTyping} img={c?.isGroupChat?"images/noProfile.jpeg":currentuser === c?.users[0]?._id ? c?.users[1]?.profile:c?.users[0]?.profile} name={c?.isGroupChat?c?.chatname:currentuser === c?.users[0]?._id ? c?.users[1]?.username:c?.users[0]?.username} chat={c} key={c?._id}  />
                </div>
 
          )):allChat?.map((c) =>(
@@ -299,21 +327,29 @@ const create = async(e)=>{
         <div className='flex justify-between items-center message  md:bg-[#84b6f7]'>
            <div className='flex h-12 items-center p-3'>
                <img src={currentChat?.isGroupChat?"images/noProfile.jpeg":currentuser === currentChat?.users[0]?._id ? currentChat?.users[1]?.profile:currentChat?.users[0]?.profile} alt='image' className='w-10 h-10  rounded-full border'/>
-               <h1 className='capitalize text-black ml-4 font-sans ' >{currentChat?.isGroupChat?currentChat?.chatname:currentuser === currentChat?.users[0]?._id ? currentChat?.users[1]?.username:currentChat?.users[0]?.username}</h1>
+               <div className='flex flex-col'>
+                    <h1 className='capitalize text-black ml-4 font-sans ' >{currentChat?.isGroupChat?currentChat?.chatname:currentuser === currentChat?.users[0]?._id ? currentChat?.users[1]?.username:currentChat?.users[0]?.username}</h1>
+                    {isTyping ?<div className='flex flex-wrap ml-4'>{currentChat?.isGroupChat?"Someone ":currentuser === currentChat?.users[0]?._id ? currentChat?.users[1]?.username:currentChat?.users[0]?.username} is typing..</div>:<div  className='flex flex-wrap ml-4'></div>}
+               </div>
+
            </div>
+          
            {currentChat?.isGroupChat && currentChat?.groupAdmin?._id === currentuser && <div>
                         <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer" onClick={addGroup}></i>
                     </div>}
    </div>
    <div className='md:h-[calc(100vh-10.2rem)] md:bg-[#BED7F8] p-3 overflow-y-scroll'>
    {!messageloading ? allmessage.map((m) =>(
-                <Messages own={m.sender._id === currentuser} message={m} key={m._id}/>
+                <div key={m._id} ref={scrollRef}>
+                <Messages own={m.sender._id === currentuser} message={m}/>
+                </div>
             )):allmessage.map((m) =>(
               <MessageSkeleton key={m._id}/>
           ))}
    </div>
+  
         <form className='flex bg-[#BED7F8] h-12 items-center p-2 m-3 mt-3 rounded-lg' >
-          <input type="text" placeholder='Enter message' value={message} onChange={e =>setMessage(e.target.value)} className='w-full h-10 rounded-lg p-5 border' required />
+          <input type="text" placeholder='Enter message' value={message} onChange={typingHandler} className='w-full h-10 rounded-lg p-5 border' required />
            <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" onClick={sendMessage} ></i></button> 
           </form>
         </div>:<div className='flex m-auto items-center'><NopPreview/></div>}
@@ -346,7 +382,7 @@ const create = async(e)=>{
             <div className='h-[calc(100vh-7.9rem)] md:h-[calc(100vh-2.7rem)] p-3 overflow-y-scroll'>
             {allChat ?!chatloading? allChat?.map((c) =>(
               
-               <div className='individual-chat' key={c?._id} onClick={() =>{setCurrentChat(c)}} >
+               <div className='individual-chat' key={c?._id} onClick={() =>{dispatch(setCurrentChat(c))}} >
                <Conversation img={c?.isGroupChat?"images/noProfile.jpeg":currentuser === c?.users[0]._id ? c?.users[1]?.profile:c?.users[0]?.profile } name={c?.isGroupChat?c?.chatname:currentuser === c?.users[0]?._id ? c?.users[1]?.username:c?.users[0]?.username} chat={c} key={c?._id}  />
                </div>
 
@@ -361,7 +397,7 @@ const create = async(e)=>{
             <div className='message'>
             <div className='flex justify-between items-center message bg-[#8cbeff] md:hidden'>
                     <div className='flex h-12 items-center p-3'>
-                    <i className="fa-solid mr-2 fa-xl cursor-pointer fa-arrow-left" onClick={() =>{setCurrentChat(!currentChat)}}></i>
+                    <i className="fa-solid mr-2 fa-xl cursor-pointer fa-arrow-left" onClick={() =>{dispatch(setCurrentChat(!currentChat))}}></i>
                         <Link to="/profile"><img src={currentChat?.isGroupChat?"images/noProfile.jpeg":currentChat?.users[0]?._id === currentuser?currentChat?.users[1]?.profile :currentChat?.users[0]?.profile }  alt='image' className='w-10 h-10 rounded-full cursor-pointer border'/></Link>
                         <Link to="/profile"><h1 className='capitalize text-black ml-4 font-sans cursor-pointer'>{currentChat?.isGroupChat ? currentChat?.chatname : currentChat?.users[0]?._id === currentuser  ? currentChat?.users[1]?.username:currentChat?.users[0]?.username}</h1></Link>
                     </div>
@@ -371,10 +407,14 @@ const create = async(e)=>{
             </div>
             <div className='h-[calc(100vh-12rem)] bg-[#BED7F8]  p-3 overflow-y-scroll'>
             {!messageloading ? allmessage.map((m) =>(
-                <Messages message={m} own={m.sender._id === currentuser} key={m._id}/>
-            )):allmessage.map((m) =>(
+              <div key={m._id} ref={scrollRef}>
+                <Messages own={m.sender._id === currentuser} message={m}/>
+                </div>
+            ))
+            :allmessage.map((m) =>(
               <MessageSkeleton key={m._id}/>
-          ))}
+          ))
+          }
             </div>
             <form className='flex bg-[#BED7F8] h-12 items-center p-2 m-3 mt-3 rounded-lg' >
           <input type="text" placeholder='Enter message' value={message} onChange={e =>setMessage(e.target.value)} className='w-full h-full rounded-lg p-5 border' required />

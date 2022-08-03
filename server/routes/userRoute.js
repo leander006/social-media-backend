@@ -16,7 +16,6 @@ router.get("/suggesteduser/user",protect,suggestedUser)
 router.post("/upload",protect,uploadPic)
 router.put("/update/:id",protect,updateUser)
 router.put("/addFollower/:id",protect,follow)
-router.get("/loginUser",protect,loginUser)
-
+router.get("/loginUser/user",protect,loginUser)
  
 module.exports = router;

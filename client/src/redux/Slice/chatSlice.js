@@ -3,7 +3,9 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
   allChat: [],
   chatloading:false,
-  error:false
+  error:false,
+  notification:[],
+  currentChat:false
 }
 
 
@@ -22,12 +24,18 @@ export const ChatSlice = createSlice({
             state.chatloading=false
             state.error=true
         },
+        setNotification:(state,action)=>{
+          state.notification=action.payload
+        },
+        setCurrentChat:(state,action)=>{
+          state.currentChat=action.payload
+        }
       },
 })
     
 
 
-export const { chatStart,chatSuccess,chatError} = ChatSlice.actions
+export const { chatStart,chatSuccess,chatError,setNotification,setCurrentChat} = ChatSlice.actions
 
 
 export default ChatSlice.reducer    

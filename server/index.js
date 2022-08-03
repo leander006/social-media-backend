@@ -9,14 +9,17 @@ const userRoute = require('./routes/userRoute');
 const messageRoute = require('./routes/messageRoute');
 const postRoute = require("./routes/postRoute")
 const commentRoute = require("./routes/commentRoute")
+
+
 const cookieParser = require('cookie-parser')
 const app = express();
 
 
 const cors = require('cors')
 
-app.use("/uploadProfile",express.static("uploadProfile"))
-app.use("/uploads",express.static("uploads"))
+// for multer upload //
+// app.use("/uploadProfile",express.static("uploadProfile"))
+// app.use("/uploads",express.static("uploads"))
 
 dotenv.config();
 
@@ -40,6 +43,7 @@ app.use("/api/message",messageRoute);
 app.use("/api/post",postRoute)
 
 app.use("/api/comment",commentRoute)
+
 
 mongoose.connect(process.env.MONGO_URI).then(console.log("Connected to mongodb")).catch((err)=>{console.log("invalid",err)})
 
@@ -65,7 +69,7 @@ io.on("connection",(socket) =>{
 
       socket.on("setup",(userData) =>{
             socket.join(userData._id);
-            socket.emit("connection");
+            socket.emit("connected");
       })
       socket.on("join room",(room) =>{
             socket.join(room)
@@ -93,13 +97,3 @@ io.on("connection",(socket) =>{
 
 
 // end //
-
-//suggestion for different people to follower new people
-// Story option
-
-// Home page with post of our follwers and ourself
-
-// Exlore page post of all users who's account is public
-
-// Frontend changes in conversation part
-//  and in getConversation name part
