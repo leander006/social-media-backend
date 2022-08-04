@@ -21,15 +21,7 @@ const ChatSchema = new mongoose.Schema({
       groupAdmin:{
             type:mongoose.Schema.Types.ObjectId,
             ref:"User"
-      },
-      Notifications: {
-        type: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Chat',
-            },
-            ],
-      },  
+      } 
       },
 {timestamps:true}
 )

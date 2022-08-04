@@ -58,11 +58,6 @@ const allMessages = asyncHandler(async(req,res) =>{
                   path:"chat.users",
                   select:"username profile"
             })
-            message = await User.populate(message,{
-                  path:"chat.users",
-                  select:"username profile"
-            })
-
             return res.status(200).json(message)
       } catch (error) {
             return res.status(500).send({message:error.message})

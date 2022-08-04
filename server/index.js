@@ -65,7 +65,7 @@ const io = require('socket.io')(server,{
 });
 
 io.on("connection",(socket) =>{
-      console.log("Connect to socket",socket.id);
+      // console.log("Connect to socket",socket.id);
 
       socket.on("setup",(userData) =>{
             socket.join(userData._id);
@@ -73,7 +73,7 @@ io.on("connection",(socket) =>{
       })
       socket.on("join room",(room) =>{
             socket.join(room)
-            console.log("User joined room",room);
+            // console.log("User joined room",room);
       })
 
       socket.on("typing", (room) => socket.in(room).emit("typing"));

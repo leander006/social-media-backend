@@ -5,8 +5,9 @@ const initialState = {
   chatloading:false,
   error:false,
   notification:[],
-  currentChat:false
+  currentChat:false,
 }
+
 
 
 export const ChatSlice = createSlice({

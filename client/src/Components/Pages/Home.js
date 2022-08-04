@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect} from 'react'
 import ExploreMore from '../ExploreMore'
 import Footer from '../Footer'
 import Navbar from '../Navbar'
@@ -11,17 +11,21 @@ import { useDispatch, useSelector } from 'react-redux'
 import { followerPostError, followerPostStart, followerPostSuccess } from '../../redux/Slice/postSlice'
 import axios from 'axios'
 
+
+
 function Home() {
 
   const {followerPost,loading} = useSelector(state =>state.post)
   const {currentUser} = useSelector(state =>state.user)
   const dispatch = useDispatch()
+
   const config ={
     headers:{
         "Content-Type":"application/json",
         Authorization:`Bearer ${Cookie.get('token')}`
     }
   }
+
 
   useEffect(() => {
     const getFollowersPost = async() =>{

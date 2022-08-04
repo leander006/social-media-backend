@@ -21,6 +21,9 @@ import MessageSkeleton from '../Skeleton/MessageSkeleton'
 import ConversationSkeleton from '../Skeleton/ConversationSkeleton'
 import GroupUser from '../GroupUser'
 import ListItems from '../ListItems'
+import NotificationBadge from 'react-notification-badge';
+import {Effect} from 'react-notification-badge';
+
 var socket,selectedChatCompare
 const Endpoint="http://localhost:3001"
 
@@ -42,8 +45,9 @@ function Chat() {
   const {allmessage,messageloading} = useSelector(state => state.message)
   const {currentUser,chatloading} = useSelector(state => state.user)
   const [chatname, setChatname] = useState("")
+  const [Notifications, setNotifications] = useState(false);
   const currentuser = currentUser._id?currentUser?._id:currentUser.others?._id
-
+  const [loading, setLoading] = useState(false);
   // Socket //
   const [socketConnected, setSocketConnected] = useState(false)
   const [typing, setTyping] = useState(false)
@@ -117,6 +121,12 @@ function Chat() {
       setVisible(!visible)
       setSearch("")       
   }
+  const getNotification =async(newMessage)=>{
+    if(!selectedChatCompare || selectedChatCompare._id === newMessage.chat._id){
+      
+      const {data} = await axios.put("http://localhost:3001/api/user/notification/notify",{id:newMessage._id},config)
+    }
+  }
 
   useEffect(() => {
     const getChat = async() =>{
@@ -135,8 +145,10 @@ function Chat() {
   useEffect(() => {
     const getMessage = async() =>{
       try {
+        setLoading(true)
         dispatch(messageStart())
         const {data} = await axios.get("http://localhost:3001/api/message/get/"+currentChat._id,config)
+        setLoading(false)
         dispatch(messageSuccess(data))
         socket.emit("join room",currentChat._id)
       } catch (error) {
@@ -145,15 +157,12 @@ function Chat() {
       }
     }
     getMessage()
-    selectedChatCompare=currentChat._id;
+    selectedChatCompare=currentChat;
   }, [currentChat])
 
   const sendMessage = async(e) =>{
         e.preventDefault()
         socket.emit("stop typing",currentChat._id);
-        if(!selectedChatCompare || selectedChatCompare._id === currentChat._id){
-              
-        }
         try {
             dispatch(messageStart())
             const {data} = await axios.post("http://localhost:3001/api/message/"+currentChat._id,{content:message},config)
@@ -166,13 +175,27 @@ function Chat() {
         }
   }
   useEffect(() => {
+    const getNotifications = async() =>{
+          try {
+                const {data} = await axios.get("http://localhost:3001/api/user/notification/notify",config)
+                dispatch(setNotification(JSON.parse(data)))
+          } catch (error) {
+                console.log(error);
+          }
+    }
+    getNotifications();
+})
+
+  useEffect(() => {
     socket.on("message recieved",(newMessage) =>{
           if(!selectedChatCompare || selectedChatCompare._id === newMessage.chat._id){
                 // notification
+                getNotification(newMessage)
+                console.log("newMessage ",newMessage);
+                  console.log("notification ",notification);
                 if(!notification.includes(newMessage)){
-                  // await axios.post("http://localhost:3001/api/user/notification/notify",{id:newMessage.chat._id},config)
-                  console.log("newMessage ",newMessage);
-                  dispatch(setNotification([newMessage,...notification]))
+                  
+                  dispatch(setNotification(newMessage))
                   setMessage("")
                 }
                 
@@ -276,7 +299,7 @@ const create = async(e)=>{
 
 useEffect(() => {
   scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-}, [setMessage,currentChat,sendMessage]);
+}, [currentChat]);
 
 
   return (
@@ -286,10 +309,36 @@ useEffect(() => {
           <div>
             <SideBar/>
           </div>
+          {Notifications &&
+                  <div>
+                        {notification.length !== 0 ? <div className="fixed z-30 md:w-1/3 w-11/12 bg-[#5a6fac] h-[25vh] mt-14 ">
+                              <div className='h-full w-full overflow-y-scroll'>
+                              {notification?.map((n)=>(
+                                    <div className='bg-[#8fabff] my-1 mx-1 p-2 text-white cursor-pointer' key={n?._id} onClick={async() =>{
+                                          try {
+                                                dispatch(setCurrentChat(n?.chat))
+                                                await axios.put("http://localhost:3001/api/user/notification/remove",{id:n?._id},config)
+                                                console.log("Remove");
+                                                dispatch(setNotification(notification?.filter((ni) => ni !== n?._id)));
+                                                setNotifications(!Notifications);
+                                          } catch (error) {
+                                                console.log(error);
+                                          }
+                                    }}>{n?.chat?.isGroupChat?`New message in ${n?.chat?.chatname}`:`New message from ${n?.chat?.isGroupChat?n?.chat?.chatname:n?.sender?.username}`}</div>
+                              ))}
+                              </div>
+                        </div>:<div className="fixed z-30 md:w-1/4 w-6/12 bg-[#5a6fac] mt-12 ml-1 text-center p-2 text-white">No notifications</div>}
+                  </div>}
           {/* Destop view  */}
           <div className='hidden md:flex w-screen '>
        <div className='conversation w-[40%] border border-y-0'>
+         
        <div className='flex justify-between items-center p-3'>
+       <div className='mr-2 text-[#BED7F8] cursor-pointer' onClick={e=>setNotifications(!Notifications)}>
+                <NotificationBadge count={notification?.length} effect={Effect.SCALE}/>
+                        <i className="fa-solid fa-lg fa-bell cursor-pointer" >
+                        </i>
+        </div>
           <div className='flex bg-[#455175] w-full h-8 mt-1 items-center rounded-md'>
             <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>setSearch(e.target.value)}  placeholder='search your friends'></input>
             <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={ handleVisible}></i>
@@ -304,8 +353,10 @@ useEffect(() => {
           </div>
                 
         <div>
-             <i className="fa-solid fa-2xl fa-user-plus ml-4 text-[#BED7F8] cursor-pointer" onClick={handleGroupChat}></i>
+             <i className="fa-solid fa-xl fa-user-plus ml-4 text-[#BED7F8] cursor-pointer" onClick={handleGroupChat}></i>
         </div>
+       
+                  
        </div>       
        {search && <ChatSearchSkeleton/>}
        <div className='md:h-[calc(100vh-6.7rem)] p-3 overflow-y-scroll'>
@@ -339,7 +390,7 @@ useEffect(() => {
                     </div>}
    </div>
    <div className='md:h-[calc(100vh-10.2rem)] md:bg-[#BED7F8] p-3 overflow-y-scroll'>
-   {!messageloading ? allmessage.map((m) =>(
+   {!loading ? allmessage.map((m) =>(
                 <div key={m._id} ref={scrollRef}>
                 <Messages own={m.sender._id === currentuser} message={m}/>
                 </div>
@@ -364,6 +415,11 @@ useEffect(() => {
        
          {!currentChat ? <div className='conversation md:flex-1'>
             <div className='flex justify-between items-center md:p-3'>
+            <div className='mx-1 text-[#BED7F8] cursor-pointer' onClick={e=>setNotifications(!Notifications)}>
+                <NotificationBadge count={notification?.length} effect={Effect.SCALE}/>
+                        <i className="fa-solid fa-xl fa-bell cursor-pointer" >
+                        </i>
+        </div>
               <div className='flex bg-[#455175] ml-2 w-full h-8 mt-2 items-center rounded-md'>
                     <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} onChange={e =>setSearch(e.target.value)} type="text"  placeholder='search your friends'/>
                     <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={handleVisible}></i>
@@ -494,6 +550,8 @@ useEffect(() => {
                       </div>
                     </div>  
                   }
+
+
 
         <ToastContainer/>
         <Footer/>

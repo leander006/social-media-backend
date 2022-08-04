@@ -75,8 +75,8 @@ const UserSchema = new mongoose.Schema({
     Notifications: {
         type: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Chat',
+                type:mongoose.Schema.Types.ObjectId,
+                ref:"Message"
             },
         ],
     },
