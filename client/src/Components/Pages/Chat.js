@@ -41,11 +41,10 @@ function Chat() {
   const [searchResult, setSearchResult] = useState(false)
   const [addUserGroup, setAdddUserGroup] = useState(false)
   const [visi, setVisi] = useState(false)
-  const {allChat,notification,currentChat} = useSelector(state => state.chat)
+  const {allChat,currentChat} = useSelector(state => state.chat)
   const {allmessage,messageloading} = useSelector(state => state.message)
   const {currentUser,chatloading} = useSelector(state => state.user)
   const [chatname, setChatname] = useState("")
-  const [Notifications, setNotifications] = useState(false);
   const currentuser = currentUser._id?currentUser?._id:currentUser.others?._id
   const [loading, setLoading] = useState(false);
   // Socket //
@@ -122,8 +121,7 @@ function Chat() {
       setSearch("")       
   }
   const getNotification =async(newMessage)=>{
-    if(!selectedChatCompare || selectedChatCompare._id === newMessage.chat._id){
-      
+    if(!selectedChatCompare || selectedChatCompare._id !== newMessage.chat._id){
       const {data} = await axios.put("http://localhost:3001/api/user/notification/notify",{id:newMessage._id},config)
     }
   }
@@ -174,37 +172,18 @@ function Chat() {
             console.log(error?.response?.data);
         }
   }
-  useEffect(() => {
-    const getNotifications = async() =>{
-          try {
-                const {data} = await axios.get("http://localhost:3001/api/user/notification/notify",config)
-                dispatch(setNotification(JSON.parse(data)))
-          } catch (error) {
-                console.log(error);
-          }
-    }
-    getNotifications();
-})
-
+  
   useEffect(() => {
     socket.on("message recieved",(newMessage) =>{
-          if(!selectedChatCompare || selectedChatCompare._id === newMessage.chat._id){
-                // notification
-                getNotification(newMessage)
-                console.log("newMessage ",newMessage);
-                  console.log("notification ",notification);
-                if(!notification.includes(newMessage)){
-                  
-                  dispatch(setNotification(newMessage))
-                  setMessage("")
-                }
-                
+          if(!selectedChatCompare || selectedChatCompare._id !== newMessage.chat._id){
+                // notification    
           }
           else{
                 dispatch(messageSuccess([...allmessage,newMessage]))
           }  
     })
 })
+
   const handleGroupChat = (e) =>{
         e.preventDefault()
         setSearchResult(!searchResult) 
@@ -299,7 +278,7 @@ const create = async(e)=>{
 
 useEffect(() => {
   scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-}, [currentChat]);
+}, [currentChat,message]);
 
 
   return (
@@ -309,36 +288,17 @@ useEffect(() => {
           <div>
             <SideBar/>
           </div>
-          {Notifications &&
-                  <div>
-                        {notification.length !== 0 ? <div className="fixed z-30 md:w-1/3 w-11/12 bg-[#5a6fac] h-[25vh] mt-14 ">
-                              <div className='h-full w-full overflow-y-scroll'>
-                              {notification?.map((n)=>(
-                                    <div className='bg-[#8fabff] my-1 mx-1 p-2 text-white cursor-pointer' key={n?._id} onClick={async() =>{
-                                          try {
-                                                dispatch(setCurrentChat(n?.chat))
-                                                await axios.put("http://localhost:3001/api/user/notification/remove",{id:n?._id},config)
-                                                console.log("Remove");
-                                                dispatch(setNotification(notification?.filter((ni) => ni !== n?._id)));
-                                                setNotifications(!Notifications);
-                                          } catch (error) {
-                                                console.log(error);
-                                          }
-                                    }}>{n?.chat?.isGroupChat?`New message in ${n?.chat?.chatname}`:`New message from ${n?.chat?.isGroupChat?n?.chat?.chatname:n?.sender?.username}`}</div>
-                              ))}
-                              </div>
-                        </div>:<div className="fixed z-30 md:w-1/4 w-6/12 bg-[#5a6fac] mt-12 ml-1 text-center p-2 text-white">No notifications</div>}
-                  </div>}
           {/* Destop view  */}
           <div className='hidden md:flex w-screen '>
        <div className='conversation w-[40%] border border-y-0'>
          
        <div className='flex justify-between items-center p-3'>
-       <div className='mr-2 text-[#BED7F8] cursor-pointer' onClick={e=>setNotifications(!Notifications)}>
+       {/* <div className='mr-2 text-[#BED7F8] cursor-pointer' onClick={e=>setNotifications(!Notifications)}>
+
                 <NotificationBadge count={notification?.length} effect={Effect.SCALE}/>
                         <i className="fa-solid fa-lg fa-bell cursor-pointer" >
                         </i>
-        </div>
+        </div> */}
           <div className='flex bg-[#455175] w-full h-8 mt-1 items-center rounded-md'>
             <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>setSearch(e.target.value)}  placeholder='search your friends'></input>
             <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={ handleVisible}></i>
@@ -362,7 +322,7 @@ useEffect(() => {
        <div className='md:h-[calc(100vh-6.7rem)] p-3 overflow-y-scroll'>
          {allChat ? !chatloading? allChat?.map((c) =>(
                <div className='individual-chat' key={c?._id} onClick={() =>{dispatch(setCurrentChat(c))}} >
-               <Conversation isTyping={isTyping} img={c?.isGroupChat?"images/noProfile.jpeg":currentuser === c?.users[0]?._id ? c?.users[1]?.profile:c?.users[0]?.profile} name={c?.isGroupChat?c?.chatname:currentuser === c?.users[0]?._id ? c?.users[1]?.username:c?.users[0]?.username} chat={c} key={c?._id}  />
+               <Conversation img={c?.isGroupChat?"images/noProfile.jpeg":currentuser === c?.users[0]?._id ? c?.users[1]?.profile:c?.users[0]?.profile} name={c?.isGroupChat?c?.chatname:currentuser === c?.users[0]?._id ? c?.users[1]?.username:c?.users[0]?.username} chat={c} key={c?._id}  />
                </div>
 
          )):allChat?.map((c) =>(
@@ -415,11 +375,11 @@ useEffect(() => {
        
          {!currentChat ? <div className='conversation md:flex-1'>
             <div className='flex justify-between items-center md:p-3'>
-            <div className='mx-1 text-[#BED7F8] cursor-pointer' onClick={e=>setNotifications(!Notifications)}>
+            {/* <div className='mx-1 text-[#BED7F8] cursor-pointer' onClick={e=>setNotifications(!Notifications)}>
                 <NotificationBadge count={notification?.length} effect={Effect.SCALE}/>
                         <i className="fa-solid fa-xl fa-bell cursor-pointer" >
                         </i>
-        </div>
+        </div> */}
               <div className='flex bg-[#455175] ml-2 w-full h-8 mt-2 items-center rounded-md'>
                     <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} onChange={e =>setSearch(e.target.value)} type="text"  placeholder='search your friends'/>
                     <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={handleVisible}></i>
@@ -435,7 +395,7 @@ useEffect(() => {
               </div>}
             </div>
             {search && <ChatSearchSkeleton/>}
-            <div className='h-[calc(100vh-7.9rem)] md:h-[calc(100vh-2.7rem)] p-3 overflow-y-scroll'>
+            <div className='h-[calc(100vh-7rem)] p-1 overflow-y-scroll'>
             {allChat ?!chatloading? allChat?.map((c) =>(
               
                <div className='individual-chat' key={c?._id} onClick={() =>{dispatch(setCurrentChat(c))}} >
@@ -455,7 +415,12 @@ useEffect(() => {
                     <div className='flex h-12 items-center p-3'>
                     <i className="fa-solid mr-2 fa-xl cursor-pointer fa-arrow-left" onClick={() =>{dispatch(setCurrentChat(!currentChat))}}></i>
                         <Link to="/profile"><img src={currentChat?.isGroupChat?"images/noProfile.jpeg":currentChat?.users[0]?._id === currentuser?currentChat?.users[1]?.profile :currentChat?.users[0]?.profile }  alt='image' className='w-10 h-10 rounded-full cursor-pointer border'/></Link>
-                        <Link to="/profile"><h1 className='capitalize text-black ml-4 font-sans cursor-pointer'>{currentChat?.isGroupChat ? currentChat?.chatname : currentChat?.users[0]?._id === currentuser  ? currentChat?.users[1]?.username:currentChat?.users[0]?.username}</h1></Link>
+                        <div className='flex flex-col'>
+                    <h1 className='capitalize text-black ml-4 font-sans ' >{currentChat?.isGroupChat?currentChat?.chatname:currentuser === currentChat?.users[0]?._id ? currentChat?.users[1]?.username:currentChat?.users[0]?.username}</h1>
+                    {isTyping ?<div className='flex flex-wrap ml-4'>{currentChat?.isGroupChat?"Someone ":currentuser === currentChat?.users[0]?._id ? currentChat?.users[1]?.username:currentChat?.users[0]?.username} is typing..</div>:<div  className='flex flex-wrap ml-4'></div>}
+                  </div>
+                       
+                        
                     </div>
                     {currentChat?.isGroupChat && currentChat?.groupAdmin?._id === currentuser &&<div>
                         <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer"></i>

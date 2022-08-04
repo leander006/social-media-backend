@@ -1,4 +1,3 @@
-import { current } from '@reduxjs/toolkit';
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -65,7 +64,7 @@ function SideBar() {
                         <Link to={"/profile/"+current._id}><h1 className='ml-2 text-[#04283D] border border-x-0 border-b-2 border-[#04283D] border-t-0' >Profile</h1></Link>
                   </div>
             </div>}
-            { !visible && <div className='fixed bottom-0 m-3'>
+            {!visible &&  <div className='fixed bottom-0 m-3'>
                   <div className='flex items-center'>
                         <i className="fa-solid fa-xl fa-arrow-right-from-bracket cursor-pointer" onClick={log}></i>
                         <h1 className='ml-2 text-[#04283D]'>Logout</h1>

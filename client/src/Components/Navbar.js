@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import SearchSkeleton from './Skeleton/SearchSkeleton'
 import Cookie from "js-cookie"  
 import axios from 'axios';
@@ -8,7 +8,8 @@ import SearchFreind from './SearchFreind'
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { setNotification } from '../redux/Slice/chatSlice'
+import { logout } from '../redux/Slice/userSlice'
+
 
 
 
@@ -17,6 +18,7 @@ const [visible, setVisible] = useState(false);
 const [search, setSearch] = useState("");
 const [searched, setSearched] = useState([]);
 const dispatch = useDispatch();
+const navigate = useNavigate();
 const {currentUser} = useSelector(state => state.user);
 const config ={
       headers:{
@@ -25,19 +27,11 @@ const config ={
       }
     }
 
-useEffect(() => {
-      const getNotifications = async() =>{
-            try {
-                  const {data} = await axios.get("http://localhost:3001/api/user/notification/notify",config)
-                  dispatch(setNotification(JSON.parse(data)))
-                  console.log(JSON.parse(data));
-            } catch (error) {
-                  console.log(error);
-            }
+    const log = (e)=>{
+      e.preventDefault();
+      dispatch(logout())
+      navigate("/")
       }
-      getNotifications();
-},[])
-
 
 const handleVisible = async(e) =>{
       e.preventDefault()
@@ -94,8 +88,11 @@ const current =currentUser.others?currentUser.others:currentUser
                         </div>
               }
               
-                
+              
                 <div className='flex items-center text-white'>
+                <div className='flex items-center mr-2 '>
+                        <i className="fa-solid  text-[#BED7F8] fa-xl fa-arrow-right-from-bracket cursor-pointer" onClick={log}></i>
+                  </div>
                   <div className='mr-2 text-[#BED7F8] cursor-pointer'>
                         <Link to="/write"><i className="fa-solid fa-xl fa-calendar-plus"></i></Link>
                   </div>

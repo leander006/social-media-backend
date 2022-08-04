@@ -59,13 +59,13 @@ function ExploreMore({explore}) {
 
   return (
         <>
-   <div className='flex flex-col w-screen md:w-[59%] p-2  lg:w-[65%] xl:w-[49%] bg-[#455175] md:mt-4 my-3' >
+   <div className='flex flex-col w-screen md:w-[59%]   lg:w-[65%] xl:w-[49%] bg-[#455175] md:mt-4 my-3' >
           <div className='flex p-1 items-center' >
                   <Link to={"/profile/"+explore?.owner?._id}><img src={explore?.owner?.profile} alt='image' className='w-10 h-10  rounded-full cursor-pointer border'/></Link>
                   <Link to={"/profile/"+explore?.owner?._id}><h1 className='capitalize ml-2 font-sans cursor-pointer text-white' >{explore?.owner?.username}</h1></Link>
           </div>
           <div className='flex justify-center'>
-          <Link to={"/singlePage/"+explore?._id}><img src={explore?.content} className= 'object-contain cursor-pointer lg:w-[100vw]' alt='image'/></Link>
+          <Link to={"/singlePage/"+explore?._id}><img src={explore?.content} className= 'object-contain cursor-pointer w-screen lg:w-[100vw]' alt='image'/></Link>
           </div>
           <div className='flex my-3 mx-3 items-center justify-between' >
                 <div className='flex likes cursor-pointer items-center' onClick={handleLikes}>

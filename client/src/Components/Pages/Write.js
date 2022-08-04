@@ -89,7 +89,7 @@ const handleSubmit = async(e) =>{
                 <div className='flex justify-between p-4'>
                       <div className='flex items-center space-x-5'>
                             <i className="fa-solid fa-2xl fa-xmark cursor-pointer text-[#8aaaeb]" onClick={() => navigate("/home")}></i>
-                            <h1 className='font-bold text-xl'>Post</h1>
+                            <h1 className='font-bold  text-xl text-[#8aaaeb]'>Post</h1>
                       </div>
                       <div>
                             <button type="submit"><i className="fa-solid fa-2xl cursor-pointer fa-check text-[#8aaaeb]" ></i></button>

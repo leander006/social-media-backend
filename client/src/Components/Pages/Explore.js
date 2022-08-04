@@ -54,9 +54,9 @@ const handle = () =>{
           <SideBar/>
         </div>
         <div className='flex flex-col mb-4'>
-         <div className='flex md:hidden m-auto mt-1 items-center bg-slate-200 rounded-md'>
-                <input className='rounded-md m-2 p-1' type="text" placeholder='search your friends'></input>
-                <i className="fa-solid fa-xl fa-magnifying-glass ml-1"></i>
+         <div className='flex md:hidden m-auto mt-0.5 w-[90vw] items-center bg-slate-200 rounded-md'>
+                <input className='rounded-md w-full m-2 p-1' type="text" placeholder='search your friends'></input>
+                <i className="fa-solid fa-xl fa-magnifying-glass mr-2"></i>
           </div>
       { !loading? <div className={click?'m-0 w-screen lg:w-[87vw] md:w-[77vw] p-3  h-[calc(100vh-5rem)] md:h-[calc(100vh-2.7rem)] overflow-y-scroll justify-center absolute grid auto-rows-2fr grid-cols-8':'m-0  w-screen md:w-[93%] p-3 bg-[#2D3B58] h-[calc(100vh-6.9rem)] md:h-[calc(100vh-2.7rem)] overflow-y-scroll justify-center md:absolute grid auto-rows-2fr grid-cols-8'}  >
     {allpost?.map((p) =>(

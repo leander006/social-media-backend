@@ -17,8 +17,8 @@ function Conversation({chat,name,img,isTyping}) {
                   <h1 className='capitalize text-slate-600'>{name}</h1>
 
                   <div className='flex flex-col'>
-                        {isTyping ?<div className='flex flex-wrap ml-1'>{chat?.isGroupChat?"Someone ":currentuser === chat?.users[0]?._id ? chat?.users[1]?.username:chat?.users[0]?.username} is typing..</div>:<div><h1 className='md:hidden lg:flex capitalize text-primary' >{chat?.latestMessage?.content?.length>20?chat?.latestMessage?.content.substring(0,20)+"...":chat?.latestMessage?.content}</h1>
-                        <h1 className=' hidden md:flex lg:hidden capitalize text-primary' >{chat?.latestMessage?.content?.length>20?chat?.latestMessage?.content.substring(0,15)+"...":chat?.latestMessage?.content}</h1></div>}
+                        <h1 className='md:hidden lg:flex capitalize text-primary' >{chat?.latestMessage?.content?.length>20?chat?.latestMessage?.content.substring(0,20)+"...":chat?.latestMessage?.content}</h1>
+                        <h1 className=' hidden md:flex lg:hidden capitalize text-primary' >{chat?.latestMessage?.content?.length>20?chat?.latestMessage?.content.substring(0,15)+"...":chat?.latestMessage?.content}</h1>
                   </div>
 
             </div>

@@ -9,12 +9,15 @@ function Footer() {
         const {allPost} = useSelector(state=>state.post)
         const navigate = useNavigate()
         const dispatch = useDispatch();
+        const {currentUser} = useSelector(state => state.user);
         const explore= (e) =>{
                 e.preventDefault();
                 dispatch(unClicked())
                 setVisible(!visible);
                 navigate("/explore")
           }
+
+        const current =currentUser.others?currentUser.others:currentUser
   return (
     <div className={allPost?'flex items-center bg-[#BED7F8] h-10 md:hidden justify-between p-2  w-screen':'flex items-center bg-[#BED7F8] h-10 md:hidden justify-between fixed bottom-0 p-2  w-screen'}>
            
@@ -39,7 +42,7 @@ function Footer() {
           </div>
 
           <div className='cursor-pointer'>
-                  <Link to ="/profile" ><i  className="fa-solid fa-xl fa-user"></i></Link>
+                  <Link to ={"/profile/"+current._id} ><i  className="fa-solid fa-xl fa-user"></i></Link>
           </div >
     </div>
   )
