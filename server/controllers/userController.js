@@ -142,57 +142,10 @@ const updateUser =asyncHandler(async(req,res) =>{
 })
 
 const suggestedUser =asyncHandler(async(req,res) =>{
-      console.log("suggesteduser");
       try {
-
-
-            const user = await User.findById(req.user._id)
-            const following = user.following
-
-            // console.log(following);
-            // const user = await User.find({following})
-           
-            
-            // id.push(following[Math.floor(Math.random() * following.length)])
-
-            // const id1 = following[Math.floor(Math.random() * following.length)]
-            // id.splice(indexs)
-            // console.log(id.includes(id1));
-            // if(id.includes(id1) === false){
-            //       id.push(id1)
-            // }
-
-            // console.log(following({length: 2}, () => Math.floor(Math.random() * 40)))
-                  // id.push(id1)
-            // }
-            // else{
-            //       id.push(following[Math.floor(Math.random() * following.length-1)])
-            // }
-
-            // id.push(following[Math.floor(Math.random() * following.length)])
-            // id.push(following[Math.floor(Math.random() * following.length)])
-            // console.log(following[Math.floor(Math.random() * following.length)]);
-            // console.log(id);
-            // const newUser = await User.findById(req.user._id)
-            // const following = newUser.following
-            // const alluser = await User.find({})
-            // const moreuser  = []
-            // moreuser.push(allUser)
-            // console.log(typeof(moreuser));
-            // moreuser.pull(following)
-     
-            // console.log(users);
-            // console.log(moreuser);
-
-            // const moreuser = await Promise.all(
-                  // following.map((id) =>{
-                  //     return User.findById({$ne:id})
-                  // })
-            //   )
-            //   console.log("moreuser ",moreuser);
-            // const user = await User.find({$nt:req.user._id,postCount: { $gt: 0 }, })
-            
-            // return res.status(200).json(user)
+            var users = await User.find({"_id":{$ne:req.user._id},followers:{$nin:req.user._id}})
+            users=users.slice(0,7)
+            res.status(200).json(users)
        } catch (error) {
              return res.status(500).send({error:error.message})
        }
