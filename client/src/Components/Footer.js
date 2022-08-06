@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom'
-import { unClicked } from '../redux/Slice/userSlice';
+import { clicked} from '../redux/Slice/userSlice';
 
 
 function Footer() {
@@ -12,14 +12,14 @@ function Footer() {
         const {currentUser} = useSelector(state => state.user);
         const explore= (e) =>{
                 e.preventDefault();
-                dispatch(unClicked())
+                dispatch(clicked())
                 setVisible(!visible);
                 navigate("/explore")
           }
 
         const current =currentUser.others?currentUser.others:currentUser
   return (
-    <div className={allPost?'flex items-center bg-[#BED7F8] h-10 md:hidden justify-between p-2  w-screen':'flex items-center bg-[#BED7F8] h-10 md:hidden justify-between fixed bottom-0 p-2  w-screen'}>
+    <div className={allPost?'flex items-center bg-[#BED7F8] h-10 lg:hidden justify-between p-2  w-screen':'flex items-center bg-[#BED7F8] h-10 lg:hidden justify-between fixed bottom-0 p-2  w-screen'}>
            
           <div className='cursor-pointer'>
                   <Link to ="/home" ><i  className="fa-solid fa-xl fa-house"></i></Link>  

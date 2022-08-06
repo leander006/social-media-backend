@@ -25,6 +25,11 @@ function Register() {
                   console.log(err?.response?.data);
             }
           };
+
+          const google = (e) =>{
+            e.preventDefault();
+              window.open("http://localhost:3001/api/auth/google","_self")
+          }
   return (
       <>
       <div className="flex justify-evenly flex-row-reverse h-screen w-screen md:bg-[#2D3B58]" >
@@ -69,7 +74,7 @@ function Register() {
                         <h1 className='text-center my-2 text-slate-500'>--------or--------</h1>
                         <div className=' bg-[#2D3B58] text-white flex rounded-lg hover:bg-[#212e49] hover:border '>
                                  <i className="fa-brands text-[#b4c1db] fa-2xl fa-google-plus-g m-auto pl-2"></i>
-                                 <button  className=' w-full h-10'>Sign in with google</button>
+                                 <button  className=' w-full h-10' onClick={google}>Sign in with google</button>
                         </div>
                   </div>
             </div>

@@ -3,16 +3,15 @@ const asyncHandler = require('express-async-handler');
 const Post = require("../model/Post")
 const Message= require("../model/Message");
 const { cloudinary } = require("../utils/cloudinary");
+const passport = require("passport")
+const dotenv = require('dotenv');
 
 const particularUser = asyncHandler(async(req,res) =>{
             const name = req.query.name
             const userId = req.query.userId
       try {
             const users = name ? await User.find({"_id":{$ne:req.user._id},username:{$regex:name ,$options:'$i'}}):await User.findById(userId).populate("following","-password").populate("followers","-password")
-            if(users.length !== 0){
                   return res.status(200).json(users)
-            }
-            return res.status(404).send({error:"User doest not exist"});
        } catch (error) {
              return res.status(500).send({error:error.message})
        }
@@ -41,7 +40,7 @@ try {
 const userById = asyncHandler(async(req,res) =>{
       try {
            const user = await User.findById(req.params.id).populate("following","-password").populate("followers","-password")
-           const post = await Post.find({owner:req.params.id})
+           const post = await Post.find({owner:req.params.id}).populate("owner")
            return res.status(200).json({user:user,post:post})
       } catch (error) {
             return res.status(500).send({error:error.message})
@@ -142,14 +141,23 @@ const updateUser =asyncHandler(async(req,res) =>{
 })
 
 const suggestedUser =asyncHandler(async(req,res) =>{
+
       try {
             var users = await User.find({"_id":{$ne:req.user._id},followers:{$nin:req.user._id}})
-            users=users.slice(0,7)
-            res.status(200).json(users)
+            function getMultipleRandom(users, num) {
+                  const shuffled = [...users].sort(() => 0.5 - Math.random());
+
+                  return shuffled.slice(0, num);
+            }
+            res.status(200).json(getMultipleRandom(users, 5))
        } catch (error) {
              return res.status(500).send({error:error.message})
        }
 })
+
+
+
+
 
 module.exports = {
 	allUser,

@@ -99,7 +99,7 @@ const handleSubmit = async(e) =>{
                 <div className='flex flex-col justify-center items-center' >
                       <img className='image w-28 h-28 md:w-64 md:h-64 lg:w-72 lg:h-72 xl:w-80 xl:h-80 ' src={previewSource?previewSource:profile?profile:'/images/noImage.png'} alt='image'/>
                       <label className='text-[#8aaaeb] cursor-pointer font-bold text-2xl mt-2 hover:text-[#6795f1]' htmlFor='forFile'>Upload</label>
-                      <input type="file" id='forFile' accept='image/png , image/jpg, image/jpeg ,video/mp4' value={fileInputState} onChange={handleFileInputChange}style={{display:"none"}}  name="file" required />
+                      <input type="file" id='forFile' accept='image/png , image/jpg, image/jpeg ,video/mp4' value={fileInputState} onChange={handleFileInputChange}style={{display:"none"}}  name="file"/>
                 </div>
                 {selectedImg && <div className='flex justify-center'><h1 className='bg-blue-600 active:bg-blue-400 cursor-pointer mt-2 text-white p-1 rounded' onClick={handleImage}>Upload image</h1></div>}
                 <div className='bottom'>

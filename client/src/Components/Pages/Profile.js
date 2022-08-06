@@ -1,13 +1,15 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import {useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import {useSelector } from 'react-redux'
+import { Link, useParams } from 'react-router-dom'
 import Footer from '../Footer'
 import Pin from '../GridSystem/Pin'
 import Cookie from "js-cookie"  
 import Navbar from '../Navbar'
 import SideBar from '../SideBar'
-import { chatError, chatStart, chatSuccess } from '../../redux/Slice/chatSlice'
+import ExploreMore from '../ExploreMore'
+import { SpinnerCircular } from 'spinners-react';
+
 
 
 
@@ -19,10 +21,8 @@ function Profile() {
   const [follow, setFollow] = useState(false)
   const [user, setUser] = useState()
   const [post, setPost] = useState([])
-  const {allChat} = useSelector(state => state.chat)
-  const dispatch = useDispatch()
   const current =currentUser.others?currentUser.others:currentUser
-  const navigate = useNavigate()
+
 
   const config ={
     headers:{
@@ -34,11 +34,12 @@ function Profile() {
 useEffect(() => {
   const getPost = async() =>{
     try {
+      setLoading(true)
       const {data} = await axios.get("http://localhost:3001/api/user/"+userId,config)
       setUser(data.user)
       setPost(data.post)
       setFollow(current?.following?.includes(data.user._id))
-      setLoading(true)
+      setLoading(false)
     } catch (error) {
         console.log(error?.response?.data);
     }
@@ -46,22 +47,6 @@ useEffect(() => {
   getPost()
 },[userId])
 
-const openChat = async(e) =>{
-  e.preventDefault()
-  try {
-    dispatch(chatStart())
-    const {data} = await axios.post("http://localhost:3001/api/chat/"+userId,{},config)
-    if(typeof(data) === "string"){
-      navigate("/chat")
-      return 
-    }
-    dispatch(chatSuccess([data,...allChat,]))
-    navigate("/chat")
-} catch (error) {
-    dispatch(chatError())
-    console.log(error);
-}
-}
 
 const following = async(e) =>{
   e.preventDefault()
@@ -72,73 +57,63 @@ const following = async(e) =>{
         console.log(error?.response?.data);
   }
 }
-
   const sizeArray = ["sm", "md", "lg"];
   return (
     <>
     <Navbar/>
-      <div className='flex bg-[#2D3B58] '>
+      <div className='flex bg-[#2D3B58]'>
         <div className='sidebar'>
           <SideBar/>
         </div>
-        <div className='h-[calc(100vh-20rem)] text-white xl:w-[94%]  w-screen'>
-            <div className='flex justify-center md:space-x-12 '>
-                <div className='left image mt-6 xl:ml-[16rem] mr-2'>
-                      <img className='rounded-full p-1 md:p-4 h-12 w-12 md:w-36 md:h-36' alt='profile' src={user?.profile} />
-                </div>
-                <div className='right flex flex-col'>
-                  <div className='top flex space-x-14 md:space-x-[12rem] xl:space-x-[16rem] lg:space-x-[14rem] mt-8 xl:mr-48'>
-                        <div>
-                              <h1>{user?.username}</h1>
-                        </div>
-                        {userId !== currentUser?._id &&<div className='h-6 flex items-center'>
-                              {/* <h1 className=' rounded-lg p-0.5 text-black bg-[#BED7F8] cursor-pointer active:bg-[#88b8f7] active:rounded-lg' onClick={openChat}>Message</h1> */}
+        {!loading ?<div className='bg-[#2D3B58] w-full flex flex-col h-[calc(100vh-3rem)]'>
+        <div className={click?'flex w-screen flex-col text-white pt-6 lg:w-[80vw] xl:w-[86vw] ':'flex flex-col w-screen bg-[#2D3B58]  md:px-16 pt-6  text-white lg:w-[95vw] '}  >
+          <div className='flex lg:mx-36'>
+                <div className='p-1 pl-2  md:px-8 flex flex-col items-center'>
+                      <img className='rounded-full p-1 w-24 md:w-36 lg:w-48' alt='profile' src={user?.profile} />
+                      <h1 className='name'>{user?.username}</h1>
+                      {userId !== currentUser?._id &&<div className='h-6 flex mt-3 items-center'>
                               {userId !== currentUser?._id && <div>
-                              {follow ?<i className="fa-solid fa-user-slash fa-xl ml-2 cursor-pointer" onClick={following}></i>:
-                              <i className="fa-solid fa-xl ml-2 fa-user-plus cursor-pointer" onClick={following}></i>}
+                              {follow ?<i className="fa-solid fa-user-slash fa-xl  cursor-pointer" onClick={following}></i>:
+                              <i className="fa-solid fa-xl  fa-user-plus cursor-pointer" onClick={following}></i>}
                               </div>}
-                        </div>  } 
-                         
-                  </div>
-
-                  <div className='mid-up flex space-x-4 md:space-x-10 lg:space-x-14 md:mb-3 mt-4'>
-                    <div>
-                    <h1>{user?.postCount} post</h1>
-                    </div>
-                    <div>
-                    <h1>{user?.followers.length} followers</h1>
-                    </div>
-                    <div>
-                    <h1>{user?.following.length} following</h1>
-                    </div>
-                  </div>
-                  <div className='mid-bottom bio mt-4 md:m-0 md:space-x-5 flex '>
-                  <div >
-                      <h1 className='font-bold'>Bio:</h1>
-                  </div>
-                  <div className='h-28  md:w-80 w-64 break-all pl-2 pr-2'>
-                  {user?.bio}
-                  </div>
-
-                  </div>
-
+              </div>  } 
                 </div>
-            </div>
-            {user?._id === currentUser?._id && <div className='mt-24 flex justify-center items-center '>
-            <Link to={"/edit/"+userId}><div className='bg-[#BED7F8] text-black w-64 md:w-80 xl:w-[36rem] lg:w-96 rounded-lg flex active:bg-[#85b6f7] justify-center cursor-pointer'>
-                 <h1 className='font-bold'>Edit Profile</h1>
-              </div></Link>
-            </div>}
+                <div className='flex flex-col pt-2 pr-2 md:px-8 w-full'>
+                    <div className='flex justify-between w-full '>
+                        <h1>{user?.postCount} post</h1>
+                        <h1>{user?.followers.length} followers</h1>
+                        <h1>{user?.following.length} following</h1>
+                    </div>
+                    <div className='p-2 mt-6 '>
+                        {user?.bio}
+                    </div>
+                </div>
+          </div>
+           <div className='px-3 flex justify-between pt-2 lg:mx-16'>
+           {user?._id === currentUser?._id && 
+            <Link to={"/edit/"+userId}><div className={click?'bg-[#BED7F8] text-black lg:ml-12 md:w-[80vw] lg:w-[60vw] w-[75vw] items-center rounded-lg active:bg-[#85b6f7] cursor-pointer':'bg-[#BED7F8] text-black lg:w-[60vw] xl:ml-28 md:w-[80vw] lg:ml-12 w-[90vw] items-center rounded-lg active:bg-[#85b6f7] cursor-pointer'}>
+                 <h1 className='font-bold text-center'>Edit Profile</h1>
+              </div></Link>}  
+              
+          </div>
 
-            <div className={click?'m-0 w-screen xl:w-[86vw] lg:w-[80vw] md:w-[77vw] p-3 md:mt-3 h-[calc(100vh-5rem)] md:h-[calc(100vh-24.8rem)] overflow-y-scroll justify-center absolute grid auto-rows-2fr grid-cols-8':'m-0  w-screen md:w-[93%] p-9 bg-[#2D3B58] md:h-[calc(100vh-24.8rem)] md:mt-3 overflow-y-scroll justify-center md:absolute grid auto-rows-2fr grid-cols-8'}  >
-    {post.map((p) =>(
-        <Pin url={p.content} id={p._id} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
-      )
-    )}
-  </div>
         </div>
+        {user?.postCount !== 0 ?<div className='md:px-24 bg-[#2D3B58] overflow-y-scroll'>
+        <div className={click?'m-0  w-screen xl:w-[76vw] md:grid lg:w-[60vw] p-3 md:mt-3 h-[calc(100vh-5rem)] md:h-[calc(100vh-28.8rem)] overflow-y-scroll justify-center absolute hidden auto-rows-2fr grid-cols-8':'m-0 w-[50vw]  md:w-[80vw] p-9 bg-[#2D3B58] md:h-[calc(100vh-18.8rem)]  overflow-y-scroll justify-center md:grid md:absolute hidden auto-rows-2fr grid-cols-8'}  >
+                  {post.map((p) =>(
+                      <Pin url={p.content} id={p._id} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
+                    ))}
+        </div>
+          <div className='md:hidden'>
+                  {post.map((p) =>(
+                         <ExploreMore explore={p} key={p._id} bookmark={currentUser?.bookmarkedPost?.includes(p?._id)?true:false} likes= {currentUser?.likedPost?.includes(p?._id)?true:false}/>
+                  ))}
+          </div>
+          </div>:<div className='h-[calc(100vh-4.3rem)] flex mt-28 m-auto font-bold text-3xl md:h-[calc(100vh-2.7rem)] text-[#547bca]' >No Post Available </div>}
 
-      </div>
+        </div>:<SpinnerCircular size="90" className='bg-[#2D3B58] w-full flex items-center flex-col h-[calc(100vh-3rem)] mx-auto' thickness='100'  speed="600" color='white' secondaryColor="black"/>}
+ 
+        </div>
       <Footer/>
     </>
   )

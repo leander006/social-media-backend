@@ -19,6 +19,7 @@ function Edit() {
       const [selectedImg, setSelectedImg] = useState("")
       const [previewSource, setPreviewSource] = useState('');
       const [fileInputState, setFileInputState] = useState('');
+      const [status, setStatus] = useState("")
       const {editId} = useParams()
 
       const config ={
@@ -87,7 +88,7 @@ function Edit() {
             dispatch(loginStart())
             try {
                   const user = await axios.put("http://localhost:3001/api/user/update/"+editId,{username:username, bio:bio, name:name,
-                  profile:profile},config); 
+                  profile:profile,status:status},config); 
 
                   dispatch(loginSuccess(user.data))
                   navigate("/profile/"+editId)
@@ -99,6 +100,7 @@ function Edit() {
                   }
            
       }
+
       const log = (e)=>{
             e.preventDefault();
             dispatch(logout())
@@ -144,7 +146,15 @@ function Edit() {
                               <h1 className='text-[#8aaaeb] '>Bio</h1>
                               <textarea className='bg-[#2D3B58] border-b w-full mt-2 outline-none' placeholder={user?.bio} onChange={e=>setBio(e.target.value)} type="text"></textarea>
                         </div>
-
+                        <div className='p-2'>
+                              <h1 className='text-[#8aaaeb] '>Status</h1>
+                              <div className='flex space-x-3 text-[#437df0]'>
+                                    <input type="radio" id="html" name="fav_language" onChange={e=>setStatus(e.target.value)}  value="Private"/>
+                                    <label htmlFor="html">Private</label><br/>
+                                    <input type="radio" id="css" name="fav_language" onChange={e=>setStatus(e.target.value)} value="Public"/>
+                                    <label htmlFor="css">Public</label><br></br>
+                              </div>      
+                        </div>
                   </div> 
                   <div className='flex text-lg font-bold ml-2 mt-2 text-[#8aaaeb]'>
                          <h1 className='cursor-pointer' onClick={log}>Switch account</h1>

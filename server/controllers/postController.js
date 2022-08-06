@@ -53,6 +53,11 @@ const deletePost = asyncHandler(async(req,res) =>{
     const comment = await Comment.find({post:post._id})
     try {
         await Post.findByIdAndDelete(req.params.id)
+        await User.findByIdAndUpdate(
+			req.user._id,
+			{ $dec: { postCount: 1 } },
+			{ new: true }
+		);
         // await Comment.findByIdAndDelete(comment._id)
         return res.status(200).json("Deleted successfully");
     } catch (error) {
@@ -78,6 +83,7 @@ const followingPost = asyncHandler(async(req,res) =>{
 
       
         const followerPost = post.concat(morePost.flat())
+        console.log(followerPost);
 // flat() is use to return json as a single object if not used it returned two object as [{},{}]
 
           res.status(200).json(followerPost)

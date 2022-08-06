@@ -7,6 +7,8 @@ const {allUser, particularUser,groupUser, updateUser, loginUser, userById, sugge
 const { protect } = require('../middleware/authMiddleware');
 const { upload } = require('../middleware/profilePicUpload');
 
+const dotenv = require('dotenv');
+
 
 router.get("/",protect,allUser)
 router.get("/oneUser",protect,particularUser)

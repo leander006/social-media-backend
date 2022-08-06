@@ -30,39 +30,23 @@ const config ={
     const log = (e)=>{
       e.preventDefault();
       dispatch(logout())
+      window.open("http://localhost:3001/api/auth/logout", "_self");
       navigate("/")
       }
 
-const handleVisible = async(e) =>{
-      e.preventDefault()
-      try {
-            const {data} = await axios.get("http://localhost:3001/api/user/oneUser?name="+search,config)
-            setSearched(data)
-           
-            toast.success("This are result", {
-                  position: "bottom-center",
-                  autoClose: 1000,
-                  hideProgressBar: true,
-                  closeOnClick: false,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  });
-      } catch (error) {
-            toast.warn("something went wrong try again", {
-                  position: "bottom-center",
-                  autoClose: 1000,
-                  hideProgressBar: true,
-                  closeOnClick: false,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  })
+const handleSearch = async(query)=>{
+      setSearch(query)
+      if(!query){
+        return
       }
-      setVisible(!visible)
-      setSearch("")
-      
-}
+      try {
+          const {data} = await axios.get("http://localhost:3001/api/user/oneUser?name="+search,config)
+          setSearched(data)
+
+      } catch (error) {
+          console.log(error);      
+      }
+  }
 
 const current =currentUser.others?currentUser.others:currentUser
   return (
@@ -74,23 +58,23 @@ const current =currentUser.others?currentUser.others:currentUser
                 </div>
 
                 <div className='md:flex hidden h-8 w-1/3 m-auto mt-1 items-center bg-[#455175] rounded-md'>
-                <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>setSearch(e.target.value)} placeholder='search your friends'></input>
-                <i className="fa-solid fa-xl fa-magnifying-glass ml-1 text-[#BED7F8] cursor-pointer " onClick={handleVisible}></i>
+                <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>handleSearch(e.target.value)}  placeholder='search your friends'></input>
                 </div>
 
-                {visible &&
-                        <div className=" hidden md:flex fixed z-30 ">
-                              <div className="md:w-64 lg:w-80 xl:w-[30rem] xl:ml-[25rem] lg:ml-[18rem] md:mt-10 md:ml-[12rem]">
-                              {searched.map((s) =>(
+                
+                        <div className=" hidden md:flex fixed z-30 xl:ml-[26rem] lg:ml-64 ml-44 mt-12 bg-[#a1bcf1]">
+                              <div className="md:w-64 lg:w-80 xl:w-96 ">
+                              {searched?.map((s) =>(
                                     <SearchFreind key={s._id} search={s}/>
                               ))}
+                            
                               </div>
                         </div>
-              }
+              
               
               
                 <div className='flex items-center text-white'>
-                <div className='flex items-center mr-2 '>
+                <div className='flex lg:hidden items-center mr-2 '>
                         <i className="fa-solid  text-[#BED7F8] fa-xl fa-arrow-right-from-bracket cursor-pointer" onClick={log}></i>
                   </div>
                   <div className='mr-2 text-[#BED7F8] cursor-pointer'>
@@ -108,8 +92,8 @@ const current =currentUser.others?currentUser.others:currentUser
                 </div>
           </div>
           
-          <ToastContainer/>
-          {search && <SearchSkeleton/>}
+         
+          
       </div>
   )
 }

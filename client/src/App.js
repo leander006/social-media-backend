@@ -1,5 +1,5 @@
 import Explore from './Components/Pages/Explore'
-import Chats from "./Components/Pages/Chats";
+
 import Home from "./Components/Pages/Home";
 import {
   BrowserRouter as Router,
@@ -34,7 +34,6 @@ function App() {
    <Route path="/profile/:userId" element={<Profile/>}/>
    <Route path="/savedPost" element={<SavedPost/>}/>
    <Route path="/chat" element={<Chat/>}/>
-   <Route path="/message/:chatId" element={<Chats/>}/>
    <Route path="/explore" element={<Explore/>}/>
    <Route path="/write" element={<Write/>}/>
    <Route path="/login" element={<Login/>}/>

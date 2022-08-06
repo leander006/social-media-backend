@@ -21,8 +21,7 @@ import MessageSkeleton from '../Skeleton/MessageSkeleton'
 import ConversationSkeleton from '../Skeleton/ConversationSkeleton'
 import GroupUser from '../GroupUser'
 import ListItems from '../ListItems'
-import NotificationBadge from 'react-notification-badge';
-import {Effect} from 'react-notification-badge';
+
 
 var socket,selectedChatCompare
 const Endpoint="http://localhost:3001"
@@ -120,11 +119,7 @@ function Chat() {
       setVisible(!visible)
       setSearch("")       
   }
-  const getNotification =async(newMessage)=>{
-    if(!selectedChatCompare || selectedChatCompare._id !== newMessage.chat._id){
-      const {data} = await axios.put("http://localhost:3001/api/user/notification/notify",{id:newMessage._id},config)
-    }
-  }
+
 
   useEffect(() => {
     const getChat = async() =>{
@@ -289,7 +284,7 @@ useEffect(() => {
             <SideBar/>
           </div>
           {/* Destop view  */}
-          <div className='hidden md:flex w-screen '>
+          <div className='hidden lg:flex w-screen '>
        <div className='conversation w-[40%] border border-y-0'>
          
        <div className='flex justify-between items-center p-3'>
@@ -371,9 +366,9 @@ useEffect(() => {
           {/* Mobile view */}
 
 
-          <div className='flex md:hidden z-10 flex-col md:p-0 md:items-center w-screen '>
+          <div className='flex lg:hidden z-10 flex-col md:p-0 w-screen '>
        
-         {!currentChat ? <div className='conversation md:flex-1'>
+         {!currentChat ? <div className='conversation lg:flex-1'>
             <div className='flex justify-between items-center md:p-3'>
             {/* <div className='mx-1 text-[#BED7F8] cursor-pointer' onClick={e=>setNotifications(!Notifications)}>
                 <NotificationBadge count={notification?.length} effect={Effect.SCALE}/>
@@ -395,7 +390,7 @@ useEffect(() => {
               </div>}
             </div>
             {search && <ChatSearchSkeleton/>}
-            <div className='h-[calc(100vh-7rem)] p-1 overflow-y-scroll'>
+            <div className='h-[calc(100vh-8rem)] p-1 overflow-y-scroll'>
             {allChat ?!chatloading? allChat?.map((c) =>(
               
                <div className='individual-chat' key={c?._id} onClick={() =>{dispatch(setCurrentChat(c))}} >
@@ -482,7 +477,7 @@ useEffect(() => {
                       <div className='bg-[#1f62b9]  h-full  m-auto w-11/12 ' >
                         <h1 className='text-2xl font-bold text-[#153f75] text-center' >Update group</h1>
                                       <form className='h-14 flex w-full p-1 ' onSubmit={handleRename}>
-                                            <input className='focus:outline-slate-900 m-0.5 w-full h-full p-1' type="text" placeholder={currentChat.chatname} vvalue={chatname} onChange={e =>setChatname(e.target.value)} required  />
+                                            <input className='focus:outline-slate-900 m-0.5 w-full h-full p-1' type="text" placeholder={currentChat.chatname} value={chatname} onChange={e =>setChatname(e.target.value)} required  />
                                             <input value="Rename" type="submit" className='bg-[#4c92ee] rounded m-1' />
                                      </form>
                                     

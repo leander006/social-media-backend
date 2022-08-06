@@ -34,18 +34,14 @@ export const UserSlice = createSlice({
         },
         clicked:(state)=>{
             state.loading=false
-            state.click=true
+            state.click=!state.click
         },
-        unClicked:(state)=>{
-            state.loading=false
-            state.click=false
-        }
       },
 })
     
 
 
-export const { loginStart,loginSuccess,loginError,logout,clicked,unClicked} = UserSlice.actions
+export const { loginStart,loginSuccess,loginError,logout,clicked} = UserSlice.actions
 
 
 export default UserSlice.reducer    

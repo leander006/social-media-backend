@@ -10,12 +10,14 @@ const messageRoute = require('./routes/messageRoute');
 const postRoute = require("./routes/postRoute")
 const commentRoute = require("./routes/commentRoute")
 
+const cors = require('cors')
+const cookieSession = require('cookie-session');
 
 const cookieParser = require('cookie-parser')
 const app = express();
+const passportSetup = require("./utils/passport");
+const passport = require("passport")
 
-
-const cors = require('cors')
 
 // for multer upload //
 // app.use("/uploadProfile",express.static("uploadProfile"))
@@ -26,11 +28,20 @@ dotenv.config();
 app.use(express.json());
 
 app.use(cookieParser())
+app.use(
+      cookieSession({ name:"session", keys:["leander"], maxAge: 60 * 60 * 100 })
+);
 
 app.use(cors({
-      origin:["http://localhost:3000"],
+      origin:"http://localhost:3000",
+      methods: "GET,POST,PUT,DELETE",
       credentials:true
-}));
+}));  
+
+app.use(passport.initialize());
+app.use(passport.session());
+    
+
 
 app.use("/api/auth",authRoute);
 

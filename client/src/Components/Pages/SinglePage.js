@@ -111,11 +111,11 @@ function SinglePage() {
           <div>
             <SideBar/>
           </div>
-         {loading? <div className='flex flex-col p-4 md:items-center lg:justify-center md:p-4 md:flex-row h-[calc(100vh-4.3rem)] w-screen md:h-[calc(100vh-2.7rem)] overflow-y-scroll'>
-              <div className='h-1/4 md:h-3/4 lg:h-5/6 md:border border-[#BED7F8] md:w-[50%] lg:w-2/5'>
+         {loading? <div className='flex flex-col p-4 lg:items-center lg:justify-center lg:p-4 lg:flex-row h-[calc(100vh-4.3rem)] w-screen lg:h-[calc(100vh-2.7rem)] overflow-y-scroll'>
+              <div className='h-1/4 lg:h-5/6 lg:border border-[#BED7F8]  lg:w-2/5'>
                         <img className=' w-full h-full' src={post?.content}></img>
               </div>
-              <div className='flex flex-col md:border border-[#BED7F8] p-2 h-3/4 md:h-3/4 lg:h-5/6 md:w-[50%] lg:w-2/5  '>
+              <div className='flex flex-col lg:border border-[#BED7F8] p-2 h-3/4 lg:h-5/6 lg:w-2/5  '>
                   <div className='flex p-1' >
                         <Link to={"/profile/"+post?.owner?._id}><img src={post?.owner?.profile} alt='image' className='w-fit h-12 rounded-full cursor-pointer border' /></Link>
                         <div className='main '>
@@ -123,30 +123,32 @@ function SinglePage() {
                         <p className='ml-2 text-sm mt-3 text-slate-300 break-all'>{post?.caption}</p>
                         </div>
                   </div>
-                 {allComment.length ===0 ?<div className='border-x-0 flex items-center justify-center border-t-2 border-[#BED7F8] md:h-3/4 border-b-0 overflow-y-scroll'>
-                        <h1 className='text-slate-400'>No Comments</h1>
-                  </div>:
-                  <div className='border-x-0 border-t-2 border-[#BED7F8] md:h-3/4 border-b-0 overflow-y-scroll'>
-                 {allComment?.map((c)=>(
-                      <Comment key={c._id} comment={c}/>
-                 ))} 
-                  </div>}
-                  <div className='flex my-3 mx-3 text-white  items-center justify-between' >
+                  <div className='flex my-3 mx-3 text-white  items-center' >
                 <div className='flex items-center' >
-                      <div className='flex likes cursor-pointer  flex-col justify-center mt-3' onClick={handleLikes}>
+                      <div className='flex likes cursor-pointer flex-col justify-center mt-3' onClick={handleLikes}>
                       {isLiked?
                               <i className="fa-solid fa-heart fa-2xl pr-3 text-red-700"/>: 
                               <i className="fa-regular fa-heart fa-2xl pr-3"/>
                               }
-                              <h1 className='mt-3 ml-1'>{like}</h1>
+                              <h1 className='mt-3 ml-3'>{like}</h1>
                       </div>
                 </div>
-                 <div className=' cursor-pointer'>
+                 <div className='mb-6 cursor-pointer'>
                  { bookmark ?<i className="fa-solid fa-xl fa-bookmark cursor-pointer" onClick={handleSaved}></i>:
                         <i className="fa-regular fa-xl fa-bookmark cursor-pointer" onClick={handleSaved}></i>}
                 </div>             
                 
-          </div>
+                </div>
+                 {allComment.length ===0 ?<div className='border-x-0 flex items-center justify-center border-t-2 border-[#BED7F8] h-3/4 lg:h-3/4 border-b-0 overflow-y-scroll'>
+                        <h1 className='text-slate-400'>No Comments</h1>
+                  </div>:
+                  <div className='border-x-0 border-t-2 border-[#BED7F8] h-3/4 lg:h-3/4 border-b-0 overflow-y-scroll'>
+                 {allComment?.map((c)=>(
+                      <Comment key={c._id} comment={c}/>
+                      
+                 ))} 
+                  </div>}
+                
                   <div className='flex items-center bg-[#455175] rounded-md'>
                         <input className='w-full rounded-md p-1' value={comment} placeholder='Comment here' onChange={e=>setComment(e.target.value)}  type="text"></input>
                         <i className="fa-solid fa-xl fa-paper-plane p-2 text-[#BED7F8] cursor-pointer " onClick={handleComment}></i>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { clicked, logout,unClicked } from '../redux/Slice/userSlice';
+import { clicked, logout} from '../redux/Slice/userSlice';
 
 function SideBar() {
       const [visible, setVisible] = useState(true);
@@ -17,23 +17,24 @@ function SideBar() {
       }
       const handleUnVisibility = (e) =>{
             e.preventDefault();
-            dispatch(unClicked())
+            dispatch(clicked())
             setVisible(!visible);
       }
       const explore= (e) =>{
             e.preventDefault();
-            dispatch(unClicked())
+            dispatch(clicked())
             setVisible(!visible);
             navigate("/explore")
       }
       const log = (e)=>{
             e.preventDefault();
+            window.open("http://localhost:3001/api/auth/logout", "_self");
             dispatch(logout())
             navigate("/")
       }
   return (
         <>
-      <div className={visible?'hidden md:flex flex-1 bg-[#BED7F8] h-[calc(100vh-2.7rem)] z-10 w-12':'hidden md:flex bg-[#BED7F8] flex-col h-[calc(100vh-2.7rem)] z-10 w-44' }> 
+      <div className={visible?'hidden lg:flex flex-1 bg-[#BED7F8] h-[calc(100vh-2.7rem)] z-10 w-12':'hidden md:flex bg-[#BED7F8] flex-col h-[calc(100vh-2.7rem)] z-10 w-44' }> 
             <div>
                   {visible && <h1><i className="fa-solid fa-xl fa-bars ml-3 mt-5 cursor-pointer text-[#001A72]" onClick={handleVisibility }></i></h1>}
                  { !visible && <i className="fa-solid fa-xl ml-3 mt-5  fa-xmark text-[#001A72] cursor-pointer"onClick={handleUnVisibility }></i>}

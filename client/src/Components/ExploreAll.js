@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { Link} from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 import Cookie from "js-cookie"  
 import axios from 'axios';
-import { loginError, loginStart, loginSuccess } from '../redux/Slice/userSlice';
+import { clicked, loginError, loginStart, loginSuccess } from '../redux/Slice/userSlice';
 
 function ExploreAll({exploreAll}) {
       const {currentUser} = useSelector(state =>state.user)
@@ -11,13 +11,18 @@ function ExploreAll({exploreAll}) {
       const [isLiked, setIsLiked] = useState(exploreAll.likes?.includes(currentUser._id))
       const [bookmark, setBookmark] = useState(exploreAll.bookmark?.includes(currentUser._id))
       const dispatch = useDispatch()
+      const navigage = useNavigate();
       const config ={
             headers:{
                 "Content-Type":"application/json",
                 Authorization:`Bearer ${Cookie.get('token')}`
             }
           }
+          const click = () =>{
 
+                dispatch(clicked())
+                navigage("/profile/"+exploreAll?.owner?._id)
+          }
           useEffect(() => {
             setIsLiked(currentUser?.others?currentUser.others?.likedPost?.includes(exploreAll._id):currentUser.likedPost?.includes(exploreAll._id) );
           }, [exploreAll.likes,exploreAll._id,currentUser])
@@ -57,13 +62,13 @@ function ExploreAll({exploreAll}) {
 
   return (
         <>
-      <div className='flex flex-col w-screen md:w-[49%] p-2 lg:w-[45%] xl:w-[43%] bg-[#455175] md:mt-4 my-3' >
+      <div className='flex flex-col  lg:w-[45%] xl:w-[43%] mb-6 md:m-4 bg-[#455175] lg:mt-4 ' >
       <div className='flex p-1 items-center' >
-            <Link to={"/profile/"+exploreAll?.owner?._id}><img src={exploreAll?.owner?.profile} alt='image' className='w-10 h-10  rounded-full cursor-pointer border'/></Link>
-            <Link to={"/profile/"+exploreAll?.owner?._id}><h1 className='capitalize ml-2 font-sans cursor-pointer text-white' >{exploreAll?.owner?.name}</h1></Link>
+            <img src={exploreAll?.owner?.profile} alt='image' className='w-10 h-10  rounded-full cursor-pointer border' onClick={click}/>
+             <h1 className='capitalize ml-2 font-sans cursor-pointer text-white' onClick={click} >{exploreAll?.owner?.name}</h1>
       </div>
       <div className='flex justify-center'>
-      <Link to={"/singlePage/"+exploreAll?._id}><img src={exploreAll?.content} className= 'object-contain w-screen cursor-pointer ' alt='image' /></Link>
+      <Link to={"/singlePage/"+exploreAll?._id}><img src={exploreAll?.content} className= 'object-cover w-screen cursor-pointer ' alt='image' /></Link>
       </div>
       <div className='flex my-3 mx-3 items-center justify-between' >
             <div className='flex likes cursor-pointer items-center' onClick={handleLikes}>
