@@ -8,7 +8,7 @@ function Register() {
       const [password, setPassword] = useState("")
       const [name, setName] = useState("")
       const [email, setEmail] = useState("")
-
+      const [msg, setMsg] = useState("")
       const navigate = useNavigate()
 
       const handleSubmit = async(e) => {
@@ -20,6 +20,7 @@ function Register() {
                 name,
                 email
               });
+              setMsg(data.message);
               navigate('/login');
             } catch (err) {
                   console.log(err?.response?.data);
@@ -76,6 +77,7 @@ function Register() {
                                  <i className="fa-brands text-[#b4c1db] fa-2xl fa-google-plus-g m-auto pl-2"></i>
                                  <button  className=' w-full h-10' onClick={google}>Sign in with google</button>
                         </div>
+                        {msg && <h1 className='text-green-300'>Email send</h1>}
                   </div>
             </div>
       </div>

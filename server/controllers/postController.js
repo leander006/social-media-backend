@@ -83,7 +83,6 @@ const followingPost = asyncHandler(async(req,res) =>{
 
       
         const followerPost = post.concat(morePost.flat())
-        console.log(followerPost);
 // flat() is use to return json as a single object if not used it returned two object as [{},{}]
 
           res.status(200).json(followerPost)

@@ -29,16 +29,16 @@ passport.use(
             //  console.log("existingUser  ",existingUser);
             console.log("successss\n");
              if(existingUser){
-                  // console.log("success1\n",profile);
+                 
                   
                   return done(null, existingUser);
              }
              else{
                  const user= new User({ googleId: profile.id ,
-                              name:profile._json.name,
-                              username:profile._json.name,
+                              name:profile._json.name?profile._json.name:"xyz",
+                              username:profile._json.name?profile._json.name:"xwyz",
                               email:profile._json.email,
-                              profile:profile._json.picture,
+                              profile:profile._json.picture?profile._json.picture:"",
                               isVerified:profile._json.email_verified
                   })
                   await user.save();

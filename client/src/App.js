@@ -16,6 +16,7 @@ import SinglePage from './Components/Pages/SinglePage';
 import Chat from './Components/Pages/Chat';
 import Write from './Components/Pages/Write';
 import Edit from './Components/Pages/Edit';
+import EmailVerificatiion from './Components/Pages/EmailVerificatiion';
 
 axios.defaults.withCredentials= true;
 
@@ -40,6 +41,7 @@ function App() {
    <Route path="/edit/:editId" element={<Edit/>}/>
    <Route path="/register" element={<Register/>}/>
    <Route path="/singlepage/:postId" element={<SinglePage/>}/>
+   <Route path="/users/:id/verify/:token" element={<EmailVerificatiion/>} />
   </Routes>
  </Router>
   );

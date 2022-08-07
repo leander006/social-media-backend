@@ -5,6 +5,7 @@ const Message= require("../model/Message");
 const { cloudinary } = require("../utils/cloudinary");
 const passport = require("passport")
 const dotenv = require('dotenv');
+const Token = require("../model/Token");
 
 const particularUser = asyncHandler(async(req,res) =>{
             const name = req.query.name
@@ -140,6 +141,8 @@ const updateUser =asyncHandler(async(req,res) =>{
        }
 })
 
+
+
 const suggestedUser =asyncHandler(async(req,res) =>{
 
       try {
@@ -155,7 +158,26 @@ const suggestedUser =asyncHandler(async(req,res) =>{
        }
 })
 
+const token =async(req,res) =>{
+      try {
+            const user = await User.findOne({_id:req.params.id})
+            if(!user){
+                  return res.status(400).send({message:"Invalid link"});
+            }
+            const token = await Token.findOne({
+                  userId:user._id,
+                  token:req.params.token,
+            })
+            if(!token) return res.status(401).send({message:"Invalid link"});
+           const newUser= await User.findByIdAndUpdate(user._id,{isVerified:true});
+           
+            await Token.findByIdAndDelete(token._id);
 
+            res.status(200).json(newUser);
+      } catch (error) {
+            return res.status(500).send({message:"Internal server error"});
+      }
+}
 
 
 
@@ -169,5 +191,6 @@ module.exports = {
       userById,
       suggestedUser,
       uploadPic,
-      friendSearch 
+      friendSearch,
+      token 
 };
