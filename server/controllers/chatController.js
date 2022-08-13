@@ -118,13 +118,8 @@ const renameGroup = asyncHandler(async(req,res) =>{
       const chatname = req.body.chatname
       const chatId = req.params.id
       try {
-            const updatedChat = await Chat.findByIdAndUpdate(chatId,{
-                  chatname
-            },
-            {
-                  new:true
-            }
-      )
+            const updatedChat = await Chat.findByIdAndUpdate(chatId,{chatname},
+            {new:true})
             .populate("users","-password")
             .populate("groupAdmin","-password")
             return res.status(200).send(updatedChat) 
@@ -177,11 +172,22 @@ const removeMember = asyncHandler(async(req,res) =>{
             return res.status(404).send({message:error.message})
       }
 })
+
+const deleteChat = asyncHandler(async(req,res) =>{
+      try {
+            await Chat.findByIdAndDelete(req.params.id)
+            return res.status(200).json("Chat deleted")
+      } catch (error) {
+            res.status(404).send({message:error.message})
+      }
+})
+
 module.exports = {
 	accessChat,
       fetchChat,
       createGroupChat,
       renameGroup,
       addMember,
-      removeMember
+      removeMember,
+      deleteChat
 };

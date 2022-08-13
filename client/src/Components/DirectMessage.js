@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { chatError, chatStart, chatSuccess, setCurrentChat } from '../redux/Slice/chatSlice';
 
-function DirectMessage({search,setSearched}) {
+function DirectMessage({search,setSearched,setSearch}) {
 
   const {allChat} = useSelector(state => state.chat)
   const dispatch = useDispatch()
@@ -22,8 +22,8 @@ function DirectMessage({search,setSearched}) {
           const {data} = await axios.post("http://localhost:3001/api/chat/"+search._id,{},config)
           if(typeof(data.res) === "string"){
             dispatch(setCurrentChat(data.chat))
-            console.log("search");
             setSearched([])
+            setSearch("");
             return 
           }
           dispatch(chatSuccess([data,...allChat,]))

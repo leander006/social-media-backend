@@ -11,11 +11,11 @@ import DirectMessage from '../DirectMessage'
 import { useDispatch, useSelector } from 'react-redux'
 import { chatError, chatStart, chatSuccess, setCurrentChat} from '../../redux/Slice/chatSlice'
 import { messageError, messageStart, messageSuccess } from '../../redux/Slice/messageSlice'
-import MessageSkeleton from '../Skeleton/MessageSkeleton'
+import toast from 'react-hot-toast';
 import ConversationSkeleton from '../Skeleton/ConversationSkeleton'
 import GroupUser from '../GroupUser'
 import ListItems from '../ListItems'
-
+import { SpinnerCircular } from 'spinners-react'
 
 var socket,selectedChatCompare
 const Endpoint="http://localhost:3001"
@@ -34,6 +34,7 @@ function Chat() {
   const [addUserGroup, setAdddUserGroup] = useState(false)
   const {allChat,currentChat} = useSelector(state => state.chat)
   const {allmessage} = useSelector(state => state.message)
+  const [loading, setLoading] = useState(false)
   const {currentUser,chatloading} = useSelector(state => state.user)
   const [chatname, setChatname] = useState("")
   const currentuser = currentUser._id?currentUser?._id:currentUser.others?._id
@@ -101,10 +102,12 @@ function Chat() {
   useEffect(() => {
     const getMessage = async() =>{
       try {
+        setLoading(true)
         dispatch(messageStart())
         const {data} = await axios.get("http://localhost:3001/api/message/get/"+currentChat._id,config)
         dispatch(messageSuccess(data))
         socket.emit("join room",currentChat._id)
+        setLoading(false)
       } catch (error) {
         dispatch(messageError())
           console.log(error?.response?.data);
@@ -140,6 +143,18 @@ function Chat() {
     })
 })
 
+const groupDelete = async(e)=>{
+    e.preventDefault()
+    try {
+          dispatch(chatStart());
+          await axios.delete("http://localhost:3001/api/chat/delete/"+currentChat._id,config)
+          dispatch(chatSuccess((allChat.filter((c)  => c._id !== currentChat._id))))
+          dispatch(setCurrentChat(""))
+    } catch (error) {
+          dispatch(chatError());
+    }
+
+}
   const handleGroupChat = (e) =>{
         e.preventDefault()
         setSearchResult(!searchResult) 
@@ -171,8 +186,8 @@ const handleSearched = async(query)=>{
   try {
       const {data} = await axios.get("http://localhost:3001/api/user/oneUser?name="+search,config)
       setSearched(data)
-
   } catch (error) {
+      toast.error(error)        
       console.log(error);      
   }
 }
@@ -191,28 +206,42 @@ const handleCancel =(deleteUser) =>{
 const handleRemove =async(deleteUser) =>{
   try {
       const {data} = await axios.put("http://localhost:3001/api/chat/remove/"+currentChat._id,{userId:deleteUser._id},config)
-      setMessage("")
       dispatch(setCurrentChat(data))
+      toast.success("Removed user")
   } catch (error) {
+
       console.log(error);
   }
 }
 
+const exit = async(removeUser) =>{
+  try {
+    dispatch(chatStart())
+    const {data}=await axios.put("http://localhost:3001/api/chat/remove/"+currentChat._id,{userId:removeUser._id},config)
+    dispatch(chatSuccess((allChat.filter((c)  => c._id !== currentChat._id))))
+    dispatch(setCurrentChat(""))
+    toast.success("Left group")
+} catch (error) {
+    console.log(error);
+}
+}
 
 const handleAdd =async(addUser) =>{
   const Users = currentChat?.users?.map((u) =>u._id)
   try {
     if(Users.includes(addUser._id)){
-      console.log("Already included in grp ");
+      toast.error("Already included in grp ")
       return
     }
     else{
       const {data} = await axios.put("http://localhost:3001/api/chat/add/"+currentChat._id,{userId:addUser._id},config)
       dispatch(setCurrentChat(data));
+      toast.success("New member added in group") 
     }
     
   } catch (error) {
-      console.log(error);
+      toast.error(error.response.data.message)  
+      console.log(error);      
   }
 }
 
@@ -221,6 +250,7 @@ const handleRename =async(e) =>{
   try {
       const {data} = await axios.put("http://localhost:3001/api/chat/rename/"+currentChat._id,{chatname:chatname},config)
       dispatch(setCurrentChat(data));
+      toast.success("Renamed the group")        
   } catch (error) {
       console.log(error);
   }
@@ -234,6 +264,7 @@ const create = async(e)=>{
     const {data} = await axios.post("http://localhost:3001/api/chat",{name:name,
     users:JSON.stringify(selectedUser.map((u) =>u._id)),
     },config)
+
     dispatch(chatSuccess([data,...allChat,]))
     setCurrentChat(data)
     setSearchResult(!searchResult) 
@@ -264,7 +295,7 @@ useEffect(() => {
             <div className="shadow hidden md:flex mt-24 fixed z-30 ">
                <div className="md:w-64 lg:w-80 xl:w-[30rem]  ">
                 {searched?.map((s) =>(
-                        <DirectMessage key={s._id} setSearched={setSearched} search={s}/>
+                        <DirectMessage key={s._id} setSearched={setSearched} setSearch={setSearch} search={s}/>
                 ))}
                 </div>
               </div>
@@ -303,18 +334,30 @@ useEffect(() => {
                </div>
 
            </div>
-          
+           <div className='flex'>
+           {!currentChat?.isGroupChat && currentChat.users.filter((c)  => c._id === currentuser)?.length === 1&&<div>
+                        <i className="fa-solid fa-xl mr-2 fa-trash cursor-pointer" onClick={groupDelete}></i>
+                    </div>}
+            {currentChat?.isGroupChat &&  currentChat?.groupAdmin?._id !== currentuser&&<div>
+              <i className="fa-solid fa-xl mr-2 fa-delete-left cursor-pointer" onClick={() => exit(currentUser)}></i>
+            </div>}
+
+            {currentChat?.isGroupChat &&  currentChat?.groupAdmin?._id === currentuser&&<div>
+                <i className="fa-solid fa-xl mr-2 fa-trash cursor-pointer" onClick={groupDelete}></i>
+            </div>} 
            {currentChat?.isGroupChat && currentChat?.groupAdmin?._id === currentuser && <div>
                         <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer" onClick={addGroup}></i>
                     </div>}
-   </div>
-   <div className='md:h-[calc(100vh-10.2rem)] md:bg-[#BED7F8] p-3 overflow-y-scroll'>
+            </div>
+        </div>
+
+   {!loading ?<div className='md:h-[calc(100vh-10.2rem)] md:bg-[#BED7F8] p-3 overflow-y-scroll'>
    {allmessage?.map((m) =>(
                 <div key={m._id} ref={scrollRef}>
-                <Messages own={m.sender._id === currentuser} message={m}/>
+                <Messages own={m.sender._id === currentuser} messages={m} setMessage={setMessage}/>
                 </div>
             ))}
-   </div>
+   </div>:<SpinnerCircular size="90" className='bg-[#2D3B58] w-full flex items-center md:h-[calc(100vh-10.2rem)] flex-col  mx-auto' thickness='100'  speed="600" color='white' secondaryColor="black"/>}
   
         <form className='flex bg-[#BED7F8] h-12 items-center p-2 m-3 mt-3 rounded-lg' >
           <input type="text" placeholder='Enter message' value={message} onChange={typingHandler} className='w-full h-10 rounded-lg p-5 border' required />
@@ -332,15 +375,14 @@ useEffect(() => {
        
          {!currentChat ? <div className='conversation lg:flex-1'>
             <div className='flex justify-between items-center md:p-3'>
-              <div className='flex bg-[#455175] ml-2 w-full h-8 mt-2 items-center rounded-md'>
-                    <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} onChange={e =>handleSearched(e.target.value)}  type="text"  placeholder='search your friends'/>
+              <div className='flex bg-[#455175] mx-2 w-full h-8 mt-2 items-center rounded-md'>
+                    <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>handleSearched(e.target.value)} placeholder='search your friends'/>
               </div>
-                    <i className="fa-solid fa-xl mt-2 fa-user-plus ml-3 mr-1 text-[#BED7F8] cursor-pointer" onClick={handleGroupChat}></i>
-             
+
               <div className="flex mt-24 fixed z-30 ">
                 <div className=" w-[92vw] p-2">
                 {searched?.map((s) =>(
-                      <DirectMessage key={s._id} setSearched={setSearched} search={s}/>
+                      <DirectMessage key={s._id} setSearched={setSearched} setSearch={setSearch} search={s}/>
                 ))}
                 </div> 
               </div>
@@ -367,21 +409,32 @@ useEffect(() => {
                         <div className='flex flex-col'>
                     <h1 className='capitalize text-black ml-4 font-sans ' >{currentChat?.isGroupChat?currentChat?.chatname:currentuser === currentChat?.users[0]?._id ? currentChat?.users[1]?.username:currentChat?.users[0]?.username}</h1>
                     {isTyping ?<div className='flex flex-wrap ml-4'>{currentChat?.isGroupChat?"Someone ":currentuser === currentChat?.users[0]?._id ? currentChat?.users[1]?.username:currentChat?.users[0]?.username} is typing..</div>:<div  className='flex flex-wrap ml-4'></div>}
+                  </div>    
                   </div>
-                       
-                        
-                    </div>
-                    {currentChat?.isGroupChat && currentChat?.groupAdmin?._id === currentuser &&<div>
-                        <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer"></i>
+
+                  <div className='flex'>
+                      {!currentChat?.isGroupChat && currentChat.users.filter((c)  => c._id === currentuser)?.length === 1&&<div>
+                        <i className="fa-solid fa-xl mr-2 fa-trash cursor-pointer" onClick={groupDelete}></i>
+                    </div>}
+                      {currentChat?.isGroupChat &&  currentChat?.groupAdmin?._id !== currentuser&&<div>
+                    <i className="fa-solid fa-xl mr-2 fa-delete-left cursor-pointer" onClick={() => exit(currentUser)}></i>
+                    </div>}
+                    {currentChat?.isGroupChat &&  currentChat?.groupAdmin?._id === currentuser&&<div>
+                    <i className="fa-solid fa-xl mr-2 fa-trash cursor-pointer" onClick={groupDelete}></i>
+                    </div>} 
+                    {currentChat?.isGroupChat && currentChat?.groupAdmin?._id === currentuser && <div>
+                        <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer" onClick={addGroup}></i>
                     </div>}
             </div>
-            <div className='h-[calc(100vh-10rem)] bg-[#BED7F8]  p-3 overflow-y-scroll'>
+
+            </div>
+            {!loading ?<div className='h-[calc(100vh-10rem)] bg-[#BED7F8]  p-3 overflow-y-scroll'>
             {allmessage?.map((m) =>(
               <div key={m._id} ref={scrollRef}>
-                <Messages own={m.sender._id === currentuser} message={m}/>
+                <Messages own={m.sender._id === currentuser} messages={m} setMessage={setMessage}/>
                 </div>
             ))}
-            </div>
+            </div>:<SpinnerCircular size="90" className='bg-[#2D3B58] w-full flex items-center h-[calc(100vh-10.2rem)] flex-col  mx-auto' thickness='100'  speed="600" color='white' secondaryColor="black"/>}
             <form className='flex bg-[#BED7F8] h-12 items-center p-2 m-3 mt-3 rounded-lg' >
           <input type="text" placeholder='Enter message' value={message} onChange={typingHandler} className='w-full h-full rounded-lg p-5 border' required />
            <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" onClick={sendMessage}  ></i></button> 
@@ -401,7 +454,7 @@ useEffect(() => {
                                         <input className='focus:outline-slate-900 w-full h-full p-1' type="text" placeholder='Enter group Name' value={name} onChange={e =>setName(e.target.value)} required/>
                                      </div>
                                      <div className='h-14 w-full p-1 '>
-                                            <input className='focus:outline-slate-900 w-full h-full p-1' type="text" placeholder='Add user eg leander06' value={groupSearch} onChange={e =>handleSearch(e.target.value)} required  />
+                                            <input className='focus:outline-slate-900 w-full h-full p-1' type="text" placeholder='Add user eg leander06' value={groupSearch} onChange={e =>handleSearch(e.target.value)}  />
                                      </div>
                                      <div className='w-full '>
                                        <div className='flex flex-wrap'>

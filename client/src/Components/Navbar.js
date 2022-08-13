@@ -62,7 +62,7 @@ const current =currentUser.others?currentUser.others:currentUser
                 </div>
 
                 
-                        <div className=" hidden md:flex fixed z-30 xl:ml-[26rem] lg:ml-64 ml-44 mt-12 bg-[#a1bcf1]">
+                        <div className=" hidden md:flex fixed z-30 lg:mr-44 md:mr-28  mt-12 bg-[#a1bcf1]">
                               <div className="md:w-64 lg:w-80 xl:w-96 ">
                               {searched?.map((s) =>(
                                      <SearchFreind key={s._id} search={s} searched={searched} setSearched={setSearched}/>

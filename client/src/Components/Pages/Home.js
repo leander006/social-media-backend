@@ -62,7 +62,7 @@ useEffect(() => {
     <>
     <Navbar/>
       <div className='flex bg-[#2D3B58] z-50 mt-10 '>
-       {followerPost.length !==0?<div className='main md:flex mx-auto lg:basis-[70%] md:basis-[60%] '>
+       {followerPost?.length !==0?<div className='main md:flex mx-auto lg:basis-[70%] md:basis-[60%] '>
             {!loading ?<div className='flex flex-col lg:pl-[17rem] md:pr-5 md:pt-2 md:pb-10 h-[calc(100vh-2.7rem)] overflow-y-scroll  '>
                 {followerPost?.map((p) =>(
                   <ExploreMore explore={p} key={p._id}/>

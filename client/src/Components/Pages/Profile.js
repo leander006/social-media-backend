@@ -92,7 +92,7 @@ const following = async(e) =>{
           </div>
         </div>
         {user?.postCount !== 0 ?<div className='md:px-12 lg:px-12 bg-[#2D3B58] '>
-        <div className='m-0 w-[50vw] md:w-[80vw] p-9 bg-[#2D3B58] overflow-y-scroll md:h-[74%]  justify-center md:grid md:absolute hidden auto-rows-2fr grid-cols-8' >
+        <div className='m-0 w-[50vw] md:w-[80vw] p-9 bg-[#2D3B58] overflow-y-scroll md:h-[67%]  justify-center md:grid md:absolute hidden auto-rows-2fr grid-cols-8' >
                   {post.map((p) =>(
                       <Pin url={p.content} id={p._id} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
                     ))}

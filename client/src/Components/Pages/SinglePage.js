@@ -8,7 +8,6 @@ import SingleSkeleton from '../Skeleton/SingleSkeleton'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginError, loginStart, loginSuccess } from '../../redux/Slice/userSlice'
 import { commentError, commentStart, commentSuccess } from '../../redux/Slice/commentSlice'
-import { SpinnerCircular } from 'spinners-react'
 import { postError, postStart, postSuccess } from '../../redux/Slice/postSlice'
 
 function SinglePage() {
@@ -128,7 +127,7 @@ function SinglePage() {
                         <img className='h-full w-screen object-contain' src={post?.content}></img>
               </div>
               <div className='flex flex-col justify-between lg:border border-[#BED7F8] p-2 h-3/5 lg:h-5/6 lg:w-2/5  '>
-                  <div className='flex p-1 flex-col justify-between h-64' >
+                  <div className='flex p-1 flex-col justify-between lg:h-64' >
                         <div className='flex'>
                           <div className='flex p-1 mt-1 basis-20 lg:basis-14 rounded-full' >
                             <img src={post?.owner?.profile} alt='image' className='rounded-full h-fit cursor-pointer' onClick={click}/>

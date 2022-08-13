@@ -1,6 +1,6 @@
 
 const express = require('express');
-const { accessChat,fetchChat, createGroupChat,renameGroup,addMember, removeMember } = require('../controllers/chatController');
+const { accessChat,fetchChat, createGroupChat,renameGroup,addMember, removeMember, deleteChat } = require('../controllers/chatController');
 // const { setNotifications, getNotifications } = require('../controllers/notifyController');
 const router = express.Router();
 
@@ -14,8 +14,7 @@ router.post("/",protect,createGroupChat)
 router.put("/rename/:id",protect,renameGroup)
 router.put("/add/:id",protect,addMember)
 router.put("/remove/:id",protect,removeMember)
-// router.put("/notification/:id",protect,setNotifications)
-// router.get("/notification/:id",protect,getNotifications)
+router.delete("/delete/:id",protect,deleteChat)
 
  
 module.exports = router;
