@@ -110,10 +110,11 @@ const loginUser =asyncHandler(async(req,res) =>{
 const uploadPic =async (req, res) => {
       try {
           const fileStr = req.body.data;
-          const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-              upload_preset: 'Social_Media_app',
-          });
-          res.status(200).json(uploadResponse);
+          const uploadResponse = await cloudinary.uploader.upload(fileStr,{ eager: [
+            { width: 180, height: 180, crop: "pad" },
+            {upload_preset: 'Social_Media_app'} ]}, 
+            );
+          res.status(200).json(uploadResponse.eager[0]);
       } catch (err) {
           console.error(err);
           res.status(500).json({ err: 'Something went wrong' });
@@ -179,8 +180,36 @@ const token =async(req,res) =>{
       }
 }
 
+const followerUser =asyncHandler(async(req,res) =>{
+
+      try {
+            var users = await User.find({"_id":{$ne:req.user._id},following:{$elemMatch:{$eq:req.user._id}}})
+            function getMultipleRandom(users, num) {
+                  const shuffled = [...users].sort(() => 0.5 - Math.random());
+
+                  return shuffled.slice(0, num);
+            }
+            res.status(200).json(getMultipleRandom(users, 10))
+       } catch (error) {
+             return res.status(500).send({error:error.message})
+       }
+})
 
 
+const followingUser =asyncHandler(async(req,res) =>{
+
+      try {
+            var users = await User.find({"_id":{$ne:req.user._id},followers:{$elemMatch:{$eq:req.user._id}}})
+            function getMultipleRandom(users, num) {
+                  const shuffled = [...users].sort(() => 0.5 - Math.random());
+
+                  return shuffled.slice(0, num);
+            }
+            res.status(200).json(getMultipleRandom(users, 10))
+       } catch (error) {
+             return res.status(500).send({error:error.message})
+       }
+})
 module.exports = {
 	allUser,
       particularUser,
@@ -192,5 +221,7 @@ module.exports = {
       suggestedUser,
       uploadPic,
       friendSearch,
-      token 
+      token,
+      followingUser,
+      followerUser  
 };

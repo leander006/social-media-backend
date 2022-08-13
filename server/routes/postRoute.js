@@ -1,13 +1,14 @@
 
 const express = require('express');
 const { like, bookmark } = require('../controllers/mediaController');
-const { createPost, getPost, particularPost, deletePost, followingPost, likePost, bookmarkPost } = require('../controllers/postController');
+const { createPost, getPost, particularPost, deletePost, followingPost, likePost, bookmarkPost, uploadPost } = require('../controllers/postController');
 const { protect } = require('../middleware/authMiddleware');
-const { uploadPost } = require('../middleware/postPicUpload');
+// const { uploadPost } = require('../middleware/postPicUpload');
 const router = express.Router();
 
 
-router.post("/",uploadPost.single('content'),protect,createPost)
+router.post("/",protect,createPost)
+router.post("/postUpload/postImg",protect,uploadPost)
 router.get("/",protect,getPost)
 router.get("/:id",protect,particularPost)
 router.put("/likePost/:id",protect,like)

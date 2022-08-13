@@ -1,21 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Conversation from '../Conversation'
-import Footer from '../Footer'
 import Navbar from '../Navbar'
-import SideBar from '../SideBar'
 import Messages from '../Mesaages'
 import NopPreview from '../NopPreview'
-import ChatSearchSkeleton from '../Skeleton/ChatSearchSkeleton'
 import Cookie from "js-cookie"  
 import axios from 'axios';
 import {io} from  "socket.io-client"
-
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import DirectMessage from '../DirectMessage'
 import { useDispatch, useSelector } from 'react-redux'
-import { chatError, chatStart, chatSuccess, setCurrentChat, setNotification } from '../../redux/Slice/chatSlice'
+import { chatError, chatStart, chatSuccess, setCurrentChat} from '../../redux/Slice/chatSlice'
 import { messageError, messageStart, messageSuccess } from '../../redux/Slice/messageSlice'
 import MessageSkeleton from '../Skeleton/MessageSkeleton'
 import ConversationSkeleton from '../Skeleton/ConversationSkeleton'
@@ -28,7 +22,6 @@ const Endpoint="http://localhost:3001"
 
 
 function Chat() {
-  const [visible, setVisible] = useState(false)
   const scrollRef = useRef()
   const [search, setSearch] = useState("")
   const [message, setMessage] = useState("")
@@ -39,13 +32,11 @@ function Chat() {
   const [name, setName] = useState("")
   const [searchResult, setSearchResult] = useState(false)
   const [addUserGroup, setAdddUserGroup] = useState(false)
-  const [visi, setVisi] = useState(false)
   const {allChat,currentChat} = useSelector(state => state.chat)
-  const {allmessage,messageloading} = useSelector(state => state.message)
+  const {allmessage} = useSelector(state => state.message)
   const {currentUser,chatloading} = useSelector(state => state.user)
   const [chatname, setChatname] = useState("")
   const currentuser = currentUser._id?currentUser?._id:currentUser.others?._id
-  const [loading, setLoading] = useState(false);
   // Socket //
   const [socketConnected, setSocketConnected] = useState(false)
   const [typing, setTyping] = useState(false)
@@ -90,35 +81,7 @@ function Chat() {
           Authorization:`Bearer ${Cookie.get('token')}`
       }
     }
-  const handleVisible = async(e) =>{
-      e.preventDefault()
-      try {
-            const {data} = await axios.get("http://localhost:3001/api/user/freind/search?name="+search,config)
-            setSearched(data)
-            toast.success("This are result", {
-              position: "bottom-center",
-              autoClose: 1000,
-              hideProgressBar: true,
-              closeOnClick: false,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              });
-           
-      } catch (error) {
-        toast.warn("something went wrong try again", {
-          position: "bottom-center",
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          });
-      }
-      setVisible(!visible)
-      setSearch("")       
-  }
+
 
 
   useEffect(() => {
@@ -138,10 +101,8 @@ function Chat() {
   useEffect(() => {
     const getMessage = async() =>{
       try {
-        setLoading(true)
         dispatch(messageStart())
         const {data} = await axios.get("http://localhost:3001/api/message/get/"+currentChat._id,config)
-        setLoading(false)
         dispatch(messageSuccess(data))
         socket.emit("join room",currentChat._id)
       } catch (error) {
@@ -190,7 +151,7 @@ function Chat() {
     
 }
 
-const handleSearch = async(query)=>{
+const handleSearch= async(query)=>{
     setGroupSearch(query)
     if(!query){
       return
@@ -201,6 +162,19 @@ const handleSearch = async(query)=>{
     } catch (error) {
         console.log(error);
     }
+}
+const handleSearched = async(query)=>{
+  setSearch(query)
+  if(!query){
+    return
+  }
+  try {
+      const {data} = await axios.get("http://localhost:3001/api/user/oneUser?name="+search,config)
+      setSearched(data)
+
+  } catch (error) {
+      console.log(error);      
+  }
 }
 
 const handleGroup =(addUser)=>{
@@ -279,31 +253,21 @@ useEffect(() => {
   return (
       <>
       <Navbar/>
-        <div className='flex bg-[#2D3B58]'>
-          <div>
-            <SideBar/>
-          </div>
+        <div className='flex bg-[#2D3B58] mt-10'>
           {/* Destop view  */}
-          <div className='hidden lg:flex w-screen '>
+          <div className='hidden md:flex w-screen '>
        <div className='conversation w-[40%] border border-y-0'>
          
        <div className='flex justify-between items-center p-3'>
-       {/* <div className='mr-2 text-[#BED7F8] cursor-pointer' onClick={e=>setNotifications(!Notifications)}>
-
-                <NotificationBadge count={notification?.length} effect={Effect.SCALE}/>
-                        <i className="fa-solid fa-lg fa-bell cursor-pointer" >
-                        </i>
-        </div> */}
           <div className='flex bg-[#455175] w-full h-8 mt-1 items-center rounded-md'>
-            <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>setSearch(e.target.value)}  placeholder='search your friends'></input>
-            <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={ handleVisible}></i>
-            {visible &&  <div className="shadow hidden md:flex mt-24 fixed z-30 ">
-               {!visi && <div className="md:w-64 lg:w-80 xl:w-[30rem]  ">
-                {searched.map((s) =>(
-                        <DirectMessage key={s._id}  visi={visi} setVisi={setVisi} search={s}/>
+            <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>handleSearched(e.target.value)} placeholder='search your friends'></input>
+            <div className="shadow hidden md:flex mt-24 fixed z-30 ">
+               <div className="md:w-64 lg:w-80 xl:w-[30rem]  ">
+                {searched?.map((s) =>(
+                        <DirectMessage key={s._id} setSearched={setSearched} search={s}/>
                 ))}
-                </div>}
-              </div>}
+                </div>
+              </div>
              
           </div>
                 
@@ -313,7 +277,7 @@ useEffect(() => {
        
                   
        </div>       
-       {search && <ChatSearchSkeleton/>}
+       {/* {search && <ChatSearchSkeleton/>} */}
        <div className='md:h-[calc(100vh-6.7rem)] p-3 overflow-y-scroll'>
          {allChat ? !chatloading? allChat?.map((c) =>(
                <div className='individual-chat' key={c?._id} onClick={() =>{dispatch(setCurrentChat(c))}} >
@@ -345,13 +309,11 @@ useEffect(() => {
                     </div>}
    </div>
    <div className='md:h-[calc(100vh-10.2rem)] md:bg-[#BED7F8] p-3 overflow-y-scroll'>
-   {!loading ? allmessage.map((m) =>(
+   {allmessage?.map((m) =>(
                 <div key={m._id} ref={scrollRef}>
                 <Messages own={m.sender._id === currentuser} message={m}/>
                 </div>
-            )):allmessage.map((m) =>(
-              <MessageSkeleton key={m._id}/>
-          ))}
+            ))}
    </div>
   
         <form className='flex bg-[#BED7F8] h-12 items-center p-2 m-3 mt-3 rounded-lg' >
@@ -366,33 +328,25 @@ useEffect(() => {
           {/* Mobile view */}
 
 
-          <div className='flex lg:hidden z-10 flex-col md:p-0 w-screen '>
+          <div className='flex md:hidden z-10 flex-col md:p-0 w-screen h-[calc(100vh-2.5rem)]'>
        
          {!currentChat ? <div className='conversation lg:flex-1'>
             <div className='flex justify-between items-center md:p-3'>
-            {/* <div className='mx-1 text-[#BED7F8] cursor-pointer' onClick={e=>setNotifications(!Notifications)}>
-                <NotificationBadge count={notification?.length} effect={Effect.SCALE}/>
-                        <i className="fa-solid fa-xl fa-bell cursor-pointer" >
-                        </i>
-        </div> */}
               <div className='flex bg-[#455175] ml-2 w-full h-8 mt-2 items-center rounded-md'>
-                    <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} onChange={e =>setSearch(e.target.value)} type="text"  placeholder='search your friends'/>
-                    <i className="fa-solid fa-xl fa-magnifying-glass ml-3 text-[#BED7F8] cursor-pointer " onClick={handleVisible}></i>
+                    <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} onChange={e =>handleSearched(e.target.value)}  type="text"  placeholder='search your friends'/>
               </div>
                     <i className="fa-solid fa-xl mt-2 fa-user-plus ml-3 mr-1 text-[#BED7F8] cursor-pointer" onClick={handleGroupChat}></i>
              
-              {visible && <div className="flex mt-24 fixed z-30 ">
+              <div className="flex mt-24 fixed z-30 ">
                 <div className=" w-[92vw] p-2">
-                {searched.map((s) =>(
-                      <DirectMessage key={s._id} visi={visi} setVisi={setVisi} search={s}/>
+                {searched?.map((s) =>(
+                      <DirectMessage key={s._id} setSearched={setSearched} search={s}/>
                 ))}
                 </div> 
-              </div>}
+              </div>
             </div>
-            {search && <ChatSearchSkeleton/>}
             <div className='h-[calc(100vh-8rem)] p-1 overflow-y-scroll'>
             {allChat ?!chatloading? allChat?.map((c) =>(
-              
                <div className='individual-chat' key={c?._id} onClick={() =>{dispatch(setCurrentChat(c))}} >
                <Conversation img={c?.isGroupChat?"images/noProfile.jpeg":currentuser === c?.users[0]._id ? c?.users[1]?.profile:c?.users[0]?.profile } name={c?.isGroupChat?c?.chatname:currentuser === c?.users[0]?._id ? c?.users[1]?.username:c?.users[0]?.username} chat={c} key={c?._id}  />
                </div>
@@ -421,20 +375,16 @@ useEffect(() => {
                         <i className="fa-solid fa-xl fa-user-plus mr-4 text-black cursor-pointer"></i>
                     </div>}
             </div>
-            <div className='h-[calc(100vh-12rem)] bg-[#BED7F8]  p-3 overflow-y-scroll'>
-            {!messageloading ? allmessage.map((m) =>(
+            <div className='h-[calc(100vh-10rem)] bg-[#BED7F8]  p-3 overflow-y-scroll'>
+            {allmessage?.map((m) =>(
               <div key={m._id} ref={scrollRef}>
                 <Messages own={m.sender._id === currentuser} message={m}/>
                 </div>
-            ))
-            :allmessage.map((m) =>(
-              <MessageSkeleton key={m._id}/>
-          ))
-          }
+            ))}
             </div>
             <form className='flex bg-[#BED7F8] h-12 items-center p-2 m-3 mt-3 rounded-lg' >
-          <input type="text" placeholder='Enter message' value={message} onChange={e =>setMessage(e.target.value)} className='w-full h-full rounded-lg p-5 border' required />
-           <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" onClick={sendMessage} ></i></button> 
+          <input type="text" placeholder='Enter message' value={message} onChange={typingHandler} className='w-full h-full rounded-lg p-5 border' required />
+           <button><i className="fa-solid fa-paper-plane fa-xl p-2 cursor-pointer hover:text-slate-400" onClick={sendMessage}  ></i></button> 
           </form>
           </div>}
  
@@ -510,11 +460,6 @@ useEffect(() => {
                       </div>
                     </div>  
                   }
-
-
-
-        <ToastContainer/>
-        <Footer/>
       </>
   )
 }

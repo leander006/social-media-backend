@@ -19,15 +19,9 @@ const styles = {
 function Pin({size, url,id}) {
 
   return (
-      <div
-      className="transform transition duration-500 hover:scale-110 "
-      style={{ ...styles.pin, ...styles[size], cursor: "pointer" }}
-    >
-      <Link to={"/singlepage/"+id}><img
-        className=' w-full h-full rounded-lg object-cover'
-        src={url}
-        alt=""
-      /></Link>
+    <div className="transform transition duration-500 hover:scale-110 " style={{ ...styles.pin, ...styles[size], cursor: "pointer" }}>
+      <Link to={"/singlepage/"+id}>
+        <img className=' w-full h-full rounded-lg object-cover' src={url} alt="img"/></Link>
     </div>
   )
 }

@@ -1,18 +1,22 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import ExploreAll from '../ExploreAll'
 import Cookie from "js-cookie"
-import Footer from '../Footer'
 import Navbar from '../Navbar'
-import SideBar from '../SideBar'
+
 import PostSkeleton from '../Skeleton/PostSkeleton'
+import ExploreMore from '../ExploreMore'
+import { useSelector } from 'react-redux'
+import SearchFreind from '../SearchFreind'
 
 
 function LikedPost() {
 
   const [loading, setLoading] = useState(false)
-  const [likePost, setLikePost] = useState([])
 
+  const [likePost, setLikePost] = useState([])
+  const {currentUser} = useSelector(state =>state.user)
+  const [sloading, setSloading] = useState(false)
+  const [search, setSearch] = useState([])
   const config ={
     headers:{
         "Content-Type":"application/json",
@@ -35,27 +39,46 @@ function LikedPost() {
     
   },[] )
 
+  useEffect(() => {
+    const getUsers = async() =>{
+          try {
+                setSloading(true);
+                const {data}= await axios.get("http://localhost:3001/api/user/followers/getAll",config)
+                setSearch(data);
+                setSloading(false)
+          } catch (error) {
+                console.log(error);
+          }
+    }
+    getUsers();
+}, [])
+
   return (
     <>
     <Navbar/>
-    <div className='flex justify-between bg-[#2D3B58]'>
-        <div className='sidebar'>
-          <SideBar/>
+      <div className='flex bg-[#2D3B58]  mt-10'>
+       {likePost.length !==0?<div className='main md:flex mx-auto lg:basis-[70%] md:basis-[60%] '>
+            {!loading ?<div className='flex flex-col h-[calc(100vh-2.7rem)] overflow-y-scroll lg:pl-[17rem] md:pr-5 md:pt-2 md:pb-12 '>
+            <div className='mx-auto font-bold text-xl text-[#547bca]' >Liked Post</div>
+                {likePost?.map((p) =>(
+                  <ExploreMore explore={p} key={p._id}/>
+                ))}
+                </div>:<div className='flex flex-col h-[calc(100vh-2.3rem)] md:p-0 md:items-center overflow-y-scroll lg:border md:border-x-0 lg:border-r-2 lg:border-[#BED7F8] md:border-t-0 flex-auto mb-2 md:mb-0'>
+                {likePost?.map((p) =>(
+                  <PostSkeleton key={p._id} />
+                ))}
+                </div>}
+        </div>:<div className='h-[calc(100vh-2.7rem)] lg:basis-[70%]  justify-center flex items-center lg:items-start lg:pt-36 m-auto font-bold md:text-3xl text-[#547bca]' >No Post Liked!</div>}
+
+        <div className='hidden lg:flex basis-[30%] lg:mr-[10rem] lg:ml-[2rem] md:w-60 h-[calc(100vh-3.5rem)] overflow-y-scroll lg:w-80 xl:w-96 ml-2 flex-col text-white '>
+             {currentUser.followers.length !==0?<div>
+              <h1>Followers</h1>
+              {search.map((s) =>(
+                <SearchFreind search={s} key={s._id}/>
+              ))}
+              </div>:<div>No one followers you!</div>}
         </div>
-      {likePost?<div className='likepart mb-6'>
-       {!loading ?<div className='flex flex-col md:p-0  md:items-center h-[calc(100vh-4.3rem)]  md:h-[calc(100vh-2.7rem)] overflow-y-scroll lg:border lg:border-x-0 lg:border-r-2 lg:border-[#BED7F8] lg:border-t-0 flex-auto '>
-       <div className='mx-auto my-1 font-bold text-xl text-[#547bca]' >Liked Post</div>
-            {likePost?.map((l) =>(
-              <ExploreAll key={l._id} exploreAll={l}/>
-            ))}
-        </div>:<div className='flex flex-col md:p-0  md:items-center h-[calc(100vh-4.3rem)]  md:h-[calc(100vh-2.7rem)] overflow-y-scroll md:border md:border-x-0 md:border-r-2 md:border-[#BED7F8] md:border-t-0 flex-auto mb-2 md:mb-0'>
-            {likePost?.map((l) =>(
-              <PostSkeleton key={l._id}/>
-            ))}
-        </div>}
-      </div>:<div className='h-[calc(100vh-4.3rem)] flex items-center m-auto font-bold text-3xl md:h-[calc(100vh-2.7rem)] text-[#547bca]' >No post liked yet</div>}
-    </div>
-    <Footer/>    
+      </div>
     </>
   )
 }

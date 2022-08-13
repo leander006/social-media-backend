@@ -2,7 +2,7 @@ import React from 'react'
 
 function PostSkeleton() {
   return (
-      <div className='flex animate-pulse border flex-col w-screen shadow lg:w-[65%] xl:w-[49%] bg-[#455175] md:mt-4 my-3' >
+      <div className='flex animate-pulse border flex-col w-screen md:w-[100%] shadow lg:w-[55%] xl:w-[35%] bg-[#455175] md:mt-4 my-3' >
       <div className='flex p-1 items-center' >
                 <div className="rounded-full bg-slate-200 h-10 w-10"></div>
            <div className="h-2 bg-slate-200 rounded"></div>

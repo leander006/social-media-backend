@@ -4,17 +4,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import { postError, postStart, postSuccess } from '../../redux/Slice/postSlice'
 import axios from 'axios'
 import Cookie from "js-cookie"
-import SideBar from '../SideBar'
-import Footer from '../Footer'
+
 
 import Pin from '../GridSystem/Pin'
 import Skeleton from '../Skeleton/Skeleton'
 import SearchFreind from '../SearchFreind'
+import Grid from '../GridSystem/Grid'
+import { Link } from 'react-router-dom'
 
 const sizeArray = ["sm", "md", "lg"];
 
 function Explore() {
-  const {click} = useSelector(state =>state.user)
   const [search, setSearch] = useState("");
   const [searched, setSearched] = useState([]);
 
@@ -60,15 +60,12 @@ useEffect(() => {
   return (
     <>
     <Navbar/>
-      <div className='flex bg-[#2D3B58] z-50'>
-        <div>
-          <SideBar/>
-        </div>
+      <div className='flex bg-[#2D3B58] z-50 pt-9'>
         <div className='flex flex-col mb-4'>
          <div className='flex md:hidden ml-5 mt-2 w-[90vw] items-center bg-slate-200 rounded-md'>
                 <input className='rounded-md w-full m-2 p-1' type="text" placeholder='search your friends' value={search} onChange={e =>handleSearch(e.target.value)}/>
           </div>
-          <div className="flex lg:hidden fixed z-30 ml-6 mt-12 bg-[#a1bcf1]">
+          <div className="flex lg:hidden fixed z-30 ml-6 mt-12 bg-[#a1bcf1] ">
                               <div className="w-96 ">
                               {searched?.map((s) =>(
                                     <SearchFreind key={s._id} search={s}/>
@@ -76,17 +73,24 @@ useEffect(() => {
                             
                               </div>
           </div>
-          {/* lg:w-[87vw] */}
-          {!loading? <div className={click?'m-0 w-screen bg-[#2D3B58]  lg:w-[87vw] pb-3  h-[calc(100vh-4rem)] md:h-[calc(100vh-3rem)] overflow-y-scroll justify-center absolute grid auto-rows-2fr grid-cols-8':'m-0 w-screen bg-[#2D3B58] h-[calc(100vh-7.9rem)] md:h-[calc(100vh-3rem)] lg:w-[80vw] overflow-y-scroll justify-center md:absolute grid auto-rows-2fr grid-cols-8'}  >
+
+          {!loading? <div className='hidden w-screen bg-[#2D3B58] md:h-[calc(100vh-2.25rem)] overflow-y-scroll justify-center md:absolute md:grid auto-rows-2fr grid-cols-8'>
                 {allpost?.map((p) =>(
                     <Pin url={p.content} id={p._id} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
                   )
                 )}
           </div >:<Skeleton/>}
+
+          {!loading? <div className='w-screen md:hidden bg-[#2D3B58] h-[calc(100vh-6.75rem)] overflow-y-scroll p-2 grid grid-rows-3 grid-flow-col gap-4'>
+          <div className="grid grid-cols-3 gap-2">
+            {allpost.map((p) =>(
+                <Link key={p._id} to={"/singlepage/"+p._id}><img className='transform transition duration-500 hover:scale-110 h-36 cursor-pointer' src={p?.content}/></Link>
+              ))}
+         </div>
+          </div >:<Skeleton/>}
         </div>
 
       </div>
-      <Footer/>
     </>
     
   )

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { chatError, chatStart, chatSuccess, setCurrentChat } from '../redux/Slice/chatSlice';
 
-function DirectMessage({search,visi, setVisi}) {
+function DirectMessage({search,setSearched}) {
 
   const {allChat} = useSelector(state => state.chat)
   const dispatch = useDispatch()
@@ -22,12 +22,14 @@ function DirectMessage({search,visi, setVisi}) {
           const {data} = await axios.post("http://localhost:3001/api/chat/"+search._id,{},config)
           if(typeof(data.res) === "string"){
             dispatch(setCurrentChat(data.chat))
-            setVisi(!visi)
+            console.log("search");
+            setSearched([])
             return 
           }
           dispatch(chatSuccess([data,...allChat,]))
           dispatch(setCurrentChat(data))
-          setVisi(!visi)
+          console.log("search");
+          setSearched([])
       } catch (error) {
           dispatch(chatError())
           console.log(error);
@@ -36,10 +38,10 @@ function DirectMessage({search,visi, setVisi}) {
 
   return (
     <>
-    <div className='flex bg-slate-300 p-2 cursor-pointer' onClick={openChat}>
+    <div className='flex bg-slate-300 p-2 cursor-pointer items-center' onClick={openChat}>
     <img src={search.profile} className="rounded-full h-10 w-10"/>
-          <div className="flex-1 md:ml-2 md:mt-2">
-                <div className="h-3 ">{search.username}</div>
+          <div className="flex-1 ml-2">
+                <div>{search.username}</div>
           </div>  
     </div>
   

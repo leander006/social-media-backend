@@ -18,16 +18,17 @@ const registration = asyncHandler(async(req,res) =>{
     } 
 
     const userExist = await User.findOne({username:username});
-
+console.log(" userExist ", userExist);
     const emailExist = await User.findOne({email:email})
+    console.log("email ", emailExist);
     try {
-         if(userExist !== null )
+         if(userExist )
         {
-            return res.status(400).json({error:"Username Exists"});
+            return res.status(400).send({message:"Username Exists"});
         }
-        else  if(emailExist !== null)
+        else  if(emailExist)
         {
-            return res.status(400).json({error:"Email Exists"});
+            return res.status(400).send({message:"Email Exists"});
         }
   
           const salt = await bcrypt.genSalt(10);
@@ -48,9 +49,9 @@ const registration = asyncHandler(async(req,res) =>{
         const url =`${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
         await sendEmail(user.email,"Verify email",url);
 
-        res.status(200).json(user);
+        res.status(200).send({message:"An email send for verification"});
     } catch (error) {
-        res.status(500).json({error:error.message});
+        res.status(500).send({message:error.message});
            
     }
 
@@ -60,48 +61,46 @@ const registration = asyncHandler(async(req,res) =>{
 
 const login =asyncHandler(async(req,res)=>{
     const {username} = req.body;
+
     try {
         if(!username || !req.body.password )
         {
-            return res.status(402).json({error:"Please all field"})
+            return res.status(402).send({message:"Please all field"})
         }
         const user = await User.findOne({username});
         if(!user)
         {
-            return res.status(400).json({error:"User does not exits!"});
+            return res.status(400).send({message:"User does not exits!"});
         }
         const validate = await bcrypt.compare(req.body.password,user.password)
         if(!validate)
         { 
-            return res.status(402).json({error:"Invalid password"})
+            return res.status(402).send({message:"Invalid password"})
         }
            //Send confirmation email//
            let tokens = await Token.findOne({userId:user._id})
-          if(!user.isVerified)
-          { 
-              console.log("false");
-              if(!tokens){
-               tokens =await new Token({
-                   userId:user._id,
-                   token:crypto.randomBytes(32).toString("hex"),
-               }).save();
-               const url =`${process.env.BASE_URL}users/${user._id}/verify/${tokens.token}`;
-               await sendEmail(user.email,"Verify email",url);
-               return res.status(400).send({message:"An email send to your account for verification"});
-           }
+        if(user.isVerified === "false")
+        { 
+          if(tokens){
+              return res.status(401).send({message:"Email not verified check your gmail!"});
+            }
+        }
+        if(user.isVerified === "true"){
+            console.log("true hai gando");
+            const { password, ...others } = user._doc;
+            const token=generateToken(user.id);
+            res.cookie("token",token,{ expires: new Date(Date.now() + 25892000000),
+             secure:process.env.NODE_ENV === "production"?true:false,
+             httpOnly:process.env.NODE_ENV === "production"?true:false,})
+             res.cookie("data",JSON.stringify(others),{ expires: new Date(Date.now() + 25892000000),
+                 secure:process.env.NODE_ENV === "production"?true:false,
+                 httpOnly:process.env.NODE_ENV === "production"?true:false,})
+             .status(200).json({others})
        }
+    
     // //------------------------------------------//
-    if(user.isVerified){
-       const { password, ...others } = user._doc;
-       const token=generateToken(user.id);
-       res.cookie("token",token,{ expires: new Date(Date.now() + 25892000000),
-        secure:process.env.NODE_ENV === "production"?true:false,
-        httpOnly:process.env.NODE_ENV === "production"?true:false,})
-        res.cookie("data",JSON.stringify(others),{ expires: new Date(Date.now() + 25892000000),
-            secure:process.env.NODE_ENV === "production"?true:false,
-            httpOnly:process.env.NODE_ENV === "production"?true:false,})
-        .status(200).json({others})
-    }
+    
+  
     } catch (error) {
         res.status(501).json(error.message)
        console.log(error.message);

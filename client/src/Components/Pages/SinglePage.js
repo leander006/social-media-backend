@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import Footer from '../Footer'
+import {useNavigate, useParams } from 'react-router-dom'
 import Comment from '../Comment'
 import Navbar from '../Navbar'
-import SideBar from '../SideBar'
 import Cookie from "js-cookie"  
 import axios from 'axios'
 import SingleSkeleton from '../Skeleton/SingleSkeleton'
@@ -11,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { loginError, loginStart, loginSuccess } from '../../redux/Slice/userSlice'
 import { commentError, commentStart, commentSuccess } from '../../redux/Slice/commentSlice'
 import { SpinnerCircular } from 'spinners-react'
+import { postError, postStart, postSuccess } from '../../redux/Slice/postSlice'
 
 function SinglePage() {
 
@@ -18,13 +17,14 @@ function SinglePage() {
       const [post, setPost] = useState()
       const {currentUser} = useSelector(state =>state.user)
       const {allComment} = useSelector(state =>state.comment)
+      const {allpost} = useSelector(state =>state.post)
       const [isLiked, setIsLiked] = useState()
       const [bookmark, setBookmark] = useState()
       const [comment, setComment] = useState("")
       const [loading, setLoading] = useState(false)
       const [like, setLike] = useState()
       const dispatch = useDispatch()
-
+      const navigate = useNavigate()
       const config ={
         headers:{
             "Content-Type":"application/json",
@@ -70,13 +70,28 @@ function SinglePage() {
                   dispatch(loginStart())
                   const {data}=await axios.put(`http://localhost:3001/api/post/bookmarkPost/${postId}`,{},config)
                   dispatch(loginSuccess(data))
-                  setBookmark(!bookmark)
             } catch (error) {
                   dispatch(loginError())
                   console.log(error?.response?.data);
             }
       }
+
+      const handleDelete =async(e) =>{
+        e.preventDefault()
+        try {
+              dispatch(postStart())
+              const {data}=await axios.delete(`http://localhost:3001/api/post/delete/${postId}`,config)
+              dispatch(postSuccess(allpost))
+              navigate("/home")
+        } catch (error) {
+              dispatch(postError())
+              console.log(error?.response?.data);
+        }
+    }
       
+      const click = () =>{
+        navigate("/profile/"+post?.owner?._id)
+  }
       useEffect(() => {
         const getCommet = async() =>{
           try {
@@ -107,23 +122,29 @@ function SinglePage() {
   return (
       <>
       <Navbar/>
-        <div className='flex bg-[#2D3B58]'>
-          <div>
-            <SideBar/>
-          </div>
-         {loading? <div className='flex flex-col p-4 lg:items-center lg:justify-center lg:p-4 lg:flex-row h-[calc(100vh-4.3rem)] w-screen lg:h-[calc(100vh-2.7rem)] overflow-y-scroll'>
-              <div className='h-1/4 lg:h-5/6 lg:border border-[#BED7F8]  lg:w-2/5'>
-                        <img className=' w-full h-full' src={post?.content}></img>
+        <div className='flex bg-[#2D3B58] pt-9'>
+         {loading? <div className='flex flex-col py-4 lg:items-center lg:justify-center lg:p-4 lg:flex-row h-[calc(100vh-2.3rem)] md:h-[calc(100vh-2.3rem)] w-screen lg:h-[calc(100vh-2.7rem)] overflow-y-scroll'>
+              <div className='h-2/5 lg:h-5/6 lg:border border-[#BED7F8] border-x-0 border-y-0 w-screen lg:w-2/5'>
+                        <img className='h-full w-screen object-contain' src={post?.content}></img>
               </div>
-              <div className='flex flex-col lg:border border-[#BED7F8] p-2 h-3/4 lg:h-5/6 lg:w-2/5  '>
-                  <div className='flex p-1' >
-                        <Link to={"/profile/"+post?.owner?._id}><img src={post?.owner?.profile} alt='image' className='w-fit h-12 rounded-full cursor-pointer border' /></Link>
-                        <div className='main '>
-                        <Link to={"/profile/"+post?.owner?._id}><h1 className='capitalize ml-2 font-sans cursor-pointer font-bold text-white' >{post?.owner?.username}</h1></Link>
-                        <p className='ml-2 text-sm mt-3 text-slate-300 break-all'>{post?.caption}</p>
+              <div className='flex flex-col justify-between lg:border border-[#BED7F8] p-2 h-3/5 lg:h-5/6 lg:w-2/5  '>
+                  <div className='flex p-1 flex-col justify-between h-64' >
+                        <div className='flex'>
+                          <div className='flex p-1 mt-1 basis-20 lg:basis-14 rounded-full' >
+                            <img src={post?.owner?.profile} alt='image' className='rounded-full h-fit cursor-pointer' onClick={click}/>
                         </div>
+                        <div className='main basis-10/12'>
+                            <h1 className='capitalize ml-2 font-sans cursor-pointer font-bold text-white' onClick={click}>{post?.owner?.username}</h1>
+                            <p className='ml-2 mt-3 text-slate-300'>{post?.caption}</p>
+                        </div>
+                        {post?.owner?._id === currentUser?._id && <div onClick={handleDelete}>
+                            <i className="fa-solid text-white fa-xl fa-trash-can cursor-pointer"></i>
+                        </div>}
+                  {/* </div>
+                  
+                  <div className='flex my-3 mx-3 text-white items-center' > */}
                   </div>
-                  <div className='flex my-3 mx-3 text-white  items-center' >
+                  <div className='flex pl-3'>
                 <div className='flex items-center' >
                       <div className='flex likes cursor-pointer flex-col justify-center mt-3' onClick={handleLikes}>
                       {isLiked?
@@ -137,12 +158,12 @@ function SinglePage() {
                  { bookmark ?<i className="fa-solid fa-xl fa-bookmark cursor-pointer" onClick={handleSaved}></i>:
                         <i className="fa-regular fa-xl fa-bookmark cursor-pointer" onClick={handleSaved}></i>}
                 </div>             
-                
                 </div>
-                 {allComment.length ===0 ?<div className='border-x-0 flex items-center justify-center border-t-2 border-[#BED7F8] h-3/4 lg:h-3/4 border-b-0 overflow-y-scroll'>
+                </div>
+                 {allComment.length ===0 ?<div className='border-x-0 flex items-center justify-center border-t-2 border-[#BED7F8]  h-3/5 lg:h-5/6  border-b-0 overflow-y-scroll'>
                         <h1 className='text-slate-400'>No Comments</h1>
                   </div>:
-                  <div className='border-x-0 border-t-2 border-[#BED7F8] h-3/4 lg:h-3/4 border-b-0 overflow-y-scroll'>
+                  <div className='border-x-0 border-t-2 border-[#BED7F8] border-b-0 overflow-y-scroll'>
                  {allComment?.map((c)=>(
                       <Comment key={c._id} comment={c}/>
                       
@@ -157,7 +178,6 @@ function SinglePage() {
           </div>:
           <SingleSkeleton/>}
         </div>
-        <Footer/>
       </>
   )
 }

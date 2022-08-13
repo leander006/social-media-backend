@@ -8,16 +8,16 @@ import SearchFreind from './SearchFreind'
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { logout } from '../redux/Slice/userSlice'
+import { clicked, logout } from '../redux/Slice/userSlice'
 
 
 
 
 function Navbar() {
-const [visible, setVisible] = useState(false);
 const [search, setSearch] = useState("");
 const [searched, setSearched] = useState([]);
 const dispatch = useDispatch();
+const [visible, setVisible] = useState(false)
 const navigate = useNavigate();
 const {currentUser} = useSelector(state => state.user);
 const config ={
@@ -51,8 +51,8 @@ const handleSearch = async(query)=>{
 const current =currentUser.others?currentUser.others:currentUser
   return (
 
-    <div className='container z-50'>
-          <div className='flex justify-between bg-[#455175] xl:w-screen'>
+    <div className='container fixed top-0 z-50 '>
+          <div className='flex justify-between md:justify-evenly bg-[#455175] w-screen'>
                 <div className='font-bold p-2 text-white'>
                         <h1>Logo</h1>
                 </div>
@@ -65,30 +65,49 @@ const current =currentUser.others?currentUser.others:currentUser
                         <div className=" hidden md:flex fixed z-30 xl:ml-[26rem] lg:ml-64 ml-44 mt-12 bg-[#a1bcf1]">
                               <div className="md:w-64 lg:w-80 xl:w-96 ">
                               {searched?.map((s) =>(
-                                    <SearchFreind key={s._id} search={s}/>
+                                     <SearchFreind key={s._id} search={s} searched={searched} setSearched={setSearched}/>
                               ))}
                             
                               </div>
                         </div>
-              
-              
-              
-                <div className='flex items-center text-white'>
-                <div className='flex lg:hidden items-center mr-2 '>
-                        <i className="fa-solid  text-[#BED7F8] fa-xl fa-arrow-right-from-bracket cursor-pointer" onClick={log}></i>
+                <div className='flex items-center text-white lg:space-x-4'>
+                <div className='flex mr-2 '>
+                        <Link to='/home'><i className="fa-solid  text-[#BED7F8] cursor-pointer fa-xl  fa-house"></i></Link>
+                  </div>
+                  <div className='flex  mr-2 '>
+                        <Link to='/chat'><i className="fa-regular  text-[#BED7F8] cursor-pointer fa-xl  fa-comment"></i></Link>
+                  </div>
+                  <div className='flex mr-2 '>
+                        <Link to='/explore'><i className="fa-regular text-[#BED7F8] cursor-pointer fa-xl  fa-circle-play"></i></Link>
                   </div>
                   <div className='mr-2 text-[#BED7F8] cursor-pointer'>
-                        <Link to="/write"><i className="fa-solid fa-xl fa-calendar-plus"></i></Link>
+                        <Link to="/write"><i className="fa-solid fa-xl fa-square-plus"></i></Link>
                   </div>
-                  <div className='mr-2 text-[#BED7F8] cursor-pointer'>
-                        <Link to="/chat"><i className="fa-regular fa-xl fa-comment"></i></Link>
+                  <div className='mr-2 cursor-pointer' onClick={e=>setVisible(!visible)}>
+                        <img className='rounded-full w-10 h-10 p-1' src={current.profile} />
                   </div>
-                  <div className='font-bold'>
-                        <h1>{current?.username}</h1>
-                  </div>
-                  <div className='mr-2 cursor-pointer'>
-                        <Link to={"/profile/"+current._id}><img className='rounded-full w-10 h-10 p-1' src={currentUser?.others?currentUser.others?.profile:currentUser.profile} /></Link>
-                  </div>
+                  {visible && <div className='z-50 fixed bg-[#98aef0] flex justify-center flex-col text-black  px-2 h-48 mt-56 w-44 right-3 rounded-md'>
+                        <Link to={"/profile/"+current._id}><div className='flex items-center my-2 cursor-pointer w-screen'>
+                              <i className="fa-regular fa-xl fa-user mr-3"></i>
+                              <h1>Profile</h1>
+                        </div></Link>
+                        <Link to="/savedPost"><div className='flex items-center my-2 cursor-pointer w-screen'>
+                              <i className="fa-regular fa-xl fa-bookmark mr-4"></i>
+                              <h1>Saved</h1>
+                        </div></Link>
+                        <Link to="/like"><div className='flex items-center my-2 cursor-pointer w-screen'>
+                              <i className="fa-regular mr-3 fa-xl  fa-heart"></i>
+                              <h1>Liked</h1>
+                        </div></Link>
+                        <Link to={"/edit/"+current._id}><div className='flex items-center my-2 cursor-pointer w-screen'>
+                              <i className="fa-solid fa-xl mr-3 fa-gear"></i>
+                              <h1>Setting</h1>
+                        </div></Link>
+                        <div className='flex items-center my-2 cursor-pointer w-screen' onClick={log}>
+                              <i className="fa-solid mr-3 cursor-pointer fa-xl fa-arrow-right-from-bracket "></i>
+                              <h1>Logout</h1>
+                        </div>
+                        </div>}
                 </div>
           </div>
           

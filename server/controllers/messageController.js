@@ -63,7 +63,18 @@ const allMessages = asyncHandler(async(req,res) =>{
             return res.status(500).send({message:error.message})
       }
 })
+
+const remove =  asyncHandler(async(req,res) =>{
+      try {
+            await Message.findByIdAndDelete(req.params.id)
+            res.status(200).send({message:"Message deleted"})
+      } catch (error) {
+            res.status(404).send({message:error.message})
+      }
+})
+
 module.exports = {
 	sendMessage,
-      allMessages
+      allMessages,
+      remove
 };

@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import {loginError, loginStart, loginSuccess, logout } from '../../redux/Slice/userSlice'
-import Footer from '../Footer'
 import Navbar from '../Navbar'
-import SideBar from '../SideBar'
 import Cookie from "js-cookie"
 import axios from 'axios'
+import { SpinnerCircular } from 'spinners-react';
+import toast from 'react-hot-toast';
 
 function Edit() {
       const navigate = useNavigate()
       const dispatch = useDispatch();
       const [name, setName] = useState()
       const [user, setUser] = useState()
+      const [loading, setLoading] = useState(false)
+      const [load, setLoad] = useState(false)
       const [username, setUsername] = useState()
       const [bio, setBio] = useState()
       const [profile, setProfile] = useState()
@@ -43,12 +45,14 @@ function Edit() {
                 setPreviewSource(reader.result);
             };
         }
-          
+
           useEffect(() => {
             const getPost = async() =>{
               try {
+                setLoading(true)
                 const {data} = await axios.get("http://localhost:3001/api/user/"+editId,config)
                 setUser(data.user)
+                setLoading(false)
               } catch (error) {
                   console.log(error?.response?.data);
               }
@@ -65,21 +69,26 @@ function Edit() {
             reader.onloadend = () => {
                 uploadImage(reader.result);
             };
+            
             reader.onerror = () => {
                 console.error('AHHHHHHHH!!');
             };
         };
 
-      const uploadImage = async (base64EncodedImage) => {
+
+      const uploadImage = async(base64EncodedImage) => {
             try {
-               const {data}= await axios.post('http://localhost:3001/api/user/upload',{data: base64EncodedImage }
+                  setLoad(true)
+                  const {data}= await axios.post('http://localhost:3001/api/user/upload',{data: base64EncodedImage }
                 ,config);
                 setFileInputState('');
                 setPreviewSource('');
                 setProfile(data.url)
+                setLoad(false)
+                toast.success("Image uploaded")  
             } catch (err) {
                 console.error(err);
-
+                toast.error(err?.response?.data?.message)
             }
         };
 
@@ -87,12 +96,11 @@ function Edit() {
             e.preventDefault()
             dispatch(loginStart())
             try {
+                 
                   const user = await axios.put("http://localhost:3001/api/user/update/"+editId,{username:username, bio:bio, name:name,
                   profile:profile,status:status},config); 
-
                   dispatch(loginSuccess(user.data))
                   navigate("/profile/"+editId)
-
                   }
                   catch (error) {
                         dispatch(loginError())
@@ -109,14 +117,11 @@ function Edit() {
   return (
       <>
       <Navbar/>
-        <div className='flex bg-[#2D3B58]'>
-          <div>
-            <SideBar/>
-          </div>
-          <div className='flex flex-col md:m-auto w-screen h-[calc(100vh-4.3rem)] md:pt-16 lg:w-[60%] md:w-[75%] md:h-[calc(100vh-2.7rem)] overflow-y-scroll'>
+        <div className='flex bg-[#2D3B58] pt-9'>
+         {!loading ? <div className='flex flex-col md:m-auto w-screen h-[calc(100vh-2.3rem)] md:pt-16 lg:w-[60%] md:w-[75%] md:h-[calc(100vh-2.7rem)] overflow-y-scroll'>
                   <div className='flex justify-between p-4 '>
                         <div className='flex items-center space-x-5'>
-                              <i className="fa-solid fa-2xl fa-xmark cursor-pointer text-[#8aaaeb]" onClick={() => navigate("/profile/"+editId)}></i>
+                              <i className="fa-solid fa-2xl fa-xmark cursor-pointer text-[#8aaaeb]" onClick={() => navigate("/home")}></i>
                               <h1 className='font-bold text-xl'>Edit profile</h1>
                         </div>
                         <div>
@@ -125,7 +130,9 @@ function Edit() {
                   </div>
 
                   <div className='flex flex-col justify-center items-center' >
-                        <img className='image w-16 h-16 rounded-full ' src={previewSource?previewSource:profile?profile:user?.profile} alt='image'/>
+                       {!load ? <img className='image w-16 rounded-full ' src={previewSource?previewSource:profile?profile:user?.profile} alt='image'/>
+                       :<SpinnerCircular size="90" className='bg-[#2D3B58] w-full flex items-center  md:h-56 h-28  flex-col  mx-auto' thickness='100'  speed="600" color='white' secondaryColor="black"/>}
+           
                         <label className='text-[#8aaaeb] cursor-pointer hover:text-[#6795f1]' htmlFor='forFile'>Change Profile</label>
                         <input type="file" id='forFile' accept='image/png , image/jpg, image/jpeg' style={{display:"none"}} value={fileInputState} onChange={handleFileInputChange}  name="file" required />
                   </div>
@@ -160,9 +167,8 @@ function Edit() {
                          <h1 className='cursor-pointer' onClick={log}>Switch account</h1>
                   </div>
                 
-          </div>
+          </div>:<SpinnerCircular size="90" className='bg-[#2D3B58] w-full flex items-center flex-col h-[calc(100vh-3rem)] mx-auto' thickness='100'  speed="600" color='white' secondaryColor="black"/>}
         </div>
-        <Footer/>
       </>
   )
 }

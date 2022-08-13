@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate} from 'react-router-dom'
 import Cookie from "js-cookie"  
 import axios from 'axios'
-import { clicked, loginError, loginStart, loginSuccess} from '../redux/Slice/userSlice'
+import {loginError, loginStart, loginSuccess} from '../redux/Slice/userSlice'
 
 
 
@@ -22,8 +22,6 @@ function ExploreMore({explore}) {
           }
 
           const click = () =>{
-
-            dispatch(clicked())
             navigate("/profile/"+explore?.owner?._id)
       }
 
@@ -66,13 +64,13 @@ function ExploreMore({explore}) {
   return (
         <>
 
-   <div className='flex flex-col lg:w-[65%] xl:w-[49%] bg-[#455175] mt-3 mb-6 md:mt-4 md:m-4' >
+   <div className='flex flex-col w-full bg-[#38487a] border my-6 rounded-lg' >
           <div className='flex p-1 items-center' >
-                  <img src={explore?.owner?.profile} alt='image' className='w-10 h-10  rounded-full cursor-pointer border' onClick={click}/>
+                  <img src={explore?.owner?.profile} alt='image' className='w-12 h-12 rounded-full cursor-pointer border' onClick={click}/>
                   <h1 className='capitalize ml-2 font-sans cursor-pointer text-white' onClick={click}>{explore?.owner?.username}</h1>
           </div>
           <div className='flex justify-center'>
-          <Link to={"/singlePage/"+explore?._id}><img src={explore?.content} className= 'object-cover cursor-pointer w-screen lg:w-[100vw]' alt='image'/></Link>
+          <Link to={"/singlePage/"+explore?._id}><img src={explore?.content} className= 'w-screen  object-contain cursor-pointer ' alt='image'/></Link>
           </div>
           <div className='flex my-3 mx-3 items-center justify-between' >
                 <div className='flex likes cursor-pointer items-center' onClick={handleLikes}>

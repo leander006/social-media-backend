@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const Comment = require('../model/Comment');
 const Post = require('../model/Post');
 const User = require('../model/User');
+const { cloudinary } = require('../utils/cloudinary');
 
 
 const createPost = asyncHandler(async(req,res) =>{
@@ -26,6 +27,21 @@ const createPost = asyncHandler(async(req,res) =>{
       }
   
 })
+
+
+const uploadPost =async (req, res) => {
+    try {
+        const fileStr = req.body.data;
+        const uploadResponse = await cloudinary.uploader.upload(fileStr,{ eager: [
+          { width:720, height: 720 },
+          {upload_preset: 'Social_Media_app'} ]}, 
+          );
+        res.status(200).json(uploadResponse.eager[0]);
+    } catch (err) {
+        console.error("err.message ",err.message);
+        res.status(500).json({ err: 'Something went wrong' });
+    }
+};
 // Get post by id
 const particularPost = asyncHandler(async(req,res) =>{
     try {
@@ -55,7 +71,7 @@ const deletePost = asyncHandler(async(req,res) =>{
         await Post.findByIdAndDelete(req.params.id)
         await User.findByIdAndUpdate(
 			req.user._id,
-			{ $dec: { postCount: 1 } },
+			{ $inc: { postCount: -1 } },
 			{ new: true }
 		);
         // await Comment.findByIdAndDelete(comment._id)
@@ -137,5 +153,6 @@ module.exports = {
     deletePost,
     followingPost,
     likePost,
-    bookmarkPost
+    bookmarkPost,
+    uploadPost
 };

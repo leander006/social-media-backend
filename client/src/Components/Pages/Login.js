@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { Link,useNavigate } from 'react-router-dom'
 import { loginError, loginStart, loginSuccess } from '../../redux/Slice/userSlice';
-import Navbar from '../Navbar'
+import toast from 'react-hot-toast';
 function Login() {
 
       const [username, setUsername] = useState("")
@@ -22,8 +22,8 @@ function Login() {
               dispatch(loginSuccess(data))
               navigate('/home');
             } catch (err) {
-             dispatch(loginError())
-             console.log(err?.response?.data);
+             dispatch(loginError())  
+             toast.error(err?.response?.data?.message)        
             }
           };
           const google = (e) =>{
@@ -32,12 +32,13 @@ function Login() {
           }
   return (
     <>
+    {/* <Toaster position="bottom-right" reverseOrder={false}/> */}
       <div className="flex justify-evenly h-screen w-screen md:bg-[#2D3B58]" >
         <div className='hidden md:flex m-auto flex-1'>
           <img src='/images/login.jpeg' className='' ></img>
         </div>
       <div className='flex flex-1 justify-center items-center '>
-            <div className='flex w-screen  bg-white rounded-lg lg:w-[400px]  md:w-[300px] md:justify-center' onSubmit={handleSubmit}>
+            <div className='flex w-screen  bg-white rounded-lg lg:w-[400px]  md:w-[300px] md:justify-center'>
                   <div className='flex flex-col w-full p-5'>
                         <h1 className='text-black text-xl md:mb-3'>Login</h1>
                         <form className='flex justify-center flex-col item-center mt-4' onSubmit={handleSubmit}>
@@ -46,7 +47,7 @@ function Login() {
                               <label className='mb-2'>Password</label>
                                  <input className='w-full h-12 mb-4 rounded-md p-3 md:mb-8  border border-black' onChange={e=>setPassword(e.target.value)} type="password" required/>
                                  <div className='md:flex md:justify-evenly'>
-                                 <button className='bg-[#BED7F8] mb-2  w-full md:w-32 h-10 md:mr-2 hover:bg-[#afd1fd]'>Login</button>
+                                 <input type="submit" className='bg-[#BED7F8] mb-2  w-full md:w-32 h-10 md:mr-2 hover:bg-[#afd1fd]' value='login'/>
                                  <Link to="/register"><button className='bg-[#BED7F8] w-full h-10 md:w-32 hover:bg-[#afd0fa]'>Sign up</button></Link>
                                  </div>
                         </form>

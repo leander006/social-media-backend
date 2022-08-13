@@ -2,6 +2,7 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const GitHubStrategy = require('passport-github').Strategy;
 const passport = require("passport")
 const User =  require("../model/User");
+const { randomBytes } = require('crypto');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -30,15 +31,16 @@ passport.use(
             console.log("successss\n");
              if(existingUser){
                  
-                  
+                  console.log(profile._json);
                   return done(null, existingUser);
+                  
              }
+             
              else{
                  const user= new User({ googleId: profile.id ,
                               name:profile._json.name?profile._json.name:"xyz",
-                              username:profile._json.name?profile._json.name:"xwyz",
+                              username:profile._json.name?profile._json.name:randomBytes(3).toString("hex"),
                               email:profile._json.email,
-                              profile:profile._json.picture?profile._json.picture:"",
                               isVerified:profile._json.email_verified
                   })
                   await user.save();

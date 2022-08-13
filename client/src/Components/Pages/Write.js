@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Footer from '../Footer'
 import Navbar from '../Navbar'
-import SideBar from '../SideBar'
 import Cookie from "js-cookie"
 import axios from 'axios'
-
-
+import toast from 'react-hot-toast';
+import { SpinnerCircular } from 'spinners-react';
 
 function Write() {
 
@@ -15,6 +13,7 @@ function Write() {
   const [selectedImg, setSelectedImg] = useState("")
   const [previewSource, setPreviewSource] = useState('');
   const [profile, setProfile] = useState()
+  const [loading, setLoading] = useState(false)
   const [fileInputState, setFileInputState] = useState('');
   const config ={
     headers:{
@@ -53,14 +52,17 @@ const handleImage = (e) => {
 
 const uploadImage = async (base64EncodedImage) => {
   try {
-     const {data}= await axios.post('http://localhost:3001/api/user/upload',{data: base64EncodedImage }
+      setLoading(true)
+      const {data}= await axios.post('http://localhost:3001/api/post/postUpload/postImg',{data: base64EncodedImage }
       ,config);
       setFileInputState('');
       setPreviewSource('');
       setProfile(data.url)
+      setLoading(false)
+      toast.success("Image uploaded")  
   } catch (err) {
       console.error(err);
-
+      toast.error(err?.response?.data?.message) 
   }
 };
 
@@ -73,7 +75,7 @@ const handleSubmit = async(e) =>{
 
         }
         catch (error) {
-              console.log(error?.response?.data);
+              console.log(error?.response?.data.message);
         }
  
 }
@@ -81,11 +83,8 @@ const handleSubmit = async(e) =>{
   return (
     <>
     <Navbar/>
-      <div className='flex bg-[#2D3B58]'>
-        <div>
-          <SideBar/>
-        </div>
-        <form className='flex flex-col md:justify-center  md:m-auto w-screen h-[calc(100vh-4.3rem)] lg:w-[60%] md:w-[75%] md:h-[calc(100vh-2.7rem)]' onSubmit={handleSubmit}>
+      <div className='flex bg-[#2D3B58] pt-9'>
+        <form className='flex flex-col md:justify-center  md:m-auto w-screen h-[calc(100vh-2.4rem)] lg:w-[60%] md:w-[75%] md:h-[calc(100vh-2.7rem)]' onSubmit={handleSubmit}>
                 <div className='flex justify-between p-4'>
                       <div className='flex items-center space-x-5'>
                             <i className="fa-solid fa-2xl fa-xmark cursor-pointer text-[#8aaaeb]" onClick={() => navigate("/home")}></i>
@@ -97,7 +96,7 @@ const handleSubmit = async(e) =>{
                 </div>
 
                 <div className='flex flex-col justify-center items-center' >
-                      <img className='image w-28 h-28 md:w-64 md:h-64 lg:w-72 lg:h-72 xl:w-80 xl:h-80 ' src={previewSource?previewSource:profile?profile:'/images/noImage.png'} alt='image'/>
+                     {!loading ? <img className='image w-28 h-28 md:w-64 md:h-64 lg:w-72 lg:h-72 xl:w-80 xl:h-80 ' src={previewSource?previewSource:profile?profile:'/images/noImage.png'} alt='image'/>:<SpinnerCircular size="90" className='bg-[#2D3B58] w-full flex items-center xl:h-80  md:h-64 h-28 lg:h-72 flex-col  mx-auto' thickness='100'  speed="600" color='white' secondaryColor="black"/>}
                       <label className='text-[#8aaaeb] cursor-pointer font-bold text-2xl mt-2 hover:text-[#6795f1]' htmlFor='forFile'>Upload</label>
                       <input type="file" id='forFile' accept='image/png , image/jpg, image/jpeg ,video/mp4' value={fileInputState} onChange={handleFileInputChange}style={{display:"none"}}  name="file"/>
                 </div>
@@ -107,14 +106,9 @@ const handleSubmit = async(e) =>{
                             <h1 className='text-[#8aaaeb] '>Caption</h1>
                             <textarea className='bg-[#2D3B58] border-b w-full mt-2 outline-none' type="text" value={caption} onChange={e=>setCaption(e.target.value)} required></textarea>
                       </div>
-
-
-                </div> 
-                
-              
+                </div>                      
         </form>
       </div>
-      <Footer/>
     </>
   )
 }
