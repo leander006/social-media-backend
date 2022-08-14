@@ -38,6 +38,14 @@ function Chat() {
   const {currentUser,chatloading} = useSelector(state => state.user)
   const [chatname, setChatname] = useState("")
   const currentuser = currentUser._id?currentUser?._id:currentUser.others?._id
+  const dispatch = useDispatch()
+  const config ={
+      headers:{
+          "Content-Type":"application/json",
+          Authorization:`Bearer ${Cookie.get('token')}`
+      }
+    }
+
   // Socket //
   const [socketConnected, setSocketConnected] = useState(false)
   const [typing, setTyping] = useState(false)
@@ -75,14 +83,6 @@ function Chat() {
 }
 
   //-------//
-  const dispatch = useDispatch()
-  const config ={
-      headers:{
-          "Content-Type":"application/json",
-          Authorization:`Bearer ${Cookie.get('token')}`
-      }
-    }
-
 
 
   useEffect(() => {
@@ -97,7 +97,7 @@ function Chat() {
       }
     }
     getChat()
-  }, [currentUser,message])
+  },[currentUser,message])
 
   useEffect(() => {
     const getMessage = async() =>{
@@ -132,6 +132,19 @@ function Chat() {
         }
   }
   
+  const handleDelete =async(me) =>{
+    try {
+          dispatch(messageStart())
+          await axios.delete(`http://localhost:3001/api/message/delete/${me._id}`,config)
+          dispatch(messageSuccess((allmessage.filter((m)  => m._id !== me._id))))
+          socket.emit("new message delete",me)
+          setMessage(" ")
+    } catch (error) {
+          dispatch(messageError)
+          console.log(error?.response?.data);
+    }
+}
+
   useEffect(() => {
     socket.on("message recieved",(newMessage) =>{
           if(!selectedChatCompare || selectedChatCompare._id !== newMessage.chat._id){
@@ -141,6 +154,12 @@ function Chat() {
                 dispatch(messageSuccess([...allmessage,newMessage]))
           }  
     })
+})
+
+useEffect(() => {
+  socket.on("message deleted",(newMessage) =>{
+    dispatch(messageSuccess((allmessage.filter((m)  => m._id !== newMessage._id))))
+  })
 })
 
 const groupDelete = async(e)=>{
@@ -175,7 +194,7 @@ const handleSearch= async(query)=>{
         const {data} = await axios.get("http://localhost:3001/api/user/freind/search?name="+groupSearch,config)
         setAddUser(data)
     } catch (error) {
-        console.log(error);
+        toast.error(error.response.data.error)  
     }
 }
 const handleSearched = async(query)=>{
@@ -184,11 +203,10 @@ const handleSearched = async(query)=>{
     return
   }
   try {
-      const {data} = await axios.get("http://localhost:3001/api/user/oneUser?name="+search,config)
+      const {data} = await axios.get("http://localhost:3001/api/user/freind/search?name="+search,config)
       setSearched(data)
   } catch (error) {
-      toast.error(error)        
-      console.log(error);      
+      toast.error(error.response.data.error)          
   }
 }
 
@@ -354,7 +372,7 @@ useEffect(() => {
    {!loading ?<div className='md:h-[calc(100vh-10.2rem)] md:bg-[#BED7F8] p-3 overflow-y-scroll'>
    {allmessage?.map((m) =>(
                 <div key={m._id} ref={scrollRef}>
-                <Messages own={m.sender._id === currentuser} messages={m} setMessage={setMessage}/>
+                <Messages own={m.sender._id === currentuser} handleFunction={() =>  handleDelete(m)} messages={m} setMessage={setMessage}/>
                 </div>
             ))}
    </div>:<SpinnerCircular size="90" className='bg-[#2D3B58] w-full flex items-center md:h-[calc(100vh-10.2rem)] flex-col  mx-auto' thickness='100'  speed="600" color='white' secondaryColor="black"/>}
@@ -379,8 +397,8 @@ useEffect(() => {
                     <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>handleSearched(e.target.value)} placeholder='search your friends'/>
               </div>
 
-              <div className="flex mt-24 fixed z-30 ">
-                <div className=" w-[92vw] p-2">
+              <div className="flex mt-36 fixed z-30 ">
+                <div className=" w-[92vw] p-2 ">
                 {searched?.map((s) =>(
                       <DirectMessage key={s._id} setSearched={setSearched} setSearch={setSearch} search={s}/>
                 ))}
@@ -431,7 +449,7 @@ useEffect(() => {
             {!loading ?<div className='h-[calc(100vh-10rem)] bg-[#BED7F8]  p-3 overflow-y-scroll'>
             {allmessage?.map((m) =>(
               <div key={m._id} ref={scrollRef}>
-                <Messages own={m.sender._id === currentuser} messages={m} setMessage={setMessage}/>
+                <Messages own={m.sender._id === currentuser} messages={m} handleFunction={()=> handleDelete(m)} setMessage={setMessage}/>
                 </div>
             ))}
             </div>:<SpinnerCircular size="90" className='bg-[#2D3B58] w-full flex items-center h-[calc(100vh-10.2rem)] flex-col  mx-auto' thickness='100'  speed="600" color='white' secondaryColor="black"/>}

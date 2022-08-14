@@ -9,7 +9,7 @@ const follow = asyncHandler(async(req,res) =>{
       try {
             const user = await User.findById(req.params.id)   
             const currentUser = req.user;
-            console.log(user.followers);
+
             if(!user.followers.includes(req.user._id)){
 
                   await user.updateOne({$push:{followers:req.user._id}})

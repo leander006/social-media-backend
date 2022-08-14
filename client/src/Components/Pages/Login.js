@@ -22,8 +22,9 @@ function Login() {
               dispatch(loginSuccess(data))
               navigate('/home');
             } catch (err) {
-             dispatch(loginError())  
-             toast.error(err?.response?.data?.message)        
+             dispatch(loginError()) 
+             console.log(err?.response?.data?.message); 
+             toast.error("Something went wrong login through google account")        
             }
           };
           const google = (e) =>{
@@ -32,7 +33,6 @@ function Login() {
           }
   return (
     <>
-    {/* <Toaster position="bottom-right" reverseOrder={false}/> */}
       <div className="flex justify-evenly h-screen w-screen md:bg-[#2D3B58]" >
         <div className='hidden md:flex m-auto flex-1'>
           <img src='/images/login.jpeg' className='' ></img>

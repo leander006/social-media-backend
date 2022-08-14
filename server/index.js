@@ -100,6 +100,14 @@ io.on("connection",(socket) =>{
       })
       })
 
+      socket.on("new message delete",(message) =>{
+            var chat = message.chat
+            if(!chat.users) return console.log("Users are undefined");
+            chat.users.forEach((user) =>{
+                  if(user._id == message.sender._id)return
+            socket.in(user._id).emit("message deleted",message)
+      })
+      })
       socket.off("setup",() =>{
             console.log("User Disconnected");
             socket.leave(userData._id)

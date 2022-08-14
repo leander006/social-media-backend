@@ -9,10 +9,8 @@ const setNotifications = asyncHandler(async(req,res) =>{
       const notification = currentUser.Notifications
     try {
       if(!notification.includes(req.body.id)){
-        console.log("currentUser ",notification);
       await currentUser.updateOne({$push:{Notifications:req.body.id}})
       const Users = await User.findById(currentUser._id)
-      console.log("users ",Users.Notifications);
       res.cookie("data",JSON.stringify(Users),{ expires: new Date(Date.now() + 25892000000),
         secure:process.env.NODE_ENV === "production"?true:false,
         httpOnly:process.env.NODE_ENV === "production"?true:false,})

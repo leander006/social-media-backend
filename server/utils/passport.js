@@ -24,16 +24,9 @@ passport.use(
           callbackURL: "http://localhost:3001/api/auth/google/callback",
         },
             async(accessToken, refreshToken, profile, done) => {
-                  console.log("start\n");
              const existingUser = await User.findOne({email:profile._json.email})
-
-            //  console.log("existingUser  ",existingUser);
-            console.log("successss\n");
-             if(existingUser){
-                 
-                  console.log(profile._json);
-                  return done(null, existingUser);
-                  
+             if(existingUser){  
+                  return done(null, existingUser);  
              }
              
              else{

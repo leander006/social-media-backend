@@ -4,12 +4,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { postError, postStart, postSuccess } from '../../redux/Slice/postSlice'
 import axios from 'axios'
 import Cookie from "js-cookie"
-
-
 import Pin from '../GridSystem/Pin'
 import Skeleton from '../Skeleton/Skeleton'
 import SearchFreind from '../SearchFreind'
-import Grid from '../GridSystem/Grid'
 import { Link } from 'react-router-dom'
 
 const sizeArray = ["sm", "md", "lg"];
@@ -76,10 +73,15 @@ useEffect(() => {
 
           {!loading? <div className='hidden w-screen bg-[#2D3B58] md:h-[calc(100vh-2.25rem)] overflow-y-scroll justify-center md:absolute md:grid auto-rows-2fr grid-cols-8'>
                 {allpost?.map((p) =>(
-                    <Pin url={p.content} id={p._id} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
+                    <Pin display={false} url={p.content} id={p._id} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
                   )
                 )}
-          </div >:<Skeleton/>}
+          </div >:<div className='hidden w-screen bg-[#2D3B58] md:h-[calc(100vh-2.25rem)] overflow-y-scroll justify-center md:absolute md:grid auto-rows-2fr grid-cols-8'>
+                {allpost?.map((p) =>(
+                    <Pin display={true} url={p.content} id={p._id} key={p._id} size={sizeArray[Math.floor(Math.random() * 3)]}  />
+                  )
+                )}
+          </div >}
 
           {!loading? <div className='w-screen md:hidden bg-[#2D3B58] h-[calc(100vh-6.75rem)] overflow-y-scroll p-2 grid grid-rows-3 grid-flow-col gap-4'>
           <div className="grid grid-cols-3 gap-2">

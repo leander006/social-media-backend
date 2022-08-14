@@ -66,7 +66,6 @@ const deleteComment =asyncHandler(async(req,res) =>{
             await Comment.findByIdAndDelete(req.params.id)
             await post.updateOne({$pull:{comments:comment.id}})
             const newPost = await Post.findById(post._id).populate({path:"comments",populate:{path:"username"}})
-            console.log(newPost);
             res.status(200).json(newPost.comments)
       } catch (error) {
            return res.status(500).send({error:error.message}) 

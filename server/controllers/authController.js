@@ -18,9 +18,8 @@ const registration = asyncHandler(async(req,res) =>{
     } 
 
     const userExist = await User.findOne({username:username});
-console.log(" userExist ", userExist);
     const emailExist = await User.findOne({email:email})
-    console.log("email ", emailExist);
+
     try {
          if(userExist )
         {
@@ -61,13 +60,14 @@ console.log(" userExist ", userExist);
 
 const login =asyncHandler(async(req,res)=>{
     const {username} = req.body;
-
+    console.log(req.body.password );
     try {
         if(!username || !req.body.password )
         {
             return res.status(402).send({message:"Please all field"})
         }
         const user = await User.findOne({username});
+        console.log(user);
         if(!user)
         {
             return res.status(400).send({message:"User does not exits!"});
@@ -84,9 +84,17 @@ const login =asyncHandler(async(req,res)=>{
           if(tokens){
               return res.status(401).send({message:"Email not verified check your gmail!"});
             }
+            else{
+                const token =await new Token({
+                    userId:user._id,
+                    token:crypto.randomBytes(32).toString("hex"),
+                }).save();
+                const url =`${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
+                await sendEmail(user.email,"Verify email",url);
+                return res.status(402).send({message:"Email send check your gmail!"});
+            }
         }
         if(user.isVerified === "true"){
-            console.log("true hai gando");
             const { password, ...others } = user._doc;
             const token=generateToken(user.id);
             res.cookie("token",token,{ expires: new Date(Date.now() + 25892000000),
@@ -102,8 +110,8 @@ const login =asyncHandler(async(req,res)=>{
     
   
     } catch (error) {
-        res.status(501).json(error.message)
-       console.log(error.message);
+        res.status(501).send({message:error.message})
+       console.log(error);
     }
     
 })

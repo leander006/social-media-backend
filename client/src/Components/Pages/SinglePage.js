@@ -122,26 +122,24 @@ function SinglePage() {
       <>
       <Navbar/>
         <div className='flex bg-[#2D3B58] pt-9'>
-         {loading? <div className='flex flex-col py-4 lg:items-center lg:justify-center lg:p-4 lg:flex-row h-[calc(100vh-2.3rem)] md:h-[calc(100vh-2.3rem)] w-screen lg:h-[calc(100vh-2.7rem)] overflow-y-scroll'>
-              <div className='h-2/5 lg:h-5/6 lg:border border-[#BED7F8] border-x-0 border-y-0 w-screen lg:w-2/5'>
+         {loading?
+         <div className='flex flex-col py-4 lg:items-center lg:justify-center lg:p-4 lg:flex-row h-[calc(100vh-2.3rem)] w-screen lg:h-[calc(100vh-2.7rem)] '>
+              <div className='h-1/3 lg:h-5/6 lg:border border-[#BED7F8] border-x-0 border-y-0 w-screen lg:w-2/5'>
                         <img className='h-full w-screen object-contain' src={post?.content}></img>
               </div>
-              <div className='flex flex-col justify-between lg:border border-[#BED7F8] p-2 h-3/5 lg:h-5/6 lg:w-2/5  '>
-                  <div className='flex p-1 flex-col justify-between lg:h-64' >
+              <div className='flex flex-col justify-between lg:border border-[#BED7F8] pt-1 px-2 h-2/3 lg:h-5/6 lg:w-2/5  overflow-y-scroll  '>
+                  <div className='flex p-1 flex-col justify-between basis-1/2' >
                         <div className='flex'>
                           <div className='flex p-1 mt-1 basis-20 lg:basis-14 rounded-full' >
                             <img src={post?.owner?.profile} alt='image' className='rounded-full h-fit cursor-pointer' onClick={click}/>
                         </div>
                         <div className='main basis-10/12'>
                             <h1 className='capitalize ml-2 font-sans cursor-pointer font-bold text-white' onClick={click}>{post?.owner?.username}</h1>
-                            <p className='ml-2 mt-3 text-slate-300'>{post?.caption}</p>
+                            <p className='ml-2 mt-3 h-32 text-slate-300 '>{post?.caption}</p>
                         </div>
                         {post?.owner?._id === currentUser?._id && <div onClick={handleDelete}>
-                            <i className="fa-solid text-white fa-xl fa-trash-can cursor-pointer"></i>
+                            <i className="fa-solid text-black fa-xl fa-trash-can cursor-pointer"></i>
                         </div>}
-                  {/* </div>
-                  
-                  <div className='flex my-3 mx-3 text-white items-center' > */}
                   </div>
                   <div className='flex pl-3'>
                 <div className='flex items-center' >
@@ -159,20 +157,23 @@ function SinglePage() {
                 </div>             
                 </div>
                 </div>
-                 {allComment.length ===0 ?<div className='border-x-0 flex items-center justify-center border-t-2 border-[#BED7F8]  h-3/5 lg:h-5/6  border-b-0 overflow-y-scroll'>
+                <div className='flex flex-col justify-between basis-2/3'>
+                 {allComment.length ===0 ?
+                 <div className='border-x-0 flex items-center justify-center border-t-2 border-[#BED7F8]  h-3/5 lg:h-5/6  border-b-0 '>
                         <h1 className='text-slate-400'>No Comments</h1>
                   </div>:
-                  <div className='border-x-0 border-t-2 border-[#BED7F8] border-b-0 overflow-y-scroll'>
+                  <div className='border-x-0 border-t-2 border-[#BED7F8]  h-3/5 lg:h-5/6 border-b-0'>
                  {allComment?.map((c)=>(
                       <Comment key={c._id} comment={c}/>
                       
                  ))} 
                   </div>}
                 
-                  <div className='flex items-center bg-[#455175] rounded-md'>
+                  <div className='flex items-center bg-[#455175] mb-1 lg:mb-2 rounded-md'>
                         <input className='w-full rounded-md p-1' value={comment} placeholder='Comment here' onChange={e=>setComment(e.target.value)}  type="text"></input>
                         <i className="fa-solid fa-xl fa-paper-plane p-2 text-[#BED7F8] cursor-pointer " onClick={handleComment}></i>
                   </div>
+                </div>
             </div>
           </div>:
           <SingleSkeleton/>}

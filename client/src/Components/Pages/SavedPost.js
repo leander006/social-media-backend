@@ -53,18 +53,16 @@ function YourPosts() {
     <>
     <Navbar/>
       <div className='flex bg-[#2D3B58]  mt-10'>
-       {bookmarkPost.length !==0?<div className='main md:flex mx-auto lg:basis-[70%] md:basis-[60%] '>
-            {!loading ?<div className='flex flex-col md:pt-2 md:pb-12 h-[calc(100vh-2.7rem)] overflow-y-scroll lg:pl-[17rem] md:pr-5 '>
+       {!loading ?<div className='main md:flex mx-auto lg:basis-[70%] md:basis-[60%] '>
+            { bookmarkPost.length !==0?<div className='flex flex-col md:pt-2 md:pb-12 h-[calc(100vh-2.7rem)] overflow-y-scroll lg:pl-[17rem] md:pr-5 '>
             <div className='mx-auto font-bold text-xl text-[#547bca]' >Saved Post</div>
                 {bookmarkPost?.map((p) =>(
                   <ExploreMore explore={p} key={p._id}/>
                 ))}
-                </div>:<div className='flex flex-col mt-9 md:p-0 md:items-center h-[calc(100vh-4.3rem)]  md:h-[calc(100vh-2.7rem)] overflow-y-scroll lg:border md:border-x-0 lg:border-r-2 lg:border-[#BED7F8] md:border-t-0 flex-auto mb-2 md:mb-0'>
-                {bookmarkPost?.map((p) =>(
-                  <PostSkeleton key={p._id} />
-                ))}
+                </div>:<div className='h-[calc(100vh-2.7rem)] lg:basis-[70%]  justify-center flex items-center lg:items-start lg:pt-36 m-auto font-bold md:text-3xl text-[#547bca]' >No Post Saved!</div>}
+        </div>:<div className='flex flex-col h-[calc(100vh-2.3rem)]  lg:border-[#BED7F8]'>
+                  <PostSkeleton />
                 </div>}
-        </div>:<div className='h-[calc(100vh-2.7rem)] lg:basis-[70%]  justify-center flex items-center lg:items-start lg:pt-36 m-auto font-bold md:text-3xl text-[#547bca]' >No Post Saved!</div>}
         <div className='hidden lg:flex basis-[30%] lg:mr-[10rem] lg:ml-[2rem] md:w-60  h-[calc(100vh-3.7rem)] overflow-y-scroll lg:w-80 xl:w-96 ml-2 flex-col text-white '>
              {currentUser?.following?.length !==0?<div>
               <h1>Followings</h1>

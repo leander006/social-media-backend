@@ -16,12 +16,13 @@ const styles = {
       },
     };
     
-function Pin({size, url,id}) {
+function Pin({size, url,id,display}) {
 
   return (
-    <div className="transform transition duration-500 hover:scale-110 " style={{ ...styles.pin, ...styles[size], cursor: "pointer" }}>
-      <Link to={"/singlepage/"+id}>
-        <img className=' w-full h-full rounded-lg object-cover' src={url} alt="img"/></Link>
+    <div className={!display?"transform transition duration-500 hover:scale-110":" animate-pulse transform transition duration-500 hover:scale-110"} style={{ ...styles.pin, ...styles[size], cursor: "pointer" }}>
+      
+        {display && <div className='w-full h-full bg-gray-300'></div>}
+        {!display && <Link to={"/singlepage/"+id}><img className='w-full h-full rounded-lg object-cover' src={url} alt="img"/></Link>}
     </div>
   )
 }

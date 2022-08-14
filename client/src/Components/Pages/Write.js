@@ -15,6 +15,8 @@ function Write() {
   const [profile, setProfile] = useState()
   const [loading, setLoading] = useState(false)
   const [fileInputState, setFileInputState] = useState('');
+  const [textAreaCount, setTextAreaCount] =useState("0/180");
+  const max = 180
   const config ={
     headers:{
         "Content-Type":"application/json",
@@ -66,7 +68,13 @@ const uploadImage = async (base64EncodedImage) => {
   }
 };
 
+const recalculate = e => {
+  const currentLength = e.target.value.length;
+  setTextAreaCount(`${currentLength}/${max}`);
+  setCaption(e.target.value)
+};
 
+console.log(textAreaCount);
 const handleSubmit = async(e) =>{
   e.preventDefault()
   try {
@@ -104,7 +112,8 @@ const handleSubmit = async(e) =>{
                 <div className='bottom'>
                       <div className='p-2'>
                             <h1 className='text-[#8aaaeb] '>Caption</h1>
-                            <textarea className='bg-[#2D3B58] border-b w-full mt-2 outline-none' type="text" value={caption} onChange={e=>setCaption(e.target.value)} required></textarea>
+                            <textarea className='bg-[#2D3B58] border-b w-full mt-2 outline-none' type="text" value={caption} maxLength={max} onChange={recalculate} required></textarea>
+                            <p className='text-end mr-2'>{textAreaCount}</p>
                       </div>
                 </div>                      
         </form>

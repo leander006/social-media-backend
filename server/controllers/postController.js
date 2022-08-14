@@ -36,6 +36,7 @@ const uploadPost =async (req, res) => {
           { width:720, height: 720 },
           {upload_preset: 'Social_Media_app'} ]}, 
           );
+
         res.status(200).json(uploadResponse.eager[0]);
     } catch (err) {
         console.error("err.message ",err.message);
@@ -55,8 +56,14 @@ const particularPost = asyncHandler(async(req,res) =>{
 // Get all post
 const getPost = asyncHandler(async(req,res) =>{
       try {
-            const post = await Post.find({}).populate("owner").populate({path:"likes",populate:{path:"username"}}).populate({path:"comments",populate:{path:"username"}}).sort({createdAt:-1})
-            res.status(200).json(post)
+            const user = await User.find({status:"Public"})
+            const users = user.map((u) =>u._id)
+            const morePost = await Promise.all(
+                users.map((id) =>{
+                    return Post.find({owner:id}).sort({createdAt:-1})
+                }))
+                res.status(200).json(morePost.flat())
+       
       } catch (error) {
             res.status(404).send({error:error.message})
       }
@@ -96,8 +103,6 @@ const followingPost = asyncHandler(async(req,res) =>{
                 return Post.find({owner:id}).populate("owner").populate({path:"likes",populate:{path:"username"}}).populate({path:"comments",populate:{path:"username"}}).sort({createdAt:-1})
             })
         )
-
-      
         const followerPost = post.concat(morePost.flat())
 // flat() is use to return json as a single object if not used it returned two object as [{},{}]
 

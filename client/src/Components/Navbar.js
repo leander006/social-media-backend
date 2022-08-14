@@ -14,8 +14,8 @@ import { clicked, logout } from '../redux/Slice/userSlice'
 
 
 function Navbar() {
-const [search, setSearch] = useState("");
-const [searched, setSearched] = useState([]);
+const [searched, setSearched] = useState("");
+const [search, setSearch] = useState([]);
 const dispatch = useDispatch();
 const [visible, setVisible] = useState(false)
 const navigate = useNavigate();
@@ -35,13 +35,13 @@ const config ={
       }
 
 const handleSearch = async(query)=>{
-      setSearch(query)
+      setSearched(query)
       if(!query){
         return
       }
       try {
-          const {data} = await axios.get("http://localhost:3001/api/user/oneUser?name="+search,config)
-          setSearched(data)
+          const {data} = await axios.get("http://localhost:3001/api/user/oneUser?name="+searched,config)
+          setSearch(data)
 
       } catch (error) {
           console.log(error);      
@@ -54,18 +54,18 @@ const current =currentUser.others?currentUser.others:currentUser
     <div className='container fixed top-0 z-50 '>
           <div className='flex justify-between md:justify-evenly bg-[#455175] w-screen'>
                 <div className='font-bold p-2 text-white'>
-                        <h1>Logo</h1>
+                        <h1>Talkology</h1>
                 </div>
 
                 <div className='md:flex hidden h-8 w-1/3 m-auto mt-1 items-center bg-[#455175] rounded-md'>
-                <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={search} type="text" onChange={e =>handleSearch(e.target.value)}  placeholder='search your friends'></input>
+                <input className='rounded-md focus:outline-[#BED7F8] w-full h-full p-1' value={searched} type="text" onChange={e =>handleSearch(e.target.value)}  placeholder='search your friends'></input>
                 </div>
 
                 
                         <div className=" hidden md:flex fixed z-30 lg:mr-44 md:mr-28  mt-12 bg-[#a1bcf1]">
                               <div className="md:w-64 lg:w-80 xl:w-96 ">
-                              {searched?.map((s) =>(
-                                     <SearchFreind key={s._id} search={s} searched={searched} setSearched={setSearched}/>
+                              {search?.map((s) =>(
+                                     <SearchFreind key={s._id} search={s} setSearch={setSearch}/>
                               ))}
                             
                               </div>
