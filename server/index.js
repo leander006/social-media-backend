@@ -59,7 +59,11 @@ app.use("/api/comment",commentRoute)
 
 mongoose.connect(process.env.MONGO_URI).then(console.log("Connected to mongodb")).catch((err)=>{console.log("invalid",err)})
 
+app.use(express.static(path.join(__dirname, "/client/build")));
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/client/build', 'index.html'));
+});
 
 const server = app.listen(process.env.PORT || 3001,()=>{
       console.log(`Backend runnig on port ${process.env.PORT}`);
