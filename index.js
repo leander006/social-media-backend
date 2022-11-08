@@ -14,12 +14,8 @@ const cookieSession = require("cookie-session");
 
 const cookieParser = require("cookie-parser");
 const app = express();
-const passportSetup = require("./utils/passport");
-const passport = require("passport");
 
-// for multer upload //
-// app.use("/uploadProfile",express.static("uploadProfile"))
-// app.use("/uploads",express.static("uploads"))
+const passport = require("passport");
 
 dotenv.config();
 
@@ -61,14 +57,10 @@ mongoose
     console.log("invalid", err);
   });
 
-// app.use(express.static(path.join(__dirname, "/client/build")));
-
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '/client/build', 'index.html'));
-// });
 app.get("/", (req, res) => {
   res.send("Welcome to server of Talkology");
 });
+
 const server = app.listen(process.env.PORT || 3001, () => {
   console.log(`Backend runnig on port ${process.env.PORT}`);
 });
