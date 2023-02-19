@@ -64,6 +64,10 @@ app.get("/", (req, res) => {
   res.send("Welcome to server of Talkology");
 });
 
+const server = app.listen(process.env.PORT || 3001, () => {
+  console.log(`Backend runnig on port ${process.env.PORT}`);
+});
+
 //Socket //
 
 const io = require("socket.io")(server, {
@@ -112,6 +116,3 @@ io.on("connection", (socket) => {
 });
 
 // end //
-const server = app.listen(process.env.PORT || 3001, () => {
-  console.log(`Backend runnig on port ${process.env.PORT}`);
-});
