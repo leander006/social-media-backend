@@ -62,7 +62,7 @@ const login = asyncHandler(async (req, res) => {
     if (!user) {
       return res.status(400).send({ message: "User does not exits!" });
     }
-    const validate = await bcrypt.compare(req.body.password, user.password);
+    const validate = bcrypt.compare(req.body.password, user.password);
     if (!validate) {
       return res.status(402).send({ message: "Invalid password" });
     }
@@ -113,7 +113,7 @@ const login = asyncHandler(async (req, res) => {
 const logout = (req, res) => {
   req.logout();
   console.log("logout");
-  res.redirect("http://localhost:3000");
+  res.redirect(process.env.CLIENT_URL);
 };
 
 const callback = passport.authenticate("google", { failureRedirect: "/login" });
@@ -134,7 +134,7 @@ const callFunction = (req, res) => {
     httpOnly: process.env.NODE_ENV === "production" ? true : false,
   });
   //  .status(200).json({others})
-  res.redirect("http://localhost:3000/home");
+  res.redirect(process.env.CLIENT_URL);
 };
 module.exports = {
   registration,

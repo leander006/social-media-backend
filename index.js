@@ -8,7 +8,7 @@ const userRoute = require("./routes/userRoute");
 const messageRoute = require("./routes/messageRoute");
 const postRoute = require("./routes/postRoute");
 const commentRoute = require("./routes/commentRoute");
-
+dotenv.config();
 const cors = require("cors");
 const cookieSession = require("cookie-session");
 
@@ -16,8 +16,6 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 const passport = require("passport");
-
-dotenv.config();
 
 app.use(
   cors({
@@ -75,7 +73,7 @@ const server = app.listen(process.env.PORT || 3001, () => {
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://talkology.netlify.app",
   },
 });
 

@@ -1,49 +1,49 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const GitHubStrategy = require('passport-github').Strategy;
-const passport = require("passport")
-const User =  require("../model/User");
-const { randomBytes } = require('crypto');
-const dotenv = require('dotenv');
-dotenv.config();
+const passport = require("passport");
+const { User } = require("../Models");
+const { randomBytes } = require("crypto");
 
 // For session //
 
-passport.serializeUser((user, done) => {   done(null, user); });
- 
-passport.deserializeUser((id, done) => {  
-      User.findById(id).then((user) => {
-      done(null, user);}); 
+passport.serializeUser((user, done) => {
+  done(null, user);
 });
 
-//Google auth
+passport.deserializeUser((id, done) => {
+  User.findById(id).then((user) => {
+    done(null, user);
+  });
+});
+
 passport.use(
-      new GoogleStrategy(
-        {
-          clientID: process.env.GOOGLE_CLIENT_ID1,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET1,
-          callbackURL: "http://localhost:3001/api/auth/google/callback",
-        },
-            async(accessToken, refreshToken, profile, done) => {
-             const existingUser = await User.findOne({email:profile._json.email})
-             if(existingUser){  
-                  return done(null, existingUser);  
-             }
-             
-             else{
-                 const user= new User({ googleId: profile.id ,
-                              name:profile._json.name?profile._json.name:"xyz",
-                              username:profile._json.name?profile._json.name:randomBytes(3).toString("hex"),
-                              email:profile._json.email,
-                              isVerified:profile._json.email_verified
-                  })
-                  await user.save();
-                  return done(null, user)
-             }
-
-            }   
-        
-      )
+  new GoogleStrategy(
+    {
+      clientID: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      callbackURL: "api/auth/google/callback",
+      scope: ["profile", "email"],
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      // console.log("profile ", profile);
+      try {
+        const existingUser = await User.findOne({ email: profile._json.email });
+        if (existingUser) {
+          return done(null, existingUser);
+        } else {
+          const user = new User({
+            googleId: profile.id,
+            name: profile._json.name ? profile._json.name : "xyz",
+            username: profile._json.name
+              ? profile._json.name
+              : "https://res.cloudinary.com/dttldcyp8/image/upload/v1676618773/ZenX/whrahslbvsmqrvcbrrs2.svg",
+            email: profile._json.email,
+          });
+          await user.save();
+          return done(null, user);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  )
 );
-
-
-
