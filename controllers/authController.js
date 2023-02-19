@@ -122,7 +122,7 @@ const google = passport.authenticate("google", { scope: ["email"] });
 
 const callFunction = (req, res) => {
   // Successful authentication, redirect home.
-  const token = generateToken(req.user._id);
+  const token = generateToken(req?.user?._id);
   res.cookie("token", token, {
     expires: new Date(Date.now() + 25892000000),
     secure: process.env.NODE_ENV === "production" ? true : false,

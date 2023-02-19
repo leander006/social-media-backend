@@ -16,7 +16,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 const passport = require("passport");
-
+const passportSetup = require("./utils/passport");
 app.use(
   cors({
     origin: ["*"],
