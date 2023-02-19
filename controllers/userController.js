@@ -145,7 +145,7 @@ const updateUser = asyncHandler(async (req, res) => {
         expires: new Date(Date.now() + 25892000000),
         secure: process.env.NODE_ENV === "production" ? true : false,
         httpOnly: process.env.NODE_ENV === "production" ? true : false,
-        SameSite: None,
+        SameSite: false,
       })
       .status(200)
       .json(user);

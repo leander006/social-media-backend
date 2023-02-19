@@ -92,14 +92,14 @@ const login = asyncHandler(async (req, res) => {
         expires: new Date(Date.now() + 25892000000),
         secure: process.env.NODE_ENV === "production" ? true : false,
         httpOnly: process.env.NODE_ENV === "production" ? true : false,
-        SameSite: None,
+        SameSite: false,
       });
       res
         .cookie("data", JSON.stringify(others), {
           expires: new Date(Date.now() + 25892000000),
           secure: process.env.NODE_ENV === "production" ? true : false,
           httpOnly: process.env.NODE_ENV === "production" ? true : false,
-          SameSite: None,
+          SameSite: false,
         })
         .status(200)
         .json({ others });
@@ -129,13 +129,13 @@ const callFunction = (req, res) => {
     expires: new Date(Date.now() + 25892000000),
     secure: process.env.NODE_ENV === "production" ? true : false,
     httpOnly: process.env.NODE_ENV === "production" ? true : false,
-    SameSite: None,
+    SameSite: false,
   });
   res.cookie("data", JSON.stringify(req.user), {
     expires: new Date(Date.now() + 25892000000),
     secure: process.env.NODE_ENV === "production" ? true : false,
     httpOnly: process.env.NODE_ENV === "production" ? true : false,
-    SameSite: None,
+    SameSite: false,
   });
   //  .status(200).json({others})
   res.redirect(process.env.CLIENT_URL);
