@@ -30,9 +30,9 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.json({ limit: "50mb" }));
 
 app.use(cookieParser());
-const expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
 app.use(
-  session({
+  cookieSession({
     name: "session",
     keys: ["key1"],
     cookie: {
@@ -44,7 +44,6 @@ app.use(
     },
   })
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
 
