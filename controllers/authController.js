@@ -88,19 +88,9 @@ const login = asyncHandler(async (req, res) => {
     if (user.isVerified === "true") {
       const { password, ...others } = user._doc;
       const token = generateToken(user.id);
-      res.cookie("token", token, {
-        expires: new Date(Date.now() + 25892000000),
-        secure: false,
-        httpOnly: false,
-        sameSite: false,
-      });
+      res.cookie("token", token);
       res
-        .cookie("data", JSON.stringify(others), {
-          expires: new Date(Date.now() + 25892000000),
-          secure: false,
-          httpOnly: false,
-          sameSite: false,
-        })
+        .cookie("data", JSON.stringify(others))
         .status(200)
         .json({ others });
     }
@@ -125,18 +115,8 @@ const google = passport.authenticate("google", { scope: ["email"] });
 const callFunction = (req, res) => {
   // Successful authentication, redirect home.
   const token = generateToken(req?.user?._id);
-  res.cookie("token", token, {
-    expires: new Date(Date.now() + 25892000000),
-    secure: false,
-    httpOnly: false,
-    sameSite: false,
-  });
-  res.cookie("data", JSON.stringify(req.user), {
-    expires: new Date(Date.now() + 25892000000),
-    secure: false,
-    httpOnly: false,
-    sameSite: false,
-  });
+  res.cookie("token", token);
+  res.cookie("data", JSON.stringify(req.user));
   //  .status(200).json({others})
   res.redirect(process.env.CLIENT_URL);
 };

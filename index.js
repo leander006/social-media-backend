@@ -30,8 +30,19 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.json({ limit: "50mb" }));
 
 app.use(cookieParser());
+const expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 app.use(
-  cookieSession({ name: "session", keys: ["leander"], maxAge: 60 * 60 * 100 })
+  session({
+    name: "session",
+    keys: ["key1"],
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      domain: "https://talkology.netlify.app/",
+      path: "foo/bar",
+      expires: expiryDate,
+    },
+  })
 );
 
 app.use(passport.initialize());
