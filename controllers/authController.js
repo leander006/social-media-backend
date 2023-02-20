@@ -90,16 +90,16 @@ const login = asyncHandler(async (req, res) => {
       const token = generateToken(user.id);
       res.cookie("token", token, {
         expires: new Date(Date.now() + 25892000000),
-        secure: process.env.NODE_ENV === "production" ? true : false,
-        httpOnly: process.env.NODE_ENV === "production" ? true : false,
-        SameSite: false,
+        secure: false,
+        httpOnly: false,
+        sameSite: false,
       });
       res
         .cookie("data", JSON.stringify(others), {
           expires: new Date(Date.now() + 25892000000),
-          secure: process.env.NODE_ENV === "production" ? true : false,
-          httpOnly: process.env.NODE_ENV === "production" ? true : false,
-          SameSite: false,
+          secure: false,
+          httpOnly: false,
+          sameSite: false,
         })
         .status(200)
         .json({ others });
@@ -127,15 +127,15 @@ const callFunction = (req, res) => {
   const token = generateToken(req?.user?._id);
   res.cookie("token", token, {
     expires: new Date(Date.now() + 25892000000),
-    secure: process.env.NODE_ENV === "production" ? true : false,
-    httpOnly: process.env.NODE_ENV === "production" ? true : false,
-    SameSite: false,
+    secure: false,
+    httpOnly: false,
+    sameSite: false,
   });
   res.cookie("data", JSON.stringify(req.user), {
     expires: new Date(Date.now() + 25892000000),
-    secure: process.env.NODE_ENV === "production" ? true : false,
-    httpOnly: process.env.NODE_ENV === "production" ? true : false,
-    SameSite: false,
+    secure: false,
+    httpOnly: false,
+    sameSite: false,
   });
   //  .status(200).json({others})
   res.redirect(process.env.CLIENT_URL);

@@ -3,8 +3,6 @@ const asyncHandler = require("express-async-handler");
 const Post = require("../model/Post");
 const Message = require("../model/Message");
 const { cloudinary } = require("../utils/cloudinary");
-const passport = require("passport");
-const dotenv = require("dotenv");
 const Token = require("../model/Token");
 
 const particularUser = asyncHandler(async (req, res) => {
@@ -143,9 +141,8 @@ const updateUser = asyncHandler(async (req, res) => {
     return res
       .cookie("data", JSON.stringify(user), {
         expires: new Date(Date.now() + 25892000000),
-        secure: process.env.NODE_ENV === "production" ? true : false,
-        httpOnly: process.env.NODE_ENV === "production" ? true : false,
-        SameSite: false,
+        secure: false,
+        httpOnly: false,
       })
       .status(200)
       .json(user);
