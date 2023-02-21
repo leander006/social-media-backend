@@ -36,6 +36,8 @@ app.use(
   cookieSession({
     name: "session",
     keys: ["key1"],
+    resave: true,
+    saveUninitialized: false,
     cookie: {
       secure: true,
       sameSite: "none",
