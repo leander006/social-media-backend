@@ -38,7 +38,6 @@ app.use(
     keys: ["key1"],
     cookie: {
       secure: true,
-      httpOnly: true,
       sameSite: "none",
       expires: expiryDate,
     },
