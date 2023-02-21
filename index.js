@@ -14,6 +14,7 @@ const cookieSession = require("cookie-session");
 
 const cookieParser = require("cookie-parser");
 const app = express();
+app.set("trust proxy", 1);
 
 const passport = require("passport");
 const passportSetup = require("./utils/passport");
@@ -38,8 +39,7 @@ app.use(
     cookie: {
       secure: true,
       httpOnly: true,
-      domain: "https://talkology.netlify.app/",
-      path: "foo/bar",
+      sameSite: "none",
       expires: expiryDate,
     },
   })
