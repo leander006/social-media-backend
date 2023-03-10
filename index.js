@@ -10,7 +10,6 @@ const postRoute = require("./routes/postRoute");
 const commentRoute = require("./routes/commentRoute");
 dotenv.config();
 const cors = require("cors");
-const cookieSession = require("cookie-session");
 
 const cookieParser = require("cookie-parser");
 const app = express();
@@ -31,20 +30,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.json({ limit: "50mb" }));
 
 app.use(cookieParser());
-const expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-app.use(
-  cookieSession({
-    name: "session",
-    keys: ["key1"],
-    resave: true,
-    saveUninitialized: false,
-    cookie: {
-      secure: true,
-      sameSite: "none",
-      expires: expiryDate,
-    },
-  })
-);
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -69,6 +55,17 @@ mongoose
   .catch((err) => {
     console.log("invalid", err);
   });
+// Route handler to set a cookie
+app.get("/set-cookie", (req, res) => {
+  res.cookie("myCookie", "cookie value", { maxAge: 900000, httpOnly: true });
+  res.send("Cookie set");
+});
+
+// Route handler to read a cookie
+app.get("/read-cookie", (req, res) => {
+  const myCookie = req?.cookies?.data;
+  res.send(`Cookie value: ${myCookie}`);
+});
 
 app.get("/", (req, res) => {
   res.send("Welcome to server of Talkology");

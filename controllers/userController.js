@@ -138,7 +138,14 @@ const updateUser = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    return res.cookie("data", JSON.stringify(user)).status(200).json(user);
+    return res
+      .cookie("data", JSON.stringify(user), {
+        expire: new Date(Date.now() + 60 * 60 * 1000),
+        // secure: true,
+        // sameSite: "none",
+      })
+      .status(200)
+      .json(user);
   } catch (error) {
     return res.status(500).send({ error: error.message });
   }

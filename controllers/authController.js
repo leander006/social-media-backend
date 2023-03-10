@@ -88,11 +88,27 @@ const login = asyncHandler(async (req, res) => {
     if (user.isVerified === "true") {
       const { password, ...others } = user._doc;
       const token = generateToken(user.id);
-      res.cookie("token", token);
+      new Date(Date.now() + 60 * 60 * 1000);
+      res.cookie("token", token, {
+        expire: new Date(Date.now() + 60 * 60 * 1000),
+        // secure: true,
+        // sameSite: "none",
+      });
       res
-        .cookie("data", JSON.stringify(others))
+        .cookie("data", JSON.stringify(others), {
+          expire: new Date(Date.now() + 60 * 60 * 1000),
+          // secure: true,
+          // sameSite: "none",
+        })
         .status(200)
-        .json({ others });
+        .json(
+          { others },
+          {
+            expire: new Date(Date.now() + 60 * 60 * 1000),
+            // secure: true,
+            // sameSite: "none",
+          }
+        );
     }
 
     // //------------------------------------------//
