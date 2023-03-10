@@ -107,18 +107,9 @@ const login = asyncHandler(async (req, res) => {
           sameSite: "none",
           secure: true,
           expire: new Date(Date.now() + 60 * 60 * 1000),
-          // secure: true,
-          // sameSite: "none",
         })
         .status(200)
-        .json(
-          { others },
-          {
-            expire: new Date(Date.now() + 60 * 60 * 1000),
-            // secure: true,
-            // sameSite: "none",
-          }
-        );
+        .json({ others });
     }
 
     // //------------------------------------------//
@@ -141,8 +132,22 @@ const google = passport.authenticate("google", { scope: ["email"] });
 const callFunction = (req, res) => {
   // Successful authentication, redirect home.
   const token = generateToken(req?.user?._id);
-  res.cookie("token", token);
-  res.cookie("data", JSON.stringify(req.user));
+  res.cookie("token", token, {
+    domain: "netlify.com",
+    path: "/",
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+    expire: new Date(Date.now() + 60 * 60 * 1000),
+  });
+  res.cookie("data", JSON.stringify(req.user), {
+    domain: "netlify.com",
+    path: "/",
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+    expire: new Date(Date.now() + 60 * 60 * 1000),
+  });
   //  .status(200).json({others})
   res.redirect(process.env.CLIENT_URL);
 };
