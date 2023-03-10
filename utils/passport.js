@@ -6,9 +6,19 @@ const User = require("../model/User");
 
 // For session //
 
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
+passport.serializeUser(
+  (user, done) => {
+    done(null, user);
+  },
+  {
+    domain: "netlify.com",
+    path: "/",
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+    expire: new Date(Date.now() + 60 * 60 * 1000),
+  }
+);
 
 passport.deserializeUser((id, done) => {
   User.findById(id).then((user) => {

@@ -140,6 +140,11 @@ const updateUser = asyncHandler(async (req, res) => {
     );
     return res
       .cookie("data", JSON.stringify(user), {
+        domain: 'netlify.com',
+        path: "/",
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
         expire: new Date(Date.now() + 60 * 60 * 1000),
         // secure: true,
         // sameSite: "none",

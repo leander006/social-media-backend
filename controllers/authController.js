@@ -90,12 +90,22 @@ const login = asyncHandler(async (req, res) => {
       const token = generateToken(user.id);
       new Date(Date.now() + 60 * 60 * 1000);
       res.cookie("token", token, {
+        domain: "netlify.com",
+        path: "/",
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
         expire: new Date(Date.now() + 60 * 60 * 1000),
         // secure: true,
         // sameSite: "none",
       });
       res
         .cookie("data", JSON.stringify(others), {
+          domain: "netlify.com",
+          path: "/",
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
           expire: new Date(Date.now() + 60 * 60 * 1000),
           // secure: true,
           // sameSite: "none",
