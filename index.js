@@ -10,7 +10,7 @@ const postRoute = require("./routes/postRoute");
 const commentRoute = require("./routes/commentRoute");
 dotenv.config();
 const cors = require("cors");
-
+const cookieSession = requie("cookie-session");
 const cookieParser = require("cookie-parser");
 const app = express();
 app.set("trust proxy", 1);
@@ -30,7 +30,13 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.json({ limit: "50mb" }));
 
 app.use(cookieParser());
-
+app.use(
+  cookieSession({
+    secret: "leander",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
