@@ -10,7 +10,7 @@ const postRoute = require("./routes/postRoute");
 const commentRoute = require("./routes/commentRoute");
 dotenv.config();
 const cors = require("cors");
-const cookieSession = requie("cookie-session");
+const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser");
 const app = express();
 app.set("trust proxy", 1);
