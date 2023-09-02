@@ -1,85 +1,106 @@
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const JWT = require("jsonwebtoken");
 
-const mongoose = require('mongoose');
+require("dotenv").config();
 
-
-const UserSchema = new mongoose.Schema({
-    googleId:{
-        type:String,
-        required:false,
+const UserSchema = new mongoose.Schema(
+  {
+    accountId: {
+      type: String,
     },
-    name:{
-        type:String,
-        required:true,
+    provider: {
+      type: String,
     },
-    username:{
-        type:String,
-        required:true,
-        unique:true,
+    name: {
+      type: String,
     },
-    email:{
-        type:String,
-        require:true,
-        unique:true,
+    username: {
+      type: String,
+      unique: true,
     },
-    password:{
-        type:String,
-        require:true,
+    email: {
+      type: String,
+      require: true,
+      unique: true,
     },
-    profile:{
-        type:String,
-        default:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKSLF2KD0x9KU5CwmXdqJjrphNQNmJgqzjPQ&usqp=CAU'
+    password: {
+      type: String,
+      require: true,
+    },
+    profile: {
+      type: String,
+      default:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKSLF2KD0x9KU5CwmXdqJjrphNQNmJgqzjPQ&usqp=CAU",
     },
     bio: {
-        type: String,
-        default: '',
+      type: String,
+      default: "",
     },
     followers: {
-        type: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-            },
-        ],
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
     },
     following: {
-        type: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-            },
-        ],
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
     },
-    status:{
-        type:String,
-        enum: ['Public', 'Private'],
-        default: 'Public'
+    status: {
+      type: String,
+      enum: ["Public", "Private"],
+      default: "Public",
     },
-    postCount:{
-        type:Number,
-        default:0
+    postCount: {
+      type: Number,
+      default: 0,
     },
     likedPost: {
-        type: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-            },
-        ],
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
     },
     bookmarkedPost: {
-        type: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-            },
-        ],
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
     },
-    isVerified:{
-        type:String,
-        default:false
+    isVerified: {
+      type: String,
+      default: false,
     },
-},
-{timestamps:true}
-)
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("User",UserSchema)
+// UserSchema.pre("save", function (next) {
+//   const user = this;
+//   const encryptedPassword = bcrypt.hashSync(user.password, "SALT");
+//   user.password = encryptedPassword;
+//   next();
+// });
+
+// UserSchema.methods.comparePassword = function compare(password) {
+//   return bcrypt.compareSync(password, this.password);
+// };
+
+UserSchema.methods.genJWT = function generate() {
+  return JWT.sign({ id: this._id, email: this.email }, process.env.SESSION, {
+    expiresIn: "1h",
+  });
+};
+
+module.exports = mongoose.model("User", UserSchema);

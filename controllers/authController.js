@@ -1,11 +1,11 @@
 const User = require("../model/User");
 const bcrypt = require("bcrypt");
-const generateToken = require("../config/authToken");
 const asyncHandler = require("express-async-handler");
-const passport = require("passport");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const Token = require("../model/Token");
+require("dotenv").config();
+
 // register //
 
 const registration = asyncHandler(async (req, res) => {
@@ -42,7 +42,7 @@ const registration = asyncHandler(async (req, res) => {
     }).save();
     const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
     await sendEmail(user.email, "Verify email", url);
-
+    console.log("sending emial....");
     res.status(200).send({ message: "An email send for verification" });
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -87,23 +87,15 @@ const login = asyncHandler(async (req, res) => {
     }
     if (user.isVerified === "true") {
       const { password, ...others } = user._doc;
-      const token = generateToken(user.id);
-      new Date(Date.now() + 60 * 60 * 1000);
+      const token = user.genJWT();
+      console.log(token);
       res.cookie("token", token, {
-        domain: "netlify.com",
-        path: "/",
-        httpOnly: true,
         sameSite: "none",
         secure: true,
         expire: new Date(Date.now() + 60 * 60 * 1000),
-        // secure: true,
-        // sameSite: "none",
       });
       res
         .cookie("data", JSON.stringify(others), {
-          domain: "netlify.com",
-          path: "/",
-          httpOnly: true,
           sameSite: "none",
           secure: true,
           expire: new Date(Date.now() + 60 * 60 * 1000),
@@ -119,43 +111,7 @@ const login = asyncHandler(async (req, res) => {
   }
 });
 
-const logout = (req, res) => {
-  req.logout();
-  console.log("logout");
-  res.redirect(process.env.CLIENT_URL);
-};
-
-const callback = passport.authenticate("google", { failureRedirect: "/login" });
-
-const google = passport.authenticate("google", { scope: ["email"] });
-
-const callFunction = (req, res) => {
-  // Successful authentication, redirect home.
-  const token = generateToken(req?.user?._id);
-  res.cookie("token", token, {
-    domain: "netlify.com",
-    path: "/",
-    httpOnly: true,
-    sameSite: "none",
-    secure: true,
-    expire: new Date(Date.now() + 60 * 60 * 1000),
-  });
-  res.cookie("data", JSON.stringify(req.user), {
-    domain: "netlify.com",
-    path: "/",
-    httpOnly: true,
-    sameSite: "none",
-    secure: true,
-    expire: new Date(Date.now() + 60 * 60 * 1000),
-  });
-  //  .status(200).json({others})
-  res.redirect(process.env.CLIENT_URL);
-};
 module.exports = {
   registration,
   login,
-  logout,
-  google,
-  callback,
-  callFunction,
 };

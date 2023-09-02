@@ -1,56 +1,22 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-
 const chatRoute = require("./routes/chatRoute");
 const authRoute = require("./routes/authRoute");
 const userRoute = require("./routes/userRoute");
 const messageRoute = require("./routes/messageRoute");
 const postRoute = require("./routes/postRoute");
 const commentRoute = require("./routes/commentRoute");
+const googleRoute = require("./routes/google-auth");
 dotenv.config();
-const cors = require("cors");
-const cookieSession = require("cookie-session");
-const cookieParser = require("cookie-parser");
+// const cors = require("cors");
+
+const session = require("express-session");
+
+// const cookieParser = require("cookie-parser");
 const app = express();
-app.set("trust proxy", 1);
 
 const passport = require("passport");
-const passportSetup = require("./utils/passport");
-app.use(
-  cors({
-    origin: ["*"],
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    credentials: true,
-    origin: true,
-  })
-);
-
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(express.json({ limit: "50mb" }));
-
-app.use(cookieParser());
-app.use(
-  cookieSession({
-    secret: "leander",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use("/api/auth", authRoute);
-
-app.use("/api/user", userRoute);
-
-app.use("/api/chat", chatRoute);
-
-app.use("/api/message", messageRoute);
-
-app.use("/api/post", postRoute);
-
-app.use("/api/comment", commentRoute);
 
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -61,17 +27,39 @@ mongoose
   .catch((err) => {
     console.log("invalid", err);
   });
-// Route handler to set a cookie
-app.get("/set-cookie", (req, res) => {
-  res.cookie("myCookie", "cookie value", { maxAge: 900000, httpOnly: true });
-  res.send("Cookie set");
+
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: true,
+    secret: process.env.SESSION,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function (user, cb) {
+  cb(null, user);
+});
+passport.deserializeUser(function (obj, cb) {
+  cb(null, obj);
 });
 
-// Route handler to read a cookie
-app.get("/read-cookie", (req, res) => {
-  const myCookie = req?.cookies?.data;
-  res.send(`Cookie value: ${myCookie}`);
-});
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.use("/api/auth", authRoute);
+app.use("/auth/google", googleRoute);
+app.use("/api/user", userRoute);
+
+app.use("/api/chat", chatRoute);
+
+app.use("/api/message", messageRoute);
+
+app.use("/api/post", postRoute);
+
+app.use("/api/comment", commentRoute);
 
 app.get("/", (req, res) => {
   res.send("Welcome to server of Talkology");
@@ -86,12 +74,12 @@ const server = app.listen(process.env.PORT || 3001, () => {
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://talkology.netlify.app",
+    origin: "http://localhost:3000/",
   },
 });
 
 io.on("connection", (socket) => {
-  // console.log("Connect to socket",socket.id);
+  console.log("Connect to socket", socket.id);
 
   socket.on("setup", (userData) => {
     socket.join(userData._id);

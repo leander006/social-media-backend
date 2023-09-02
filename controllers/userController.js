@@ -31,7 +31,7 @@ const friendSearch = asyncHandler(async (req, res) => {
     const users = await User.find({
       _id: { $ne: req.user._id },
       followers: { $elemMatch: { $eq: req.user._id } },
-      username: { $regex: name, $options: "$i" },
+      username: { $regex: name },
     });
     if (users.length !== 0) {
       return res.status(200).json(users);
@@ -140,9 +140,9 @@ const updateUser = asyncHandler(async (req, res) => {
     );
     return res
       .cookie("data", JSON.stringify(user), {
-        domain: 'netlify.com',
-        path: "/",
-        httpOnly: true,
+        // domain: "netlify.com",
+        // path: "/",
+        // httpOnly: true,
         sameSite: "none",
         secure: true,
         expire: new Date(Date.now() + 60 * 60 * 1000),
