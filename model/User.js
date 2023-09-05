@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
 
-require("dotenv").config();
+const { JWT_KEY } = require("../config/serverConfig");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -26,7 +26,6 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      require: true,
     },
     profile: {
       type: String,
@@ -66,7 +65,7 @@ const UserSchema = new mongoose.Schema(
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
+          ref: "Post",
         },
       ],
     },
@@ -74,7 +73,7 @@ const UserSchema = new mongoose.Schema(
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
+          ref: "Post",
         },
       ],
     },
@@ -98,7 +97,7 @@ const UserSchema = new mongoose.Schema(
 // };
 
 UserSchema.methods.genJWT = function generate() {
-  return JWT.sign({ id: this._id, email: this.email }, process.env.SESSION, {
+  return JWT.sign({ id: this._id, email: this.email }, JWT_KEY, {
     expiresIn: "1h",
   });
 };

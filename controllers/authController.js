@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const Token = require("../model/Token");
-require("dotenv").config();
+const { BASE_URL, SESSION } = require("../config/serverConfig");
 
 // register //
 
@@ -25,12 +25,14 @@ const registration = asyncHandler(async (req, res) => {
       return res.status(400).send({ message: "Email Exists" });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(req.body.password, salt);
+    const hashedPassword = await bcrypt.hash(
+      req.body.password,
+      parseInt(SESSION)
+    );
     const newUser = new User({
       username: username,
       email: email,
-      password: hashPassword,
+      password: hashedPassword,
       name: name,
     });
 
@@ -40,7 +42,7 @@ const registration = asyncHandler(async (req, res) => {
       userId: user._id,
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
-    const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
+    const url = `${BASE_URL}/users/${user._id}/verify/${token.token}`;
     await sendEmail(user.email, "Verify email", url);
     console.log("sending emial....");
     res.status(200).send({ message: "An email send for verification" });
@@ -53,16 +55,16 @@ const registration = asyncHandler(async (req, res) => {
 
 const login = asyncHandler(async (req, res) => {
   const { username } = req.body;
-  console.log(req.body.password);
   try {
     if (!username || !req.body.password) {
       return res.status(402).send({ message: "Please all field" });
     }
     const user = await User.findOne({ username });
+    // console.log("user ", user);
     if (!user) {
       return res.status(400).send({ message: "User does not exits!" });
     }
-    const validate = bcrypt.compare(req.body.password, user.password);
+    const validate = bcrypt.compareSync(req.body.password, user.password);
     if (!validate) {
       return res.status(402).send({ message: "Invalid password" });
     }
@@ -78,7 +80,7 @@ const login = asyncHandler(async (req, res) => {
           userId: user._id,
           token: crypto.randomBytes(32).toString("hex"),
         }).save();
-        const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
+        const url = `${BASE_URL}users/${user._id}/verify/${token.token}`;
         await sendEmail(user.email, "Verify email", url);
         return res
           .status(402)

@@ -37,4 +37,8 @@ const PostSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+PostSchema.pre("remove", function (next) {
+  this.model("Comment").remove({ commentable: this._id }, next);
+});
+
 module.exports = mongoose.model("Post", PostSchema);

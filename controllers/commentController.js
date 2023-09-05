@@ -4,27 +4,34 @@ const Comment = require("../model/Comment");
 const Post = require("../model/Post");
 
 const createComment = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  const { content } = req.body;
-  if (!content) {
-    return res.status(401).json("Please enter all  field");
-  }
+  const modelType = req.body.modelType;
+  const modelId = req.params.id;
+  const userId = req.user.id;
+  const content = req.body.content;
   try {
-    const newComment = new Comment({
-      username: req.user._id,
+    if (modelType == "Post") {
+      var commentable = await Post.findById(modelId).populate("comments");
+    } else if (modelType == "Comment") {
+      var commentable = await Comment.findById(modelId).populate("comments");
+    } else {
+      throw new Error("Unknown model type");
+    }
+
+    const comment = await Comment.create({
       content: content,
-      post: req.params.id,
+      user: userId,
+      onModel: modelType,
+      commentable: modelId,
+      comments: [],
+      likes: [],
     });
 
-    const comment = await newComment.save();
-    await post.updateOne({ $push: { comments: comment._id } });
-    const newcomment = await Comment.findById(comment._id).populate(
-      "username",
-      "-password"
-    );
-    res.status(200).json(newcomment);
+    commentable.comments.push(comment);
+    await commentable.save();
+
+    return res.status(201).json(comment);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).send({ error: error.message });
   }
 });
 
@@ -32,7 +39,7 @@ const createComment = asyncHandler(async (req, res) => {
 const getComment = asyncHandler(async (req, res) => {
   try {
     const comment = await Comment.find({ post: req.params.id })
-      .populate("username", "-password")
+      .populate("user", "-password")
       .sort({ createdAt: -1 });
     return res.status(200).json(comment);
   } catch (error) {
@@ -44,9 +51,10 @@ const getComment = asyncHandler(async (req, res) => {
 const getParticularComment = asyncHandler(async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id)
-      .populate("username")
+      .populate("user")
       .populate("post")
       .sort({ createdAt: -1 });
+    console.log("comment ", comment);
     return res.status(200).json(comment);
   } catch (error) {
     return res.status(500).send({ error: error.message });
@@ -55,14 +63,15 @@ const getParticularComment = asyncHandler(async (req, res) => {
 
 const deleteComment = asyncHandler(async (req, res) => {
   const comment = await Comment.findById(req.params.id);
-  const post = await Post.findById(comment.post);
 
+  const post = await Post.findById(comment.commentable);
+  console.log("post ", post);
   try {
     await Comment.findByIdAndDelete(req.params.id);
     await post.updateOne({ $pull: { comments: comment.id } });
     const newPost = await Post.findById(post._id).populate({
       path: "comments",
-      populate: { path: "username" },
+      populate: { path: "user" },
     });
     res.status(200).json(newPost.comments);
   } catch (error) {

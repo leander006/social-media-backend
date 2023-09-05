@@ -5,6 +5,9 @@ const Message = require("../model/Message");
 const { cloudinary } = require("../utils/cloudinary");
 const Token = require("../model/Token");
 
+const bcrypt = require("bcrypt");
+const { SESSION } = require("../config/serverConfig");
+
 const particularUser = asyncHandler(async (req, res) => {
   const name = req.query.name;
   const userId = req.query.userId;
@@ -113,12 +116,11 @@ const uploadPic = async (req, res) => {
   try {
     const fileStr = req.body.data;
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-      eager: [
-        { width: 180, height: 180, crop: "pad" },
-        { upload_preset: "Social_Media_app" },
-      ],
+      width: 180, // Desired width
+      height: 0, // Desired height
+      crop: "pad",
     });
-    res.status(200).json(uploadResponse.eager[0]);
+    res.status(200).json({ data: uploadResponse.url });
   } catch (err) {
     console.error(err);
     res.status(500).json({ err: "Something went wrong" });
@@ -127,6 +129,7 @@ const uploadPic = async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   try {
+    const hashedPassword = await bcrypt.hash(req.body.password,parseInt(SESSION));
     const user = await User.findByIdAndUpdate(
       req.params.id,
       {
@@ -135,19 +138,15 @@ const updateUser = asyncHandler(async (req, res) => {
         username: req.body.username,
         status: req.body.status,
         profile: req.body.profile,
+        password: hashedPassword,
       },
       { new: true }
     );
     return res
       .cookie("data", JSON.stringify(user), {
-        // domain: "netlify.com",
-        // path: "/",
-        // httpOnly: true,
         sameSite: "none",
         secure: true,
-        expire: new Date(Date.now() + 60 * 60 * 1000),
-        // secure: true,
-        // sameSite: "none",
+        expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
       })
       .status(200)
       .json(user);

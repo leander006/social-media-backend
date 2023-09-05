@@ -20,6 +20,7 @@ const createPost = asyncHandler(async (req, res) => {
       { new: true }
     );
     res.status(200).json(post);
+    console.log("post ", post);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -29,13 +30,11 @@ const uploadPost = async (req, res) => {
   try {
     const fileStr = req.body.data;
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-      eager: [
-        { width: 720, height: 720 },
-        { upload_preset: "Social_Media_app" },
-      ],
+      width: 420, // Desired width
+      height: 420, // Desired height
+      crop: "fill",
     });
-
-    res.status(200).json(uploadResponse.eager[0]);
+    res.status(200).json({ data: uploadResponse.url });
   } catch (err) {
     console.error("err.message ", err.message);
     res.status(500).json({ err: "Something went wrong" });
@@ -44,10 +43,7 @@ const uploadPost = async (req, res) => {
 // Get post by id
 const particularPost = asyncHandler(async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id)
-      .populate("owner")
-      .populate({ path: "likes", populate: { path: "username" } })
-      .populate({ path: "comments", populate: { path: "username" } });
+    const post = await Post.findById(req.params.id).populate("owner");
     res.status(200).json(post);
   } catch (error) {
     res.status(404).send({ error: error.message });
@@ -73,7 +69,8 @@ const getPost = asyncHandler(async (req, res) => {
 // Delete post
 const deletePost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id);
-  const comment = await Comment.find({ post: post._id });
+  console.log("post ", post);
+  const comment = await Comment.find({ post: post.id });
   try {
     await Post.findByIdAndDelete(req.params.id);
     await User.findByIdAndUpdate(
@@ -81,7 +78,8 @@ const deletePost = asyncHandler(async (req, res) => {
       { $inc: { postCount: -1 } },
       { new: true }
     );
-    // await Comment.findByIdAndDelete(comment._id)
+    console.log("comment ", comment);
+    // await Comment.deleteMany({""});
     return res.status(200).json("Deleted successfully");
   } catch (error) {
     return res.status(500).send({ error: error.message });
@@ -95,21 +93,23 @@ const followingPost = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     const post = await Post.find({ owner: user._id })
       .populate("owner")
-      .populate({ path: "likes", populate: { path: "username" } })
-      .populate({ path: "comments", populate: { path: "username" } })
+      .populate({ path: "likes", populate: { path: "user" } })
+      .populate({ path: "comments", populate: { path: "user" } })
       .sort({ createdAt: -1 });
+    // console.log("post ", post);
     const following = user.following;
     // Promise.all is use to get all post of user's following login user
-
+    // console.log("following ", following);
     const morePost = await Promise.all(
       following.map((id) => {
         return Post.find({ owner: id })
           .populate("owner")
-          .populate({ path: "likes", populate: { path: "username" } })
-          .populate({ path: "comments", populate: { path: "username" } })
+          .populate({ path: "likes", populate: { path: "user" } })
+          .populate({ path: "comments", populate: { path: "user" } })
           .sort({ createdAt: -1 });
       })
     );
+    // console.log("morePost ", morePost);
     const followerPost = post.concat(morePost.flat());
     // flat() is use to return json as a single object if not used it returned two object as [{},{}]
 
@@ -173,4 +173,3 @@ module.exports = {
   bookmarkPost,
   uploadPost,
 };
-

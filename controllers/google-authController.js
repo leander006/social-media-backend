@@ -6,11 +6,15 @@ const googleAuthDal = {
       accountId: oauthUser.id,
       provider: oauthUser.provider,
     });
-    if (isUserExists) {
-      return isUserExists;
+    const emailExists = await User.findOne({
+      email: oauthUser.emails[0].value,
+    });
+    if (isUserExists || emailExists) {
+      return isUserExists != null ? isUserExists : emailExists;
     }
     const user = new User({
       accountId: oauthUser.id,
+      username: oauthUser.displayName,
       name: oauthUser.displayName,
       provider: oauthUser.provider,
       email: oauthUser.emails[0].value,

@@ -3,15 +3,21 @@ const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 const express = require("express");
 const googleAuth = require("../controllers/google-authController");
 const router = express.Router();
-require("dotenv").config();
+const {
+  GOOGLE_CALLBACK_URL,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_CLIENT_ID,
+  CLIENT_URL,
+  BASE_URL,
+} = require("../config/serverConfig");
 
 let userProfile;
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: GOOGLE_CALLBACK_URL,
     },
     function (accessToken, refreshToken, profile, done) {
       userProfile = profile;
@@ -30,9 +36,9 @@ router.get(
 // URL Must be same as 'Authorized redirect URIs' field of OAuth client, i.e: /auth/google/callback
 router.get(
   "/callback",
-  passport.authenticate("google", { failureRedirect: "/auth/google/error" }),
+  passport.authenticate("google", { failureRedirect: "/api/auth/google/error" }),
   (req, res) => {
-    res.redirect("/auth/google/success"); // Successful authentication, redirect success.
+    res.redirect("/api/auth/google/success"); // Successful authentication, redirect success.
   }
 );
 
@@ -42,21 +48,21 @@ router.get("/success", async (req, res) => {
   res.cookie("token", token, {
     sameSite: "none",
     secure: true,
-    expire: new Date(Date.now() + 60 * 60 * 1000),
+    expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
   });
   res.cookie("data", JSON.stringify(user), {
     sameSite: "none",
     secure: true,
-    expire: new Date(Date.now() + 60 * 60 * 1000),
+    expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
   });
-  res.redirect("http://localhost:3000/home");
+  res.redirect(CLIENT_URL);
 });
 
 router.get("/error", (req, res) => res.send("Error logging in via Google.."));
 
 router.get("/logout", (req, res) => {
   req.logout();
-  res.redirect(process.env.CLIENT_URL);
+  res.redirect(BASE_URL);
 });
 
 module.exports = router;
