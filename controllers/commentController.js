@@ -28,8 +28,11 @@ const createComment = asyncHandler(async (req, res) => {
 
     commentable.comments.push(comment);
     await commentable.save();
-
-    return res.status(201).json(comment);
+    const newComment = await Comment.findById(comment._id).populate(
+      "user",
+      "-password"
+    );
+    return res.status(201).json(newComment);
   } catch (error) {
     return res.status(500).send({ error: error.message });
   }
@@ -38,7 +41,7 @@ const createComment = asyncHandler(async (req, res) => {
 // get all comments of particular user
 const getComment = asyncHandler(async (req, res) => {
   try {
-    const comment = await Comment.find({ post: req.params.id })
+    const comment = await Comment.find({ commentable: req.params.id })
       .populate("user", "-password")
       .sort({ createdAt: -1 });
     return res.status(200).json(comment);
@@ -54,7 +57,6 @@ const getParticularComment = asyncHandler(async (req, res) => {
       .populate("user")
       .populate("post")
       .sort({ createdAt: -1 });
-    console.log("comment ", comment);
     return res.status(200).json(comment);
   } catch (error) {
     return res.status(500).send({ error: error.message });
@@ -65,7 +67,6 @@ const deleteComment = asyncHandler(async (req, res) => {
   const comment = await Comment.findById(req.params.id);
 
   const post = await Post.findById(comment.commentable);
-  console.log("post ", post);
   try {
     await Comment.findByIdAndDelete(req.params.id);
     await post.updateOne({ $pull: { comments: comment.id } });

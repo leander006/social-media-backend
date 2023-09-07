@@ -11,15 +11,17 @@ const { SESSION } = require("../config/serverConfig");
 const particularUser = asyncHandler(async (req, res) => {
   const name = req.query.name;
   const userId = req.query.userId;
+  console.log(req.user._id);
   try {
     const users = name
       ? await User.find({
           _id: { $ne: req.user._id },
-          username: { $regex: name, $options: "$i" },
+          username: { $regex: name, $options: "i" },
         })
       : await User.findById(userId)
           .populate("following", "-password")
           .populate("followers", "-password");
+    console.log("name", name, "user ", users);
     return res.status(200).json(users);
   } catch (error) {
     return res.status(500).send({ error: error.message });
@@ -116,8 +118,6 @@ const uploadPic = async (req, res) => {
   try {
     const fileStr = req.body.data;
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-      width: 180, // Desired width
-      height: 0, // Desired height
       crop: "pad",
     });
     res.status(200).json({ data: uploadResponse.url });
@@ -129,7 +129,10 @@ const uploadPic = async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password,parseInt(SESSION));
+    const hashedPassword = await bcrypt.hash(
+      req.body.password,
+      parseInt(SESSION)
+    );
     const user = await User.findByIdAndUpdate(
       req.params.id,
       {

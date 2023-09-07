@@ -30,8 +30,8 @@ const uploadPost = async (req, res) => {
   try {
     const fileStr = req.body.data;
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-      width: 420, // Desired width
-      height: 420, // Desired height
+      width: 720, // Desired width
+      height: 720, // Desired height
       crop: "fill",
     });
     res.status(200).json({ data: uploadResponse.url });
@@ -129,8 +129,8 @@ const likePost = asyncHandler(async (req, res) => {
       likes.map((id) => {
         return Post.find({ _id: id })
           .populate("owner")
-          .populate({ path: "likes", populate: { path: "username" } })
-          .populate({ path: "comments", populate: { path: "username" } })
+          // .populate({ path: "likes", populate: { path: "username" } })
+          // .populate({ path: "comments", populate: { path: "username" } })
           .sort({ createdAt: -1 });
       })
     );
@@ -148,11 +148,13 @@ const bookmarkPost = asyncHandler(async (req, res) => {
 
     const morePost = await Promise.all(
       bookmark.map((id) => {
-        return Post.find({ _id: id })
-          .populate("owner")
-          .populate({ path: "likes", populate: { path: "username" } })
-          .populate({ path: "comments", populate: { path: "username" } })
-          .sort({ createdAt: -1 });
+        return (
+          Post.find({ _id: id })
+            .populate("owner")
+            // .populate({ path: "likes", populate: { path: "user" } })
+            // .populate({ path: "comments", populate: { path: "user" } })
+            .sort({ createdAt: -1 })
+        );
       })
     );
     res.status(200).json(morePost.flat());

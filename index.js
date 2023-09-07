@@ -10,13 +10,15 @@ const commentRoute = require("./routes/commentRoute");
 const googleRoute = require("./routes/google-auth");
 const likeRoute = require("./routes/likeRoute");
 const { passportAuth } = require("./config/jwt");
+const { createServer } = require("http");
 const cors = require("cors");
+const { Server } = require("socket.io");
 const { MONGO_URI, PORT, SESSION } = require("./config/serverConfig");
 const session = require("express-session");
 
 // const cookieParser = require("cookie-parser");
 const app = express();
-
+const httpServer = createServer(app);
 const passport = require("passport");
 
 mongoose
@@ -85,21 +87,16 @@ app.get("/", (req, res) => {
   res.send("Welcome to server of Talkology");
 });
 
-const server = app.listen(PORT || 3001, () => {
+httpServer.listen(PORT, async () => {
   console.log(`Backend runnig on port ${PORT}`);
 });
-
 //Socket //
 
-const io = require("socket.io")(server, {
-  // pingTimeout: 60000,
-  // cors: {
-  //   origin: "http://localhost:3000/",
-  // },
-});
+const io = new Server(httpServer, { cors: { origin: "*" } });
 
 io.on("connection", (socket) => {
-  console.log("Connect to socket", socket.id);
+  console.log("Connect to socket");
+  const notification = [];
 
   socket.on("setup", (userData) => {
     socket.join(userData._id);
@@ -113,7 +110,8 @@ io.on("connection", (socket) => {
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
-  socket.on("new message", (messageRecieved) => {
+  socket.on("new message", (data) => {
+    console.log("messageRecieved ", data);
     var chat = messageRecieved.chat;
     if (!chat.users) return console.log("Users are undefined");
     chat.users.forEach((user) => {
