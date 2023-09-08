@@ -8,6 +8,7 @@ const messageRoute = require("./routes/messageRoute");
 const postRoute = require("./routes/postRoute");
 const commentRoute = require("./routes/commentRoute");
 const googleRoute = require("./routes/google-auth");
+const notifcationRoute = require("./routes/notificationRoute");
 const likeRoute = require("./routes/likeRoute");
 const { passportAuth } = require("./config/jwt");
 const { createServer } = require("http");
@@ -20,6 +21,7 @@ const session = require("express-session");
 const app = express();
 const httpServer = createServer(app);
 const passport = require("passport");
+const onlineUsers = new Set();
 
 mongoose
   .connect(MONGO_URI, {
@@ -76,7 +78,7 @@ app.use("/api/auth/google", googleRoute);
 app.use("/api/user", userRoute);
 app.use("/api/like", likeRoute);
 app.use("/api/chat", chatRoute);
-
+app.use("/api/notification", notifcationRoute);
 app.use("/api/message", messageRoute);
 
 app.use("/api/post", postRoute);
@@ -95,8 +97,8 @@ httpServer.listen(PORT, async () => {
 const io = new Server(httpServer, { cors: { origin: "*" } });
 
 io.on("connection", (socket) => {
-  console.log("Connect to socket");
-  const notification = [];
+  console.log(`User ${socket.id} connected`);
+  onlineUsers.add(socket.id);
 
   socket.on("setup", (userData) => {
     socket.join(userData._id);
@@ -110,8 +112,7 @@ io.on("connection", (socket) => {
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
-  socket.on("new message", (data) => {
-    console.log("messageRecieved ", data);
+  socket.on("send_message", (messageRecieved) => {
     var chat = messageRecieved.chat;
     if (!chat.users) return console.log("Users are undefined");
     chat.users.forEach((user) => {
@@ -128,9 +129,10 @@ io.on("connection", (socket) => {
       socket.in(user._id).emit("message deleted", message);
     });
   });
-  socket.off("setup", () => {
-    console.log("User Disconnected");
-    socket.leave(userData._id);
+
+  socket.on("disconnect", () => {
+    console.log(`User ${socket.id} disconnected`);
+    onlineUsers.delete(socket.id);
   });
 });
 
