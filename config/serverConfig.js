@@ -21,4 +21,5 @@ module.exports = {
   USERNAME: process.env.USERNAME,
   PASSWORD: process.env.PASSWORD,
   CLIENT_URL: process.env.CLIENT_URL,
+  SERVER_URL: process.env.SERVER_URL,
 };

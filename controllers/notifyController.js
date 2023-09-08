@@ -1,9 +1,5 @@
-const User = require("../model/User");
 const asyncHandler = require("express-async-handler");
-const Chat = require("../model/Chat");
-const Message = require("../model/Message");
 
-const { NODE_ENV } = require("../config/serverConfig");
 const Notification = require("../model/Notification");
 
 const setNotifications = asyncHandler(async (req, res) => {
@@ -42,8 +38,30 @@ const getNotifications = asyncHandler(async (req, res) => {
   }
 });
 
+const getNotificationsById = asyncHandler(async (req, res) => {
+  try {
+    const notifications = await Notification.findOne({
+      user: req.params.id,
+    }).populate("notify");
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+const getByMessageId = asyncHandler(async (req, res) => {
+  try {
+    const notifications = await Notification.findOne({
+      notify: req.params.id,
+    }).populate("notify");
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 module.exports = {
   setNotifications,
   getNotifications,
   removeNotifications,
+  getNotificationsById,
+  getByMessageId,
 };

@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-
+const axios = require("axios").default;
 const chatRoute = require("./routes/chatRoute");
 const authRoute = require("./routes/authRoute");
 const userRoute = require("./routes/userRoute");
@@ -14,14 +14,19 @@ const { passportAuth } = require("./config/jwt");
 const { createServer } = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
-const { MONGO_URI, PORT, SESSION } = require("./config/serverConfig");
+const {
+  MONGO_URI,
+  PORT,
+  SESSION,
+  SERVER_URL,
+} = require("./config/serverConfig");
 const session = require("express-session");
-
+const users = new Map();
 // const cookieParser = require("cookie-parser");
 const app = express();
 const httpServer = createServer(app);
 const passport = require("passport");
-const onlineUsers = new Set();
+const Notification = require("./model/Notification");
 
 mongoose
   .connect(MONGO_URI, {
@@ -95,11 +100,13 @@ httpServer.listen(PORT, async () => {
 //Socket //
 
 const io = new Server(httpServer, { cors: { origin: "*" } });
-
+// const users = {};
 io.on("connection", (socket) => {
-  console.log(`User ${socket.id} connected`);
-  onlineUsers.add(socket.id);
-
+  socket.on("login", function (data) {
+    users.set(data.userId, socket.id);
+    console.log("a user " + data.userId + " connected", users.size);
+    // saving userId to object with socket ID
+  });
   socket.on("setup", (userData) => {
     socket.join(userData._id);
     socket.emit("connected");
@@ -115,8 +122,17 @@ io.on("connection", (socket) => {
   socket.on("send_message", (messageRecieved) => {
     var chat = messageRecieved.chat;
     if (!chat.users) return console.log("Users are undefined");
-    chat.users.forEach((user) => {
+    chat.users.forEach(async (user) => {
       if (user._id == messageRecieved.sender._id) return;
+      console.log(users.has(user._id));
+      if (!users.has(user._id)) {
+        const datas = await Notification.create({
+          onModel: "Message",
+          notify: messageRecieved._id,
+          user: user._id,
+        });
+        console.log("datas is ", datas);
+      }
       socket.in(user._id).emit("message recieved", messageRecieved);
     });
   });
@@ -124,15 +140,29 @@ io.on("connection", (socket) => {
   socket.on("new message delete", (message) => {
     var chat = message.chat;
     if (!chat.users) return console.log("Users are undefined");
-    chat.users.forEach((user) => {
+    chat.users.forEach(async (user) => {
       if (user._id == message.sender._id) return;
+      if (!users.has(user._id)) {
+        const { data } = await axios.get(
+          `${SERVER_URL}/api/notification/${user._id}`
+        );
+        console.log("notifications", data);
+        if (data) {
+          const datas = await Notification.findByIdAndDelete(data._id);
+          console.log("deleted", datas);
+        } else {
+          console.log("no notification created for this user", user._id);
+        }
+      }
+
       socket.in(user._id).emit("message deleted", message);
     });
   });
 
-  socket.on("disconnect", () => {
-    console.log(`User ${socket.id} disconnected`);
-    onlineUsers.delete(socket.id);
+  socket.on("disconnect", function () {
+    console.log("user " + users[socket.id] + " disconnected");
+    // remove saved socket from users object
+    users.delete(socket.id);
   });
 });
 
