@@ -12,6 +12,9 @@ const notificationScheme = new mongoose.Schema(
       required: true,
       refPath: "onModel",
     },
+    content: {
+      type: String,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

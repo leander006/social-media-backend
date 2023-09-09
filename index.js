@@ -113,7 +113,6 @@ io.on("connection", (socket) => {
   });
   socket.on("join room", (room) => {
     socket.join(room);
-    // console.log("User joined room",room);
   });
 
   socket.on("typing", (room) => socket.in(room).emit("typing"));
@@ -124,14 +123,13 @@ io.on("connection", (socket) => {
     if (!chat.users) return console.log("Users are undefined");
     chat.users.forEach(async (user) => {
       if (user._id == messageRecieved.sender._id) return;
-      console.log(users.has(user._id));
       if (!users.has(user._id)) {
-        const datas = await Notification.create({
+        await Notification.create({
           onModel: "Message",
           notify: messageRecieved._id,
           user: user._id,
+          content: messageRecieved.content,
         });
-        console.log("datas is ", datas);
       }
       socket.in(user._id).emit("message recieved", messageRecieved);
     });
@@ -146,10 +144,9 @@ io.on("connection", (socket) => {
         const { data } = await axios.get(
           `${SERVER_URL}/api/notification/${user._id}`
         );
-        console.log("notifications", data);
         if (data) {
-          const datas = await Notification.findByIdAndDelete(data._id);
-          console.log("deleted", datas);
+          await Notification.findByIdAndDelete(data._id);
+          console.log("deleted");
         } else {
           console.log("no notification created for this user", user._id);
         }
@@ -159,8 +156,8 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("disconnect", function () {
-    console.log("user " + users[socket.id] + " disconnected");
+  socket.on("removeUser", function () {
+    console.log("user disconnected");
     // remove saved socket from users object
     users.delete(socket.id);
   });
