@@ -123,11 +123,13 @@ io.on("connection", (socket) => {
     if (!chat.users) return console.log("Users are undefined");
     chat.users.forEach(async (user) => {
       if (user._id == messageRecieved.sender._id) return;
+      console.log(users.has(user._id));
       if (!users.has(user._id)) {
         await Notification.create({
           onModel: "Message",
           notify: messageRecieved._id,
           user: user._id,
+          sender: messageRecieved.sender._id,
           content: messageRecieved.content,
         });
       }
@@ -156,10 +158,9 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("removeUser", function () {
-    console.log("user disconnected");
-    // remove saved socket from users object
-    users.delete(socket.id);
+  socket.on("removeUser", function (data) {
+    users.delete(data.userId);
+    console.log("a user " + data.userId + " disconnected", users.size);
   });
 });
 

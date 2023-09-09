@@ -31,7 +31,7 @@ const getNotifications = asyncHandler(async (req, res) => {
   try {
     const notifications = await Notification.find({
       user: req.user._id,
-    }).populate("notify");
+    }).populate("sender");
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -42,7 +42,7 @@ const getNotificationsById = asyncHandler(async (req, res) => {
   try {
     const notifications = await Notification.findOne({
       user: req.params.id,
-    }).populate("notify");
+    }).populate("user");
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ error: error.message });
