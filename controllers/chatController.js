@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../model/User");
 const Chat = require("../model/Chat");
+const Message = require("../model/Message");
 
 // Create one-one chat//
 const accessChat = asyncHandler(async (req, res) => {
@@ -22,12 +23,10 @@ const accessChat = asyncHandler(async (req, res) => {
   });
 
   if (isChat.length > 0) {
-    return res
-      .status(200)
-      .json({
-        chat: isChat[0],
-        res: "chats already exist cannot create new chat",
-      });
+    return res.status(200).json({
+      chat: isChat[0],
+      res: "chats already exist cannot create new chat",
+    });
   }
 
   try {
@@ -98,12 +97,10 @@ const createGroupChat = asyncHandler(async (req, res) => {
   });
 
   if (isChat.length > 0) {
-    return res
-      .status(200)
-      .json({
-        chat: isChat[0],
-        res: "chats already exist cannot create new chat",
-      });
+    return res.status(200).json({
+      chat: isChat[0],
+      res: "chats already exist cannot create new chat",
+    });
   }
   try {
     const groupChat = await Chat.create({
@@ -191,6 +188,7 @@ const removeMember = asyncHandler(async (req, res) => {
 const deleteChat = asyncHandler(async (req, res) => {
   try {
     await Chat.findByIdAndDelete(req.params.id);
+    await Message.deleteMany({ chat: req.params.id });
     return res.status(200).json("Chat deleted");
   } catch (error) {
     res.status(404).send({ message: error.message });

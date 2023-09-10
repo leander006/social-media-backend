@@ -68,9 +68,6 @@ const getPost = asyncHandler(async (req, res) => {
 
 // Delete post
 const deletePost = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  console.log("post ", post);
-  const comment = await Comment.find({ post: post.id });
   try {
     await Post.findByIdAndDelete(req.params.id);
     await User.findByIdAndUpdate(
@@ -78,8 +75,9 @@ const deletePost = asyncHandler(async (req, res) => {
       { $inc: { postCount: -1 } },
       { new: true }
     );
-    console.log("comment ", comment);
-    // await Comment.deleteMany({""});
+
+    const result = await Comment.deleteMany({ commentable: req.params.id });
+    console.log("result ", result);
     return res.status(200).json("Deleted successfully");
   } catch (error) {
     return res.status(500).send({ error: error.message });
@@ -127,11 +125,13 @@ const likePost = asyncHandler(async (req, res) => {
     // Promise.all is use to get all post of user's following login user
     const morePost = await Promise.all(
       likes.map((id) => {
-        return Post.find({ _id: id })
-          .populate("owner")
-          // .populate({ path: "likes", populate: { path: "username" } })
-          // .populate({ path: "comments", populate: { path: "username" } })
-          .sort({ createdAt: -1 });
+        return (
+          Post.find({ _id: id })
+            .populate("owner")
+            // .populate({ path: "likes", populate: { path: "username" } })
+            // .populate({ path: "comments", populate: { path: "username" } })
+            .sort({ createdAt: -1 })
+        );
       })
     );
     res.status(200).json(morePost.flat());
