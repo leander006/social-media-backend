@@ -10,11 +10,11 @@ const follow = asyncHandler(async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     const currentUser = req.user;
-
+    var newUser = {};
     if (!user.followers.includes(req.user._id)) {
       await user.updateOne({ $push: { followers: req.user._id } });
       await currentUser.updateOne({ $push: { following: req.params.id } });
-      const newUser = await User.findById(currentUser._id);
+      newUser = await User.findById(currentUser._id);
       return res
         .cookie("data", JSON.stringify(newUser), {
           sameSite: "none",
@@ -26,7 +26,7 @@ const follow = asyncHandler(async (req, res) => {
     } else {
       await user.updateOne({ $pull: { followers: req.user._id } });
       await currentUser.updateOne({ $pull: { following: req.params.id } });
-      const newUser = await User.findById(currentUser._id);
+      newUser = await User.findById(currentUser._id);
       return res
         .cookie("data", JSON.stringify(newUser), {
           sameSite: "none",
@@ -47,7 +47,6 @@ const bookmark = asyncHandler(async (req, res) => {
   console.log("req.user._id ", req.user._id);
   const post = await Post.findById(req.params.id);
   const user = await User.findById(req.user._id);
-  console.log("bookmark controller", user);
   try {
     if (!post.bookmarked.includes(req.user._id)) {
       await post.updateOne({ $push: { bookmarked: req.user._id } });

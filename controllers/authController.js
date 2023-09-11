@@ -34,6 +34,10 @@ const registration = asyncHandler(async (req, res) => {
       email: email,
       password: hashedPassword,
       name: name,
+      profile: {
+        public_id: "mp9mhqngt4ulnnkb6ssu",
+        url: "http://res.cloudinary.com/dj-sanghvi-college/image/upload/v1694360265/mp9mhqngt4ulnnkb6ssu.png",
+      },
     });
 
     const user = await newUser.save();

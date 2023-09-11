@@ -28,9 +28,8 @@ const UserSchema = new mongoose.Schema(
       type: String,
     },
     profile: {
-      type: String,
-      default:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKSLF2KD0x9KU5CwmXdqJjrphNQNmJgqzjPQ&usqp=CAU",
+      public_id: String,
+      url: String,
     },
     bio: {
       type: String,

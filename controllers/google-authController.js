@@ -18,7 +18,11 @@ const googleAuthDal = {
       name: oauthUser.displayName,
       provider: oauthUser.provider,
       email: oauthUser.emails[0].value,
-      photoURL: oauthUser.photos[0].value,
+      status: "Public",
+      profile: {
+        public_id: "mp9mhqngt4ulnnkb6ssu",
+        url: "http://res.cloudinary.com/dj-sanghvi-college/image/upload/v1694360265/mp9mhqngt4ulnnkb6ssu.png",
+      },
       isVerified: JSON.parse(oauthUser._raw).email_verified,
     });
     await user.save();

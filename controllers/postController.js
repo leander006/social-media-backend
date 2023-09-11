@@ -2,15 +2,19 @@ const asyncHandler = require("express-async-handler");
 const Comment = require("../model/Comment");
 const Post = require("../model/Post");
 const User = require("../model/User");
+const Like = require("../model/Like");
 const { cloudinary } = require("../utils/cloudinary");
 
 const createPost = asyncHandler(async (req, res) => {
-  const { caption } = req.body;
+  const { caption, content } = req.body;
   try {
     const newPost = new Post({
       owner: req.user._id,
+      content: {
+        public_id: content.public_id,
+        url: content.url,
+      },
       caption: caption,
-      content: req.body.content,
     });
 
     const post = await newPost.save();
@@ -19,10 +23,9 @@ const createPost = asyncHandler(async (req, res) => {
       { $inc: { postCount: 1 } },
       { new: true }
     );
-    res.status(200).json(post);
-    console.log("post ", post);
+    return res.status(200).json(post);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -30,11 +33,9 @@ const uploadPost = async (req, res) => {
   try {
     const fileStr = req.body.data;
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-      width: 720, // Desired width
-      height: 720, // Desired height
       crop: "fill",
     });
-    res.status(200).json({ data: uploadResponse.url });
+    res.status(200).json(uploadResponse);
   } catch (err) {
     console.error("err.message ", err.message);
     res.status(500).json({ err: "Something went wrong" });
@@ -68,6 +69,9 @@ const getPost = asyncHandler(async (req, res) => {
 
 // Delete post
 const deletePost = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  const user = await User.findById(req.user._id);
+
   try {
     await Post.findByIdAndDelete(req.params.id);
     await User.findByIdAndUpdate(
@@ -76,8 +80,11 @@ const deletePost = asyncHandler(async (req, res) => {
       { new: true }
     );
 
-    const result = await Comment.deleteMany({ commentable: req.params.id });
-    console.log("result ", result);
+    await Comment.deleteMany({ commentable: req.params.id });
+    await Like.deleteMany({ likeable: req.params.id });
+    await user.updateOne({ $pull: { likedPost: req.params.id } });
+    await user.updateOne({ $pull: { bookmarkedPost: req.params.id } });
+    await cloudinary.uploader.destroy(post.content.public_id);
     return res.status(200).json("Deleted successfully");
   } catch (error) {
     return res.status(500).send({ error: error.message });
@@ -94,7 +101,6 @@ const followingPost = asyncHandler(async (req, res) => {
       .populate({ path: "likes", populate: { path: "user" } })
       .populate({ path: "comments", populate: { path: "user" } })
       .sort({ createdAt: -1 });
-    // console.log("post ", post);
     const following = user.following;
     // Promise.all is use to get all post of user's following login user
     // console.log("following ", following);

@@ -7,8 +7,8 @@ const PostSchema = new mongoose.Schema(
       ref: "User",
     },
     content: {
-      type: String,
-      req: true,
+      public_id: String,
+      url: String,
     },
     caption: {
       type: String,
