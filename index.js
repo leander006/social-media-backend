@@ -38,15 +38,6 @@ mongoose
     console.log("invalid", err);
   });
 
-// app.use(function (req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept"
-//   );
-//   next();
-// });
-
 app.use(
   cors({
     origin: ["*"],
@@ -100,7 +91,6 @@ httpServer.listen(PORT, async () => {
 //Socket //
 
 const io = new Server(httpServer, { cors: { origin: "*" } });
-// const users = {};
 io.on("connection", (socket) => {
   socket.on("login", function (data) {
     users.set(data.userId, socket.id);
