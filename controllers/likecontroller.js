@@ -4,7 +4,6 @@ const Like = require("../model/Like");
 const User = require("../model/User");
 
 const like = async (req, res) => {
-  console.log("like controller");
   const modelId = req.params.id;
   const userId = req.user.id;
   const modelType = req.body.modelType;
@@ -23,7 +22,6 @@ const like = async (req, res) => {
       onModel: modelType,
       likeable: modelId,
     });
-    console.log("exists ", exists, "user ", user);
     if (exists) {
       likeable.likes.pull(exists.id);
       await likeable.save();
@@ -40,7 +38,6 @@ const like = async (req, res) => {
       await likeable.save();
     }
     const newUser = await User.findById(req.user._id);
-    console.log("new ", newUser);
     return res
       .cookie("data", JSON.stringify(newUser), {
         sameSite: "none",

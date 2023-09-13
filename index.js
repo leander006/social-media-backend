@@ -19,10 +19,10 @@ const {
   PORT,
   SESSION,
   SERVER_URL,
+  CLIENT_URL,
 } = require("./config/serverConfig");
 const session = require("express-session");
 const users = new Map();
-// const cookieParser = require("cookie-parser");
 const app = express();
 const httpServer = createServer(app);
 const passport = require("passport");
@@ -40,10 +40,9 @@ mongoose
 
 app.use(
   cors({
-    origin: ["*"],
+    origin: [CLIENT_URL, "http://localhost:3000"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
-    origin: true,
   })
 );
 
@@ -52,6 +51,13 @@ app.use(
     resave: false,
     saveUninitialized: true,
     secret: SESSION,
+    proxy: true,
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 24,
+    },
   })
 );
 
@@ -110,10 +116,11 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", (messageRecieved) => {
     var chat = messageRecieved.chat;
+    // console.log("message", messageRecieved);
     if (!chat.users) return console.log("Users are undefined");
     chat.users.forEach(async (user) => {
       if (user._id == messageRecieved.sender._id) return;
-      console.log(users.has(user._id));
+      // console.log(users.has(user._id));
       if (!users.has(user._id)) {
         await Notification.create({
           onModel: "Message",
@@ -138,7 +145,7 @@ io.on("connection", (socket) => {
         );
         if (data) {
           await Notification.findByIdAndDelete(data._id);
-          console.log("deleted");
+          // console.log("deleted");
         } else {
           console.log("no notification created for this user", user._id);
         }

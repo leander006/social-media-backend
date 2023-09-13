@@ -44,7 +44,6 @@ const follow = asyncHandler(async (req, res) => {
 //bookmark and remove bookmark //
 
 const bookmark = asyncHandler(async (req, res) => {
-  console.log("req.user._id ", req.user._id);
   const post = await Post.findById(req.params.id);
   const user = await User.findById(req.user._id);
   try {
@@ -56,7 +55,7 @@ const bookmark = asyncHandler(async (req, res) => {
       await user.updateOne({ $pull: { bookmarkedPost: req.params.id } });
     }
     const newUser = await User.findById(req.user._id);
-    console.log("new user ", newUser);
+    // console.log("new user ", newUser);
     res
       .cookie("data", JSON.stringify(newUser), {
         sameSite: "none",

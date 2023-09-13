@@ -11,7 +11,7 @@ const { SESSION } = require("../config/serverConfig");
 const particularUser = asyncHandler(async (req, res) => {
   const name = req.query.name;
   const userId = req.query.userId;
-  console.log(req.user._id);
+  // console.log(req.user._id);
   try {
     const users = name
       ? await User.find({
@@ -21,7 +21,7 @@ const particularUser = asyncHandler(async (req, res) => {
       : await User.findById(userId)
           .populate("following", "-password")
           .populate("followers", "-password");
-    console.log("name", name, "user ", users);
+    // console.log("name", name, "user ", users);
     return res.status(200).json(users);
   } catch (error) {
     return res.status(500).send({ error: error.message });

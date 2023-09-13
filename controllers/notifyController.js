@@ -21,7 +21,7 @@ const setNotifications = asyncHandler(async (req, res) => {
 const removeNotifications = asyncHandler(async (req, res) => {
   try {
     const data = await Notification.findByIdAndDelete(req.params.id);
-    console.log("delete ", data);
+    // console.log("delete ", data);
     res.status(200).json("deleted notifications");
   } catch (error) {
     res.status(500).json({ error: error.message });
