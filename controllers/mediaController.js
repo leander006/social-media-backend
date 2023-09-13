@@ -15,26 +15,30 @@ const follow = asyncHandler(async (req, res) => {
       await user.updateOne({ $push: { followers: req.user._id } });
       await currentUser.updateOne({ $push: { following: req.params.id } });
       newUser = await User.findById(currentUser._id);
-      return res
-        .cookie("data", JSON.stringify(newUser), {
-          sameSite: "none",
-          secure: true,
-          expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        })
-        .status(200)
-        .json(newUser);
+      return (
+        res
+          // .cookie("data", JSON.stringify(newUser), {
+          //   sameSite: "none",
+          //   secure: true,
+          //   expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          // })
+          .status(200)
+          .json(newUser)
+      );
     } else {
       await user.updateOne({ $pull: { followers: req.user._id } });
       await currentUser.updateOne({ $pull: { following: req.params.id } });
       newUser = await User.findById(currentUser._id);
-      return res
-        .cookie("data", JSON.stringify(newUser), {
-          sameSite: "none",
-          secure: true,
-          expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        })
-        .status(200)
-        .json(newUser);
+      return (
+        res
+          // .cookie("data", JSON.stringify(newUser), {
+          //   sameSite: "none",
+          //   secure: true,
+          //   expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          // })
+          .status(200)
+          .json(newUser)
+      );
     }
   } catch (error) {
     return res.status(500).send({ error: error.message });
@@ -57,11 +61,11 @@ const bookmark = asyncHandler(async (req, res) => {
     const newUser = await User.findById(req.user._id);
     // console.log("new user ", newUser);
     res
-      .cookie("data", JSON.stringify(newUser), {
-        sameSite: "none",
-        secure: true,
-        expire: new Date(Date.now() + 60 * 60 * 1000),
-      })
+      // .cookie("data", JSON.stringify(newUser), {
+      //   sameSite: "none",
+      //   secure: true,
+      //   expire: new Date(Date.now() + 60 * 60 * 1000),
+      // })
       .status(200)
       .json(newUser);
   } catch (error) {

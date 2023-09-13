@@ -3,6 +3,7 @@ const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 const express = require("express");
 const googleAuth = require("../controllers/google-authController");
 const router = express.Router();
+const localStorage = require("localStorage");
 const {
   GOOGLE_CALLBACK_URL,
   GOOGLE_CLIENT_SECRET,
@@ -36,7 +37,9 @@ router.get(
 // URL Must be same as 'Authorized redirect URIs' field of OAuth client, i.e: /auth/google/callback
 router.get(
   "/callback",
-  passport.authenticate("google", { failureRedirect: "/api/auth/google/error" }),
+  passport.authenticate("google", {
+    failureRedirect: "/api/auth/google/error",
+  }),
   (req, res) => {
     res.redirect("/api/auth/google/success"); // Successful authentication, redirect success.
   }
@@ -45,16 +48,9 @@ router.get(
 router.get("/success", async (req, res) => {
   const user = await googleAuth.registerWithGoogle(userProfile);
   const token = user.genJWT();
-  res.cookie("token", token, {
-    sameSite: "none",
-    secure: true,
-    expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  });
-  res.cookie("data", JSON.stringify(user), {
-    sameSite: "none",
-    secure: true,
-    expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  });
+
+  localStorage.setItem("token", token);
+  localStorage.setItem("data", req.user);
   res.redirect(CLIENT_URL);
 });
 

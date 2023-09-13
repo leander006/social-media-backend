@@ -94,19 +94,20 @@ const login = asyncHandler(async (req, res) => {
     if (user.isVerified === "true") {
       const { password, ...others } = user._doc;
       const token = user.genJWT();
-      res.cookie("token", token, {
-        sameSite: "none",
-        secure: true,
-        expire: new Date(Date.now() + "1d"),
-      });
       res
-        .cookie("data", JSON.stringify(others), {
-          sameSite: "none",
-          secure: true,
-          expire: new Date(Date.now() + "1d"),
-        })
+        // .cookie("token", token, {
+        //   sameSite: "none",
+        //   secure: true,
+        //   expire: new Date(Date.now() + "1d"),
+        // });
+        // res
+        //   .cookie("data", JSON.stringify(others), {
+        //     sameSite: "none",
+        //     secure: true,
+        //     expire: new Date(Date.now() + "1d"),
+        //   })
         .status(200)
-        .json(others);
+        .json({ others, token });
     }
 
     // //------------------------------------------//
