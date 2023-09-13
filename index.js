@@ -16,10 +16,10 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 const {
   MONGO_URI,
+  URL,
   PORT,
   SESSION,
   SERVER_URL,
-  CLIENT_URL,
 } = require("./config/serverConfig");
 const session = require("express-session");
 const users = new Map();
@@ -40,7 +40,7 @@ mongoose
 
 app.use(
   cors({
-    origin: [CLIENT_URL, "http://localhost:3000"],
+    origin: [URL, "http://localhost:3000"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
   })
@@ -51,13 +51,6 @@ app.use(
     resave: false,
     saveUninitialized: true,
     secret: SESSION,
-    proxy: true,
-    cookie: {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: 1000 * 60 * 60 * 24,
-    },
   })
 );
 

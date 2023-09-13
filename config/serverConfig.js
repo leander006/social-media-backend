@@ -22,4 +22,5 @@ module.exports = {
   PASSWORD: process.env.PASSWORD,
   CLIENT_URL: process.env.CLIENT_URL,
   SERVER_URL: process.env.SERVER_URL,
+  URL:process.env.URL
 };
