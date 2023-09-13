@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const notificationScheme = new mongoose.Schema(
+const notificationSchema = new mongoose.Schema(
   {
     onModel: {
       type: String,
@@ -31,4 +31,8 @@ const notificationScheme = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Notification", notificationScheme);
+const Notification =
+  mongoose.models.Notification ||
+  mongoose.model("Notification", notificationSchema);
+
+module.exports = Notification;

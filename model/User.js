@@ -101,4 +101,6 @@ UserSchema.methods.genJWT = function generate() {
   });
 };
 
-module.exports = mongoose.model("User", UserSchema);
+const User = mongoose.models.User || mongoose.model("User", UserSchema);
+
+module.exports = User;

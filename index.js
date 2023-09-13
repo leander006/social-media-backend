@@ -32,6 +32,7 @@ mongoose
   .connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    strictQuery: true,
   })
   .then(console.log("Connected to mongodb"))
   .catch((err) => {

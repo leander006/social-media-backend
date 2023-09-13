@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const likeScheme = new mongoose.Schema(
+const likeSchema = new mongoose.Schema(
   {
     onModel: {
       type: String,
@@ -23,4 +23,6 @@ const likeScheme = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Like", likeScheme);
+const Like = mongoose.models.Like || mongoose.model("Like", likeSchema);
+
+module.exports = Like;
