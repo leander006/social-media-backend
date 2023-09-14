@@ -48,9 +48,9 @@ app.use(
 
 app.use(
   session({
+    secret: SESSION,
     resave: false,
     saveUninitialized: true,
-    secret: SESSION,
   })
 );
 

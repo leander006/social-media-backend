@@ -3,7 +3,6 @@ const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 const express = require("express");
 const googleAuth = require("../controllers/google-authController");
 const router = express.Router();
-const localStorage = require("localStorage");
 const {
   GOOGLE_CALLBACK_URL,
   GOOGLE_CLIENT_SECRET,
@@ -45,13 +44,26 @@ router.get(
   }
 );
 
+// router.get("/success", async (req, res) => {
+// const user = await googleAuth.registerWithGoogle(userProfile);
+// const token = user.genJWT();
+//   // res.cookie("token", token, {
+//   //   sameSite: "none",
+//   //   secure: true,
+//   //   expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
+//   // });
+//   // res.cookie("data", JSON.stringify(user), {
+//   //   sameSite: "none",
+//   //   secure: true,
+//   //   expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
+//   // });
+//   res.redirect(CLIENT_URL);
+// });
 router.get("/success", async (req, res) => {
   const user = await googleAuth.registerWithGoogle(userProfile);
+  const { password, ...others } = user._doc;
   const token = user.genJWT();
-
-  localStorage.setItem("token", token);
-  localStorage.setItem("data", req.user);
-  res.redirect(CLIENT_URL);
+  res.redirect(`${CLIENT_URL}?token=${token}&data=${JSON.stringify(others)}`);
 });
 
 router.get("/error", (req, res) => res.send("Error logging in via Google.."));
