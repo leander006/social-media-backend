@@ -43,22 +43,6 @@ router.get(
     res.redirect("/api/auth/google/success"); // Successful authentication, redirect success.
   }
 );
-
-// router.get("/success", async (req, res) => {
-// const user = await googleAuth.registerWithGoogle(userProfile);
-// const token = user.genJWT();
-//   // res.cookie("token", token, {
-//   //   sameSite: "none",
-//   //   secure: true,
-//   //   expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
-//   // });
-//   // res.cookie("data", JSON.stringify(user), {
-//   //   sameSite: "none",
-//   //   secure: true,
-//   //   expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
-//   // });
-//   res.redirect(CLIENT_URL);
-// });
 router.get("/success", async (req, res) => {
   const user = await googleAuth.registerWithGoogle(userProfile);
   const { password, ...others } = user._doc;
