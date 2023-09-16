@@ -18,16 +18,17 @@ const {
   MONGO_URI,
   URL,
   PORT,
-  SESSION,
   SERVER_URL,
+  KEY,
 } = require("./config/serverConfig");
-const session = require("express-session");
+const session = require("cookie-session");
 const users = new Map();
 const app = express();
 const httpServer = createServer(app);
 const passport = require("passport");
 const Notification = require("./model/Notification");
 
+app.set("trust proxy", 1);
 mongoose.set("strictQuery", false);
 mongoose
   .connect(MONGO_URI, {
@@ -49,7 +50,7 @@ app.use(
 
 app.use(
   session({
-    secret: SESSION,
+    secret: `${KEY}`,
     resave: false,
     saveUninitialized: true,
   })
