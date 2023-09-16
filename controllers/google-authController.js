@@ -20,8 +20,8 @@ const googleAuthDal = {
       email: oauthUser.emails[0].value,
       status: "Public",
       profile: {
-        public_id: "mp9mhqngt4ulnnkb6ssu",
-        url: "http://res.cloudinary.com/dj-sanghvi-college/image/upload/v1694360265/mp9mhqngt4ulnnkb6ssu.png",
+        public_id: "uezeu97x7ypdtpekuymb",
+        url: "https://res.cloudinary.com/dj-sanghvi-college/image/upload/v1694856848/uezeu97x7ypdtpekuymb.png",
       },
       isVerified: JSON.parse(oauthUser._raw).email_verified,
     });
