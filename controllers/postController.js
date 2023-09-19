@@ -18,12 +18,12 @@ const createPost = asyncHandler(async (req, res) => {
     });
 
     const post = await newPost.save();
-    await User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
       req.user._id,
       { $inc: { postCount: 1 } },
       { new: true }
     );
-    return res.status(200).json(post);
+    return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -74,7 +74,7 @@ const deletePost = asyncHandler(async (req, res) => {
 
   try {
     await Post.findByIdAndDelete(req.params.id);
-    await User.findByIdAndUpdate(
+    const newUser = await User.findByIdAndUpdate(
       req.user._id,
       { $inc: { postCount: -1 } },
       { new: true }
@@ -85,7 +85,7 @@ const deletePost = asyncHandler(async (req, res) => {
     await user.updateOne({ $pull: { likedPost: req.params.id } });
     await user.updateOne({ $pull: { bookmarkedPost: req.params.id } });
     await cloudinary.uploader.destroy(post.content.public_id);
-    return res.status(200).json("Deleted successfully");
+    return res.status(200).json(newUser);
   } catch (error) {
     return res.status(500).send({ error: error.message });
   }
