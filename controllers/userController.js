@@ -1,7 +1,6 @@
 const User = require("../model/User");
 const asyncHandler = require("express-async-handler");
 const Post = require("../model/Post");
-const Message = require("../model/Message");
 const { cloudinary } = require("../utils/cloudinary");
 const Token = require("../model/Token");
 
@@ -41,7 +40,7 @@ const friendSearch = asyncHandler(async (req, res) => {
     if (users.length !== 0) {
       return res.status(200).json(users);
     }
-    return res.status(404).send({ error: "User doest not exist" });
+    return res.status(404).send({ error: "Please follower some users" });
   } catch (error) {
     return res.status(500).send({ error: error.message });
   }
