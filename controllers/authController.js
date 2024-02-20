@@ -36,7 +36,7 @@ const registration = asyncHandler(async (req, res) => {
       name: name,
       profile: {
         public_id: "mp9mhqngt4ulnnkb6ssu",
-        url: "http://res.cloudinary.com/dj-sanghvi-college/image/upload/v1694360265/mp9mhqngt4ulnnkb6ssu.png",
+        url: "https://res.cloudinary.com/dj-sanghvi-college/image/upload/v1697996657/noProfile_jjyqlm.jpg",
       },
     });
 
